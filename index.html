@@ -1,416 +1,350 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced 150 MCQ Simulator</title>
-    
+    <title>150-Question MCQ Mock Test</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc; /* slate-50 */
-            scroll-behavior: smooth;
         }
-
-        /* Custom radio button visual hiding but keeping functional */
-        input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
         }
-
-        /* Option Card Styling */
-        .option-card {
-            transition: all 0.2s ease;
-            cursor: pointer;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+            border-radius: 4px;
         }
-
-        /* Hover effect only when not disabled */
-        .option-card:not(.disabled):hover {
-            background-color: #f1f5f9; /* slate-100 */
-            border-color: #cbd5e1; /* slate-300 */
-        }
-
-        /* Selected State */
-        input[type="radio"]:checked + .option-content {
-            background-color: #eff6ff; /* blue-50 */
-            border-color: #3b82f6; /* blue-500 */
-            box-shadow: 0 0 0 2px #3b82f6;
-        }
-
-        /* Status States for Submission */
-        .option-card.correct-answer .option-content {
-            background-color: #f0fdf4 !important; /* green-50 */
-            border-color: #22c55e !important; /* green-500 */
-            box-shadow: 0 0 0 2px #22c55e !important;
-            color: #166534; /* green-800 */
-        }
-
-        .option-card.incorrect-answer .option-content {
-            background-color: #fef2f2 !important; /* red-50 */
-            border-color: #ef4444 !important; /* red-500 */
-            box-shadow: 0 0 0 2px #ef4444 !important;
-            color: #991b1b; /* red-800 */
-        }
-
-        .option-card.missed-correct .option-content {
-            background-color: #f0fdf4 !important;
-            border-color: #4ade80 !important;
-            border-style: dashed !important;
-            border-width: 2px !important;
-        }
-
-        .option-card.disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .option-card.disabled.correct-answer, 
-        .option-card.disabled.incorrect-answer,
-        .option-card.disabled.missed-correct {
-            opacity: 1; /* Keep results fully visible */
-        }
-
-        /* Custom scrollbar for better appearance */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
+        .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #cbd5e1; 
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8; 
+        }
+
+        /* Radio button custom styling */
+        input[type="radio"]:checked + span {
+            color: #1e40af; /* blue-800 */
+            font-weight: 600;
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen relative pb-24">
+<body class="h-screen w-full overflow-hidden text-slate-800 flex flex-col">
 
-    <header class="bg-white shadow-sm sticky top-0 z-40">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="bg-blue-600 p-2 rounded-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                </div>
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold text-slate-900 leading-tight">ExamPro Simulator</h1>
-                    <p class="text-xs text-slate-500">150 Questions • Randomized Pool</p>
-                </div>
-            </div>
-            <div class="hidden md:flex bg-slate-100 text-slate-700 px-4 py-1.5 rounded-full text-sm font-medium border border-slate-200">
-                <span id="pool-size-display">Loading pool...</span>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-4xl mx-auto px-4 mt-8 w-full">
-        
-        <div id="start-screen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 text-center max-w-2xl mx-auto mt-12 transition-all duration-300">
-            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-            </div>
-            <h2 class="text-3xl font-bold text-slate-900 mb-4">Ready for your Mock Exam?</h2>
-            <p class="text-slate-600 mb-8 text-lg">
-                The system has loaded a database of <strong class="text-slate-900" id="db-count">...</strong> questions. 
-                When you click start, exactly <strong class="text-slate-900">150 questions</strong> will be randomly selected and shuffled for your test.
-            </p>
+    <div id="start-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/90 backdrop-blur-sm transition-opacity duration-500">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-lg w-full text-center mx-4 transform transition-transform duration-300 scale-100">
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2">Mock Exam 2026</h1>
+            <p class="text-slate-500 mb-6 font-medium">Comprehensive Evaluation Test</p>
             
-            <div class="grid grid-cols-2 gap-4 mb-8 text-left max-w-md mx-auto">
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <div class="text-sm text-slate-500 uppercase font-semibold">Questions</div>
-                    <div class="text-2xl font-bold text-slate-800">150</div>
-                </div>
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <div class="text-sm text-slate-500 uppercase font-semibold">Passing Score</div>
-                    <div class="text-2xl font-bold text-slate-800">70%</div>
-                </div>
+            <div class="bg-slate-50 p-4 rounded-xl text-left mb-8 border border-slate-100">
+                <h3 class="font-bold text-slate-700 mb-2">Test Instructions:</h3>
+                <ul class="text-sm text-slate-600 space-y-2">
+                    <li class="flex items-start gap-2"><span class="text-blue-500">•</span> <strong>150 Questions</strong> across 5 subjects (Gujarati, English, Balvikas, Maths, Science).</li>
+                    <li class="flex items-start gap-2"><span class="text-blue-500">•</span> Duration: <strong>120 Minutes</strong>. Test auto-submits when time is up.</li>
+                    <li class="flex items-start gap-2"><span class="text-blue-500">•</span> You can navigate freely using the grid on the right.</li>
+                    <li class="flex flex-wrap items-center gap-2 mt-2">
+                        <span>Color codes:</span>
+                        <span class="inline-flex items-center gap-1"><div class="w-2.5 h-2.5 rounded bg-slate-200"></div> Unvisited</span>
+                        <span class="inline-flex items-center gap-1"><div class="w-2.5 h-2.5 rounded bg-red-500"></div> Unanswered</span>
+                        <span class="inline-flex items-center gap-1"><div class="w-2.5 h-2.5 rounded bg-green-500"></div> Answered</span>
+                    </li>
+                </ul>
             </div>
-
-            <button onclick="startTest()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-10 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-lg">
-                Start 150-Question Test
+            
+            <button onclick="startTest()" id="start-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-blue-200 flex justify-center items-center gap-2">
+                <span>Start Test Now</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>
         </div>
+    </div>
 
-        <div id="results-header" class="hidden bg-white rounded-2xl shadow-lg border-t-4 border-blue-600 p-6 md:p-8 mb-8 text-center animate-fade-in-down">
-            <h2 class="text-3xl md:text-4xl font-black text-slate-900 mb-2">Test Completed</h2>
-            <p class="text-slate-500 font-medium mb-8">Review your performance below.</p>
-            
-            <div class="flex flex-wrap justify-center items-center gap-6 md:gap-12 mb-8">
-                <div class="flex flex-col items-center">
-                    <div id="score-display" class="text-5xl md:text-6xl font-black text-blue-600 tracking-tight">0/150</div>
-                    <div class="text-sm text-slate-500 uppercase tracking-wider font-bold mt-2">Score</div>
+    <div id="app-container" class="h-full flex flex-col hidden opacity-0 transition-opacity duration-700">
+        
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-slate-200 py-3 px-4 md:px-6 flex justify-between items-center z-10 flex-shrink-0">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
-                <div class="h-20 w-px bg-slate-200 hidden md:block"></div>
-                <div class="flex flex-col items-center">
-                    <div id="percentage-display" class="text-4xl md:text-5xl font-bold text-slate-800 tracking-tight">0%</div>
-                    <div class="text-sm text-slate-500 uppercase tracking-wider font-bold mt-2">Accuracy</div>
-                </div>
-                <div class="h-20 w-px bg-slate-200 hidden md:block"></div>
-                <div class="flex flex-col items-center">
-                    <div id="status-display" class="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight px-4 py-1 rounded-lg">FAIL</div>
-                    <div class="text-sm text-slate-500 uppercase tracking-wider font-bold mt-2">Status</div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Mock Exam</h1>
+                    <p class="text-xs text-slate-500 font-medium">150 Questions Total</p>
                 </div>
             </div>
+            <div class="flex items-center gap-2 bg-red-50 px-4 py-2 rounded-xl border border-red-100 shadow-inner">
+                <svg class="w-5 h-5 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="timer-display" class="text-xl font-mono font-bold text-red-600 tracking-wider w-20 text-center">120:00</span>
+            </div>
+        </header>
+
+        <main class="flex-1 flex flex-col lg:flex-row overflow-hidden p-3 md:p-5 gap-5 bg-slate-50">
             
-            <div class="flex justify-center mt-6">
-                <button onclick="retakeTest()" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-8 rounded-xl shadow-sm transition-colors duration-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    Draw New 150 Questions & Retake
+            <!-- Left Area: Question Box -->
+            <section class="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden relative">
+                
+                <!-- Question Header -->
+                <div class="p-4 md:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm" id="question-number-badge">1</span>
+                        <span id="question-counter" class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Question 1 of 150</span>
+                    </div>
+                    <span id="question-subject" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider shadow-sm">
+                        Subject
+                    </span>
+                </div>
+                
+                <!-- Question Content -->
+                <div class="p-5 md:p-8 flex-1 overflow-y-auto custom-scrollbar">
+                    <h2 id="question-text" class="text-lg md:text-xl font-semibold text-slate-800 leading-relaxed mb-8">
+                        Loading question content...
+                    </h2>
+                    
+                    <!-- Options -->
+                    <div id="options-container" class="space-y-3 max-w-3xl">
+                        <!-- Options injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="p-4 md:p-6 border-t border-slate-100 bg-white flex flex-wrap justify-between items-center gap-3">
+                    <button id="btn-prev" onclick="changeQuestion(-1)" class="px-5 py-2.5 bg-white border-2 border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+                        &larr; Previous
+                    </button>
+                    
+                    <button id="btn-next" onclick="changeQuestion(1)" class="px-8 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+                        Next &rarr;
+                    </button>
+                    
+                    <div class="w-full sm:w-auto mt-2 sm:mt-0 ml-auto">
+                        <button onclick="confirmSubmit()" class="w-full sm:w-auto px-6 py-2.5 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-all shadow-md shadow-red-200">
+                            Submit Test
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Area: Navigation Grid -->
+            <aside class="w-full lg:w-96 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col flex-shrink-0 h-72 lg:h-auto overflow-hidden">
+                <div class="p-5 border-b border-slate-100 bg-white">
+                    <h3 class="font-bold text-slate-800 text-lg">Question Navigator</h3>
+                    
+                    <!-- Legend -->
+                    <div class="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs font-semibold text-slate-600">
+                        <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded bg-green-500 shadow-sm"></div> Answered</div>
+                        <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded bg-red-500 shadow-sm"></div> Unanswered</div>
+                        <div class="flex items-center gap-1.5"><div class="w-3 h-3 border border-slate-300 rounded bg-slate-50"></div> Unvisited</div>
+                    </div>
+                </div>
+
+                <!-- Grid Data -->
+                <div class="p-4 flex-1 overflow-y-auto custom-scrollbar bg-slate-50">
+                    <div id="nav-grid" class="grid grid-cols-6 sm:grid-cols-10 lg:grid-cols-5 gap-2">
+                        <!-- Buttons injected by JS -->
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <div id="confirm-modal" class="hidden absolute inset-0 z-[60] flex items-center justify-center bg-slate-900/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center mx-4">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 mb-2">Submit Test?</h3>
+            <p id="confirm-modal-text" class="text-slate-600 mb-8 font-medium">You have answered X out of 150 questions.</p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirmModal()" class="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                    Back to Test
+                </button>
+                <button onclick="calculateAndShowResults()" class="flex-1 px-4 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors shadow-lg shadow-red-200">
+                    Yes, Submit
                 </button>
             </div>
         </div>
+    </div>
 
-        <form id="quiz-form" class="hidden">
-            <div class="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-xl flex items-center justify-between text-sm md:text-base sticky top-20 z-30 shadow-sm backdrop-blur-sm bg-yellow-50/90">
-                <span class="font-medium">Progress: <span id="progress-text">0/150</span> answered</span>
-                <span id="unanswered-warning" class="text-red-600 font-semibold hidden">Please answer all questions!</span>
+    <div id="results-screen" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-slate-100">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl max-w-md w-full text-center mx-4 border border-slate-200">
+            <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
-
-            <div id="questions-container" class="space-y-6 md:space-y-8">
-                <!-- Javascript will inject 150 questions here -->
-            </div>
-
-            <!-- Sticky Submit Footer -->
-            <div id="submit-footer" class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] p-4 z-50 transition-transform duration-300">
-                <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
-                    <div class="hidden sm:block text-slate-600 font-medium text-sm">
-                        Ensure you have reviewed all <span class="font-bold text-slate-900">150 questions</span> before submitting.
-                    </div>
-                    <button type="button" id="submit-btn" onclick="submitTest()" class="w-full sm:w-auto flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 text-lg">
-                        Submit Test For Grading
-                    </button>
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2">Test Completed!</h1>
+            <p class="text-slate-500 mb-8 font-medium">Here is your final evaluation score.</p>
+            
+            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 mb-8 shadow-sm">
+                <p class="text-sm text-slate-500 font-bold uppercase tracking-widest mb-2">Total Score</p>
+                <div class="text-6xl font-black text-blue-600">
+                    <span id="final-score">0</span><span class="text-2xl text-slate-400 font-bold"> / 150</span>
                 </div>
             </div>
-        </form>
-    </main>
 
-   <script>
-        const TEST_SIZE = 150;
+            <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 px-6 rounded-xl transition-colors text-lg shadow-lg">
+                Restart Application
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const SUBJECTS = ['Gujarati', 'English', 'Balvikas', 'Maths', 'Science'];
+        const JSON_FILES = ['Gujarati.json', 'English.json', 'mcq_output.json', 'Maths.json', 'Science.json'];
+        const QUESTIONS_PER_SUBJECT = 30;
+        const TOTAL_QUESTIONS = SUBJECTS.length * QUESTIONS_PER_SUBJECT;
+        const TEST_DURATION_SECONDS = 120 * 60; // 120 minutes
         
-        let allSubjectsData = []; 
-        let currentTestQuestions = [];
-        let userAnswers = {};
-        let isTestActive = false;
+        // State
+        let questions = [];
+        let currentIdx = 0;
+        let answers = {}; // Maps question index -> selected option value
+        let visited = {}; // Maps question index -> boolean
+        
+        let timeLeft = TEST_DURATION_SECONDS;
+        let timerInterval = null;
 
-        // Proper shuffling algorithm
+        // Fisher-Yates Shuffle Algorithm (Utility)
         function shuffleArray(array) {
-            const shuffled = [...array]; 
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
             }
-            return shuffled;
+            return array;
         }
 
-        // DOM Elements
-        const elStartScreen = document.getElementById('start-screen');
-        const elQuizForm = document.getElementById('quiz-form');
-        const elQuestionsContainer = document.getElementById('questions-container');
-        const elResultsHeader = document.getElementById('results-header');
-        const elSubmitFooter = document.getElementById('submit-footer');
-        const elProgressText = document.getElementById('progress-text');
-        
-        function initApp() {
-            const subjectFiles = [
-              'english.json',
-              'gujarati.json',
-              'mcq_output.json',
-              'sanskrit.json',
-              'math.json'
-            ];
+        async function fetchQuestions() {
+            let tempQuestions = [];
+            let useMockFallback = false;
 
-            document.getElementById('pool-size-display').textContent = 'Loading files...';
-
-            Promise.all(subjectFiles.map(file => fetch(file).then(response => response.json())))
-              .then(subjectData => {
-                allSubjectsData = subjectData;
-                const totalQuestions = allSubjectsData.reduce((sum, subjectArray) => sum + subjectArray.length, 0);
-                
-                document.getElementById('pool-size-display').textContent = `Pool: ${totalQuestions} Qs`;
-                document.getElementById('db-count').textContent = totalQuestions;
-              })
-              .catch(error => {
-                console.error('Error loading the MCQ JSON files:', error);
-                document.getElementById('pool-size-display').textContent = 'Error loading files';
-              });
-        }
-
-        function startTest() {
-            if (allSubjectsData.length === 0) {
-                alert("Questions are still loading or failed to load. Please verify your JSON files are in the same folder.");
-                return;
-            }
-
-            // Reset state
-            userAnswers = {};
-            isTestActive = true;
-            elQuestionsContainer.innerHTML = ''; 
-            
-            let freshBalancedTest = [];
-            
-            // Loop through each of the 5 full subject arrays and pick 30 from each
-            allSubjectsData.forEach(subjectArray => {
-                const shuffledSubject = shuffleArray(subjectArray);
-                const selected30 = shuffledSubject.slice(0, 30);
-                freshBalancedTest.push(...selected30);
-            });
-            
-            // Shuffle the final 150 questions
-            currentTestQuestions = shuffleArray(freshBalancedTest);
-            
-            renderQuestions();
-            
-            // Update UI visibility
-            elStartScreen.classList.add('hidden');
-            elResultsHeader.classList.add('hidden');
-            elQuizForm.classList.remove('hidden');
-            elSubmitFooter.classList.remove('translate-y-full'); 
-            elSubmitFooter.classList.remove('hidden');
-            
-            updateProgress();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function renderQuestions() {
-            let htmlBuffer = '';
-
-            currentTestQuestions.forEach((q, index) => {
-                const questionNumber = index + 1;
-                
-                let optionsHtml = '';
-                q.options.forEach((opt, optIndex) => {
-                    const uniqueId = `q${q.id}_o${optIndex}`;
+            try {
+                // Fetch data for all subjects concurrently (optional optimization, doing it sequentially for clarity)
+                for (let i = 0; i < JSON_FILES.length; i++) {
+                    const subject = SUBJECTS[i];
+                    const file = JSON_FILES[i];
                     
-                    optionsHtml += `
-                        <label class="option-card block relative border border-slate-200 rounded-xl overflow-hidden cursor-pointer bg-white" id="label_${uniqueId}">
-                            <input type="radio" name="question_${q.id}" value="${optIndex}" onchange="handleSelection(${q.id}, ${optIndex})" id="${uniqueId}">
-                            <div class="option-content p-4 flex items-center min-h-[3.5rem]">
-                                <div class="w-8 h-8 rounded-full border-2 border-current flex items-center justify-center mr-4 flex-shrink-0 font-semibold text-sm opacity-60">
-                                    ${String.fromCharCode(65 + optIndex)}
-                                </div>
-                                <span class="text-slate-700 font-medium">${opt}</span>
-                                
-                                <svg class="correct-icon hidden w-6 h-6 ml-auto flex-shrink-0 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <svg class="incorrect-icon hidden w-6 h-6 ml-auto flex-shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </div>
-                        </label>
-                    `;
-                });
-
-                htmlBuffer += `
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 question-block" id="qblock_${q.id}">
-                        <div class="flex gap-4 mb-5">
-                            <span class="flex-shrink-0 w-8 h-8 bg-slate-100 text-slate-600 font-bold rounded-lg flex items-center justify-center">${questionNumber}</span>
-                            <h3 class="text-lg md:text-xl font-semibold text-slate-900 pt-0.5">${q.question}</h3>
-                        </div>
-                        <div class="space-y-3 pl-0 md:pl-12">
-                            ${optionsHtml}
-                        </div>
-                    </div>
-                `;
-            });
-
-            elQuestionsContainer.innerHTML = htmlBuffer;
-        }
-
-        function handleSelection(questionId, selectedIndex) {
-            if (!isTestActive) return; 
-            
-            userAnswers[questionId] = selectedIndex;
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const answeredCount = Object.keys(userAnswers).length;
-            elProgressText.textContent = `${answeredCount}/${TEST_SIZE}`;
-            
-            if (answeredCount === TEST_SIZE) {
-                document.getElementById('unanswered-warning').classList.add('hidden');
-            }
-        }
-
-        function submitTest() {
-            const answeredCount = Object.keys(userAnswers).length;
-            if (answeredCount < TEST_SIZE) {
-                const confirmed = confirm(`You have only answered ${answeredCount} out of ${TEST_SIZE} questions. Are you sure you want to submit?`);
-                if (!confirmed) {
-                    document.getElementById('unanswered-warning').classList.remove('hidden');
-                    return;
-                }
-            }
-
-            isTestActive = false;
-            let score = 0;
-
-            // Disable footer submit button
-            elSubmitFooter.classList.add('translate-y-full'); 
-            setTimeout(() => elSubmitFooter.classList.add('hidden'), 300);
-
-            // Grade questions and update UI
-            currentTestQuestions.forEach((q) => {
-                const userAnswer = userAnswers[q.id];
-                const correctAnswer = q.answer; // Assumes your JSON has an "answer" integer index
-
-                q.options.forEach((opt, optIndex) => {
-                    const uniqueId = `q${q.id}_o${optIndex}`;
-                    const labelEl = document.getElementById(`label_${uniqueId}`);
-                    const inputEl = document.getElementById(uniqueId);
+                    const response = await fetch(file);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status} for ${file}`);
                     
-                    // Disable all inputs
-                    inputEl.disabled = true;
-                    labelEl.classList.add('disabled');
-
-                    // Apply visual grading
-                    if (optIndex === correctAnswer && userAnswer === correctAnswer) {
-                        labelEl.classList.add('correct-answer');
-                        labelEl.querySelector('.correct-icon').classList.remove('hidden');
-                    } else if (optIndex === userAnswer && userAnswer !== correctAnswer) {
-                        labelEl.classList.add('incorrect-answer');
-                        labelEl.querySelector('.incorrect-icon').classList.remove('hidden');
-                    } else if (optIndex === correctAnswer && userAnswer !== correctAnswer) {
-                        labelEl.classList.add('missed-correct');
-                        labelEl.querySelector('.correct-icon').classList.remove('hidden');
+                    const data = await response.json();
+                    if (!Array.isArray(data) || data.length < QUESTIONS_PER_SUBJECT) {
+                        throw new Error(`Not enough questions in ${file}. Expected at least ${QUESTIONS_PER_SUBJECT}.`);
                     }
-                });
 
-                if (userAnswer === correctAnswer) {
-                    score++;
+                    // CRUCIAL REQUIREMENT: 
+                    // 1. Shuffle the ENTIRE array of questions fetched from the JSON file
+                    const completelyShuffledSubjectData = shuffleArray([...data]);
+                    
+                    // 2. Slice exactly 30 questions from the shuffled array
+                    const selected30 = completelyShuffledSubjectData.slice(0, QUESTIONS_PER_SUBJECT);
+                    
+                    // Format and push to our temporary pool
+                    selected30.forEach((q, idx) => {
+                        tempQuestions.push({
+                            id: q.id || `${subject}-fetched-${idx}`,
+                            subject: subject,
+                            text: q.text || `Question text missing`,
+                            options: q.options || ['Option A', 'Option B', 'Option C', 'Option D'],
+                            correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0
+                        });
+                    });
                 }
-            });
-
-            // Calculate and display results
-            const percentage = Math.round((score / TEST_SIZE) * 100);
-            document.getElementById('score-display').textContent = `${score}/${TEST_SIZE}`;
-            document.getElementById('percentage-display').textContent = `${percentage}%`;
-            
-            const statusEl = document.getElementById('status-display');
-            if (percentage >= 70) {
-                statusEl.textContent = 'PASS';
-                statusEl.className = 'text-3xl md:text-4xl font-bold tracking-tight px-4 py-1 rounded-lg bg-green-100 text-green-800';
-            } else {
-                statusEl.textContent = 'FAIL';
-                statusEl.className = 'text-3xl md:text-4xl font-bold tracking-tight px-4 py-1 rounded-lg bg-red-100 text-red-800';
+            } catch (error) {
+                console.warn("Fetch failed or missing files. Triggering Mock Fallback Logic. Reason:", error);
+                useMockFallback = true;
             }
 
-            // Scroll to results
-            elResultsHeader.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Fallback Logic (Demonstrates the same Shuffle -> Pick 30 principle)
+            if (useMockFallback) {
+                tempQuestions = []; // Reset just in case partial data loaded
+                
+                for (let i = 0; i < SUBJECTS.length; i++) {
+                    const subject = SUBJECTS[i];
+                    let mockSubjectPool = [];
+                    
+                    // Generate a pool of 50 mock questions for this subject
+                    // (This ensures we have more than 30 so the shuffle/slice is meaningful)
+                    for (let j = 1; j <= 50; j++) {
+                        mockSubjectPool.push({
+                            id: `${subject}-mock-${j}`,
+                            subject: subject,
+                            text: `<b>[Mock Data]</b> This is simulated question #${j} for the subject <b>${subject}</b>. Which option is correct?`,
+                            options: [
+                                `Option A (Question ${j})`, 
+                                `Option B (Question ${j})`, 
+                                `Option C (Question ${j})`, 
+                                `Option D (Question ${j})`
+                            ],
+                            correctAnswer: Math.floor(Math.random() * 4) // random answer 0-3
+                        });
+                    }
+
+                    // CRUCIAL REQUIREMENT (Fallback):
+                    // 1. Shuffle the 50 mock questions
+                    const completelyShuffledMockPool = shuffleArray(mockSubjectPool);
+                    
+                    // 2. Slice exactly 30 questions
+                    const selectedMock30 = completelyShuffledMockPool.slice(0, QUESTIONS_PER_SUBJECT);
+                    
+                    // Add to total pool
+                    tempQuestions.push(...selectedMock30);
+                }
+            }
+
+            // CRUCIAL REQUIREMENT: 
+            // Finally, shuffle the combined array of 150 questions so subjects are thoroughly mixed
+            questions = shuffleArray(tempQuestions);
         }
 
-        function retakeTest() {
-            startTest();
+        function initGrid() {
+            const gridContainer = document.getElementById('nav-grid');
+            gridContainer.innerHTML = ''; 
+            
+            for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                const btn = document.createElement('button');
+                btn.id = `grid-btn-${i}`;
+                btn.innerText = i + 1;
+                btn.onclick = () => jumpToQuestion(i);
+                
+                // Base classes
+                btn.className = 'h-10 w-full rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center relative cursor-pointer border';
+                
+                gridContainer.appendChild(btn);
+                updateGridButtonClass(i); 
+            }
         }
 
-        // Initialize on page load
-        window.addEventListener('DOMContentLoaded', initApp);
-    </script>
-</body>
-</html>
-                                labelEl.querySelector('.correct-icon').classList.remove('hid
+        function updateGridButtonClass(idx) {
+            const btn = document.getElementById(`grid-btn-${idx}`);
+            if (!btn) return;
+
+            const isCurrent = (idx === currentIdx);
+            const isAnswered = (answers[idx] !== undefined);
+            const isVisited = visited[idx];
+
+            // Clean state classes
+            btn.className = 'h-10 w-full rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center cursor-pointer border';
+
+            if (isAnswered) {
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-sm');
+            } else if (isVisited) {
+                btn.classList.add('bg-red-500', 'text-white', 'border-red-600', 'shadow-sm');
+            } else {
+                btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-100');
+            }
+
+            // Add focus ring for current question
+            if (isCurrent) {
+                btn.classList.add('ring-2', 'ring-blue-600', 'ring-offset-2', 'scale-105', 'z-10');
+                // Auto scroll grid to view the active button nicely
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function renderQuestion() {
