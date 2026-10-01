@@ -346,5 +346,185 @@
                 btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
+            function renderQuestion() {
+            const q = questions[currentIdx];
+            visited[currentIdx] = true;
+            
+            // Header Text
+            document.getElementById('question-counter').innerText = `Question ${currentIdx + 1} of ${TOTAL_QUESTIONS}`;
+            document.getElementById('question-number-badge').innerText = currentIdx + 1;
+            document.getElementById('question-subject').innerText = q.subject;
+            
+            // Body Text
+            document.getElementById('question-text').innerHTML = q.text;
 
-        function renderQuestion() {
+            // Options
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            
+            q.options.forEach((optText, optIdx) => {
+                const isSelected = answers[currentIdx] === optIdx;
+                
+                const label = document.createElement('label');
+                label.className = `flex items-start p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                    isSelected 
+                    ? 'bg-blue-50 border-blue-500 shadow-sm' 
+                    : 'bg-white border-slate-100 hover:border-slate-300 hover:bg-slate-50'
+                }`;
+                
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `question-radio-group`;
+                radio.value = optIdx;
+                radio.checked = isSelected;
+                // visually hidden but accessible
+                radio.className = 'mt-1 w-5 h-5 text-blue-600 bg-slate-100 border-slate-300 focus:ring-blue-500 cursor-pointer flex-shrink-0';
+                radio.onchange = () => handleOptionSelect(optIdx);
+
+                const span = document.createElement('span');
+                span.className = `ml-3 text-base pt-0.5 ${isSelected ? 'text-blue-900 font-semibold' : 'text-slate-700 font-medium'}`;
+                span.innerText = optText;
+
+                label.appendChild(radio);
+                label.appendChild(span);
+                optsContainer.appendChild(label);
+            });
+
+            // Nav Buttons
+            document.getElementById('btn-prev').disabled = currentIdx === 0;
+            document.getElementById('btn-next').disabled = currentIdx === TOTAL_QUESTIONS - 1;
+
+            // Update all grid buttons to refresh states (efficient enough for 150 items)
+            for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                updateGridButtonClass(i);
+            }
+        }
+
+        function handleOptionSelect(optIdx) {
+            answers[currentIdx] = optIdx;
+            renderQuestion(); // Re-render to show selected styling instantly
+        }
+
+        function changeQuestion(step) {
+            const newIdx = currentIdx + step;
+            if (newIdx >= 0 && newIdx < TOTAL_QUESTIONS) {
+                currentIdx = newIdx;
+                renderQuestion();
+            }
+        }
+
+        function jumpToQuestion(idx) {
+            currentIdx = idx;
+            renderQuestion();
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    autoSubmitTest();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft / 60);
+            const s = Math.floor(timeLeft % 60);
+            const display = document.getElementById('timer-display');
+            display.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                
+            // Warning color animation < 5 mins
+            if (timeLeft < 300) {
+                display.classList.remove('text-red-600');
+                display.classList.add('text-red-700', 'animate-bounce');
+            }
+        }
+
+        function confirmSubmit() {
+            const answeredCount = Object.keys(answers).length;
+            document.getElementById('confirm-modal-text').innerText = `You have answered ${answeredCount} out of ${TOTAL_QUESTIONS} questions. Are you sure you want to finalize your submission?`;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        function autoSubmitTest() {
+            // When timer runs out
+            calculateAndShowResults();
+        }
+
+        function calculateAndShowResults() {
+            clearInterval(timerInterval);
+            closeConfirmModal();
+            
+            let score = 0;
+            for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+                if (answers[i] !== undefined && answers[i] === questions[i].correctAnswer) {
+                    score++;
+                }
+            }
+
+            // Hide Main App Container
+            document.getElementById('app-container').classList.add('hidden');
+            
+            // Show Results Screen
+            const resultScreen = document.getElementById('results-screen');
+            resultScreen.classList.remove('hidden');
+            
+            // Animate Score Counting (Optional Polish)
+            let currentScore = 0;
+            const scoreDisplay = document.getElementById('final-score');
+            const scoreInterval = setInterval(() => {
+                if (currentScore >= score) {
+                    clearInterval(scoreInterval);
+                    scoreDisplay.innerText = score;
+                } else {
+                    currentScore++;
+                    scoreDisplay.innerText = currentScore;
+                }
+            }, 20); // ms delay for animation
+        }
+
+        async function startTest() {
+            const startBtn = document.getElementById('start-btn');
+            startBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Processing Files...
+            `;
+            startBtn.disabled = true;
+
+            // Wait for fetch & shuffle logic
+            await fetchQuestions();
+
+            // Hide Start Screen
+            const startScreen = document.getElementById('start-screen');
+            startScreen.classList.add('opacity-0');
+            
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                
+                // Reveal Main Screen
+                const appContainer = document.getElementById('app-container');
+                appContainer.classList.remove('hidden');
+                
+                // Allow browser reflow before fade in
+                requestAnimationFrame(() => {
+                    appContainer.classList.remove('opacity-0');
+                });
+                
+                // Initialize Test View
+                initGrid();
+                currentIdx = 0;
+                renderQuestion();
+                startTimer();
+                
+            }, 500);
+        }
+    </script>
+</body>
+</html>
