@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>150-Question Mixed-Subject MCQ Test</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            scroll-behavior: smooth;
+        }
+
+        /* Hide native radio buttons visually but keep functional for accessibility */
+        input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* Option Card Styles */
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background-color: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .option-label:hover:not(.disabled) {
+            border-color: #cbd5e1;
+            background-color: #f1f5f9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        /* Selected State */
+        input[type="radio"]:checked + .option-label {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+
+        /* Marker Circle (A, B, C, D) */
+        .option-marker {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: 700;
+            color: #64748b;
+            background: white;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        input[type="radio"]:checked + .option-label .option-marker {
+            border-color: #3b82f6;
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        /* Post-Submit Evaluated States */
+        .option-label.disabled {
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* User selected correctly, or just highlighting correct answer */
+        .option-label.correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #166534;
+        }
+        .option-label.correct .option-marker {
+            border-color: #22c55e !important;
+            background-color: #22c55e !important;
+            color: white;
+        }
+
+        /* User selected wrong answer */
+        .option-label.incorrect {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #991b1b;
+            opacity: 0.8;
+        }
+        .option-label.incorrect .option-marker {
+            border-color: #ef4444 !important;
+            background-color: #ef4444 !important;
+            color: white;
+        }
+
+        /* Showing correct answer when user missed it */
+        .option-label.missed-correct {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            border-style: dashed !important;
+            border-width: 2px !important;
+            color: #166534;
+        }
+        .option-label.missed-correct .option-marker {
+            border-color: #22c55e !important;
+            color: #22c55e;
+            background-color: white !important;
+        }
+
+        /* Evaluation Icons */
+        .status-icon {
+            margin-left: auto;
+            display: none;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .option-label.correct .status-icon.icon-check,
+        .option-label.incorrect .status-icon.icon-cross,
+        .option-label.missed-correct .status-icon.icon-check {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Subject Badge Colors */
+        .badge-Gujarati { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .badge-Maths { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-GK { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-English { background-color: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
+        .badge-Balvikas { background-color: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-once {
+            animation: pulseOnce 0.3s ease-in-out;
+        }
+        @keyframes pulseOnce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200 sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight">150-Question Mixed-Subject Test</h1>
+                <p class="text-sm text-slate-500 font-medium mt-0.5">30 questions from each subject, shuffled every test</p>
+            </div>
+            
+            <div class="flex items-center gap-4 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-200 shadow-inner">
+                <div class="flex flex-col items-center justify-center">
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Answered</span>
+                    <div class="text-xl font-black text-blue-600 leading-none">
+                        <span id="global-progress">0</span> <span class="text-slate-400 text-base font-semibold">/ <span class="total-questions">0</span></span>
+                    </div>
+                </div>
+                <div class="h-10 w-px bg-slate-300 mx-1"></div>
+                <button onclick="attemptSubmit()" id="header-submit-btn" class="bg-slate-800 hover:bg-black text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+                    Submit Test
+                </button>
+            </div>
+        </div>
+        
+        <!-- Minimal progress bar -->
+        <div class="w-full bg-slate-100 h-1">
+            <div id="progress-bar" class="bg-blue-600 h-1 w-0 transition-all duration-300 ease-out"></div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-8 relative pb-32">
+
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <h2 class="text-lg font-black text-slate-800">Subject question banks</h2>
+                <p class="text-sm text-slate-500">Each test draws 30 from every bank, then shuffles all 150.</p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"><div class="font-bold text-amber-900">Gujarati MCQ</div><div class="text-xs text-amber-700">30 per test</div></div>
+                <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3"><div class="font-bold text-sky-900">Maths MCQ</div><div class="text-xs text-sky-700">30 per test</div></div>
+                <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3"><div class="font-bold text-green-900">GK MCQ</div><div class="text-xs text-green-700">30 per test</div></div>
+                <div class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3"><div class="font-bold text-violet-900">English MCQ</div><div class="text-xs text-violet-700">30 per test</div></div>
+                <div class="rounded-xl border border-pink-200 bg-pink-50 px-4 py-3"><div class="font-bold text-pink-900">Balvikas MCQ</div><div class="text-xs text-pink-700">30 selected from 1,000</div></div>
+            </div>
+        </section>
+        
+        <div id="results-panel" class="hidden bg-white rounded-3xl shadow-xl border border-slate-200 p-8 sm:p-12 mb-10 text-center overflow-hidden relative">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500"></div>
+            <h2 class="text-4xl font-black text-slate-800 mb-3 tracking-tight">Exam Complete</h2>
+            <p class="text-slate-500 mb-10 text-lg">Detailed performance analysis is ready below.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-6 sm:gap-8 mb-10">
+                <div class="bg-blue-50/50 border border-blue-100 rounded-3xl p-8 min-w-[220px] transform transition hover:scale-105 duration-300">
+                    <div class="text-sm text-blue-800 font-bold uppercase tracking-widest mb-2">Final Score</div>
+                    <div class="text-7xl font-black text-blue-600 tracking-tighter"><span id="final-score">0</span><span class="text-3xl text-blue-300 font-bold">/<span id="final-total">0</span></span></div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-3xl p-8 min-w-[220px] transform transition hover:scale-105 duration-300">
+                    <div class="text-sm text-slate-500 font-bold uppercase tracking-widest mb-2">Accuracy</div>
+                    <div class="text-7xl font-black text-slate-700 tracking-tighter" id="final-percentage">0%</div>
+                </div>
+            </div>
+
+            <div class="text-left">
+                <h3 class="text-lg font-bold text-slate-700 mb-4 px-2">Subject Breakdown</h3>
+                <div id="subject-breakdown" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                    <!-- Subject breakdown injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <div id="test-container" class="space-y-6 w-full">
+            <!-- Questions injected via JS -->
+        </div>
+
+        <div id="bottom-submit-container" class="mt-12 flex justify-center pb-12">
+            <button onclick="attemptSubmit()" class="bg-blue-600 hover:bg-blue-700 text-white font-black text-xl py-5 px-16 rounded-2xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center gap-3">
+                Submit & Grade Exam
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // 1. Configuration & Data Structures
+        const SUBJECTS = [
+            { name: 'Gujarati', class: 'badge-Gujarati' },
+            { name: 'Maths', class: 'badge-Maths' },
+            { name: 'GK', class: 'badge-GK' },
+            { name: 'English', class: 'badge-English' },
+            { name: 'Balvikas', class: 'badge-Balvikas' }
+        ];
+        
+        const CORE_SUBJECTS = SUBJECTS.filter(subject => subject.name !== 'Balvikas');
+        const QUESTIONS_TO_SELECT_PER_SUBJECT = 30; // Pick 30 per subject
+        const BALVIKAS_DATA_URL = './balvikas_1790933418838.json';
+        let TOTAL_QUESTIONS = 0;
+
+        // Previous subject banks retained as source material; only ACTIVE_QUESTION_DATA is used.
+        // Each entry is [question, options, correctOptionIndex].
+        const ARCHIVED_QUESTION_DATA = {
+            Mathematics: [
+                ["Solve 3x + 5 = 20.", ["3", "5", "7", "8"], 1],
+                ["What is the area of a rectangle 8 cm long and 5 cm wide?", ["13 cm²", "26 cm²", "40 cm²", "80 cm²"], 2],
+                ["What is the square root of 81?", ["7", "8", "9", "12"], 2],
+                ["A triangle has angles of 50° and 60°. What is its third angle?", ["60°", "70°", "80°", "90°"], 1],
+                ["What is 25% of 240?", ["40", "50", "60", "80"], 2],
+                ["What is the mean of 6, 8, 10, and 12?", ["8", "9", "10", "12"], 1],
+                ["What is 3/4 + 1/8?", ["4/8", "5/8", "6/8", "7/8"], 3],
+                ["Two numbers are in the ratio 2:3 and add to 25. What is the smaller number?", ["5", "10", "15", "20"], 1],
+                ["What is the circumference of a circle with radius 7 cm? Use π = 22/7.", ["14 cm", "22 cm", "44 cm", "49 cm"], 2],
+                ["What is the probability of getting heads in one toss of a fair coin?", ["0", "1/4", "1/2", "1"], 2],
+                ["Solve 2x - 3 = 11.", ["5", "6", "7", "8"], 2],
+                ["Which fraction is equal to 0.6?", ["1/2", "3/5", "2/3", "3/4"], 1],
+                ["What is the perimeter of a square with side 6 cm?", ["12 cm", "18 cm", "24 cm", "36 cm"], 2],
+                ["What is 5³?", ["25", "75", "125", "625"], 2],
+                ["What is 40% of 90?", ["18", "27", "36", "45"], 2],
+                ["What is the perimeter of a rectangle 9 cm long and 4 cm wide?", ["13 cm", "26 cm", "36 cm", "72 cm"], 1],
+                ["What is 12 × 15?", ["150", "170", "180", "190"], 2],
+                ["What is 144 ÷ 12?", ["10", "11", "12", "14"], 2],
+                ["Simplify 3x + 2x.", ["5x", "6x", "x²", "5 + x"], 0],
+                ["Expand (x + 2)(x + 3).", ["x² + 5x + 6", "x² + 6x + 5", "x² + x + 6", "2x² + 5"], 0],
+                ["A triangle has base 12 cm and height 5 cm. What is its area?", ["17 cm²", "30 cm²", "60 cm²", "120 cm²"], 1],
+                ["What is the median of 2, 5, 7, 9, and 12?", ["5", "6", "7", "9"], 2],
+                ["How many metres are in 1.5 kilometres?", ["150 m", "1,500 m", "15,000 m", "150,000 m"], 1],
+                ["What is the volume of a cube with side 4 cm?", ["16 cm³", "32 cm³", "64 cm³", "96 cm³"], 2],
+                ["Which decimal is equal to 7/10?", ["0.07", "0.7", "7.1", "70"], 1],
+                ["Solve x/5 = 9.", ["14", "35", "40", "45"], 3],
+                ["What is the sum of the interior angles of a triangle?", ["90°", "180°", "270°", "360°"], 1],
+                ["If y = 3x + 2, what is y when x = 4?", ["10", "12", "14", "16"], 2],
+                ["Which of these numbers is prime?", ["21", "27", "29", "33"], 2],
+                ["A right triangle has legs of 6 cm and 8 cm. What is its hypotenuse?", ["9 cm", "10 cm", "12 cm", "14 cm"], 1]
+            ],
+            Physics: [
+                ["What is the SI unit of force?", ["Joule", "Newton", "Watt", "Pascal"], 1],
+                ["A runner travels 100 m in 20 s. What is the average speed?", ["2 m/s", "5 m/s", "20 m/s", "80 m/s"], 1],
+                ["What force accelerates a 4 kg object at 2 m/s²?", ["2 N", "6 N", "8 N", "16 N"], 2],
+                ["What is the SI unit of energy?", ["Ampere", "Joule", "Newton", "Volt"], 1],
+                ["Which cannot travel through a vacuum?", ["Light", "Radio waves", "Sound", "X-rays"], 2],
+                ["Where does light travel fastest?", ["In a vacuum", "In water", "In glass", "In air"], 0],
+                ["What is the SI unit of electric current?", ["Ampere", "Coulomb", "Ohm", "Volt"], 0],
+                ["A 12 V supply is connected to a 4 Ω resistor. What current flows?", ["0.33 A", "3 A", "8 A", "48 A"], 1],
+                ["A device transfers 60 J of energy in 10 s. What is its power?", ["6 W", "10 W", "50 W", "600 W"], 0],
+                ["A sample has mass 300 g and volume 100 cm³. What is its density?", ["0.3 g/cm³", "3 g/cm³", "30 g/cm³", "300 g/cm³"], 1],
+                ["According to Newton's third law, forces in an interaction are:", ["Equal and opposite", "Always in the same direction", "Unrelated in size", "Present only when objects move"], 0],
+                ["What is the approximate acceleration due to gravity near Earth's surface?", ["1.0 m/s²", "4.9 m/s²", "9.8 m/s²", "98 m/s²"], 2],
+                ["A 10 N force moves an object 4 m in the force's direction. How much work is done?", ["2.5 J", "14 J", "40 J", "400 J"], 2],
+                ["In a series circuit, what is the same through every component?", ["Current", "Resistance", "Voltage", "Power"], 0],
+                ["What is the SI unit of frequency?", ["Hertz", "Joule", "Metre", "Watt"], 0],
+                ["For a reflected ray, the angle of reflection is measured from the normal and is:", ["Equal to the angle of incidence", "Twice the angle of incidence", "Always 90°", "Always zero"], 0],
+                ["Friction generally acts to:", ["Increase mass", "Oppose relative motion", "Create a vacuum", "Remove gravity"], 1],
+                ["Which change increases an object's gravitational potential energy near Earth's surface?", ["Lowering its height", "Reducing its mass", "Raising its height", "Reducing gravity to zero"], 2],
+                ["A 100 N force acts on an area of 2 m². What pressure is applied?", ["20 Pa", "50 Pa", "100 Pa", "200 Pa"], 1],
+                ["What does the conservation of energy principle say?", ["Energy can be created from nothing", "Energy disappears in every process", "Energy changes form but is conserved", "Only moving objects have energy"], 2],
+                ["What happens when two like magnetic poles are brought together?", ["They attract", "They repel", "They lose all magnetism", "They become electric charges"], 1],
+                ["A transformer operates using:", ["A steady direct current only", "A changing magnetic field", "Chemical reactions", "Static friction"], 1],
+                ["Wavelength is the distance between:", ["A crest and the next trough", "Two successive crests", "A wave and its source", "The source and the medium"], 1],
+                ["At standard atmospheric pressure, pure water boils at approximately:", ["0°C", "50°C", "100°C", "212°C"], 2],
+                ["How is heat mainly transferred through a metal rod?", ["Conduction", "Evaporation", "Reflection", "Refraction"], 0],
+                ["An astronaut takes a rock from Earth to the Moon. Which property stays the same?", ["Weight", "Mass", "Gravitational force", "Potential energy"], 1],
+                ["Which is a scalar quantity?", ["Acceleration", "Displacement", "Force", "Speed"], 3],
+                ["How does evaporation differ from boiling?", ["It occurs only at the boiling point", "It can occur at the liquid's surface below the boiling point", "It happens only inside a liquid", "It turns a gas into a solid"], 1],
+                ["What happens to current in a simple circuit when the switch opens?", ["It increases without limit", "It stops flowing", "It changes into voltage", "It flows only through the battery"], 1],
+                ["What does a convex lens do to parallel rays of light?", ["Converges them", "Absorbs all of them", "Turns them into sound", "Makes them permanently parallel"], 0]
+            ],
+            Chemistry: [
+                ["What does the atomic number of an element give?", ["Number of protons", "Number of neutrons only", "Number of shells", "Total number of molecules"], 0],
+                ["What is the chemical formula for water?", ["CO₂", "H₂O", "NaCl", "O₂"], 1],
+                ["At 25°C, a solution with pH 7 is:", ["Acidic", "Basic", "Neutral", "A metal"], 2],
+                ["What is the name of NaCl?", ["Calcium carbonate", "Sodium chloride", "Sodium hydroxide", "Carbon dioxide"], 1],
+                ["What is the name of CO₂?", ["Carbon monoxide", "Carbon dioxide", "Calcium oxide", "Cobalt"], 1],
+                ["What is the charge of an electron?", ["Positive", "Negative", "Neutral", "It has no charge unless heated"], 1],
+                ["Which subatomic particle has no electric charge?", ["Electron", "Neutron", "Proton", "Ion"], 1],
+                ["What is the charge of a proton?", ["Positive", "Negative", "Neutral", "It changes in every atom"], 0],
+                ["How can the components of a mixture usually be separated?", ["Only by a nuclear reaction", "By physical methods", "They cannot be separated", "Only by adding a catalyst"], 1],
+                ["What does an acid do to blue litmus paper?", ["Turns it red", "Turns it green", "Leaves it blue in every case", "Turns it white"], 0],
+                ["At 25°C, a solution with pH 10 is:", ["Acidic", "Neutral", "Basic", "A pure element"], 2],
+                ["Which method separates an insoluble solid from a liquid?", ["Filtration", "Distillation", "Chromatography only", "Freezing"], 0],
+                ["How can dissolved salt be recovered from salt water?", ["Use a magnet", "Evaporate the water", "Filter through paper", "Use a sieve"], 1],
+                ["What is evidence of a chemical change?", ["A new substance forms", "A solid is cut into pieces", "Water changes shape in a cup", "A mixture is sorted by hand"], 0],
+                ["An exothermic reaction:", ["Absorbs heat from its surroundings", "Releases heat to its surroundings", "Has no energy change", "Can occur only in sunlight"], 1],
+                ["What does a catalyst do in a chemical reaction?", ["Changes the reaction rate without being used up overall", "Becomes the only product", "Stops all particle motion", "Changes the atoms into different elements"], 0],
+                ["In a covalent bond, atoms generally:", ["Share pairs of electrons", "Share protons", "Transfer neutrons", "Lose their nuclei"], 0],
+                ["An ionic bond forms through:", ["Sharing of neutrons", "Transfer of electrons and attraction between ions", "Fusion of nuclei", "Sharing of whole atoms"], 1],
+                ["What is the formula of an oxygen molecule?", ["O", "O₂", "O₃ only", "CO₂"], 1],
+                ["A horizontal row in the periodic table is called a:", ["Group", "Period", "Family of compounds", "Shell"], 1],
+                ["A vertical column in the periodic table is called a:", ["Period", "Group", "Mixture", "Molecule"], 1],
+                ["Which particles are found in an atom's nucleus?", ["Electrons only", "Protons and neutrons", "Protons and electrons", "Neutrons and electrons"], 1],
+                ["Iron rusts when it reacts over time with:", ["Oxygen and water", "Nitrogen only", "Helium and salt", "Carbon dioxide only"], 0],
+                ["In a closed system, what happens to total mass during a chemical reaction?", ["It is conserved", "It always doubles", "It always becomes zero", "It depends only on the container's colour"], 0],
+                ["Sublimation is the change from:", ["Solid directly to gas", "Gas directly to liquid", "Liquid to solid", "Liquid to gas at its boiling point only"], 0],
+                ["Distillation separates substances mainly by differences in their:", ["Boiling points", "Colours", "Magnetic poles", "Particle charges"], 0],
+                ["How many oxygen atoms are in one molecule of CO₂?", ["One", "Two", "Three", "Four"], 1],
+                ["Which gas makes up about 78% of Earth's dry atmosphere?", ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"], 1],
+                ["A hydrocarbon contains which elements?", ["Carbon and hydrogen", "Hydrogen and oxygen only", "Carbon and nitrogen only", "Sodium and chlorine"], 0],
+                ["When an acid neutralizes a base, the usual products are:", ["Salt and water", "Oxygen and hydrogen only", "Two acids", "A metal and carbon"], 0]
+            ],
+            Biology: [
+                ["What is the basic structural and functional unit of living organisms?", ["Atom", "Cell", "Organ", "Tissue"], 1],
+                ["Which cell structure contains most of a eukaryotic cell's genetic material?", ["Cell wall", "Nucleus", "Ribosome", "Vacuole"], 1],
+                ["Which organelle is a major site of cellular respiration in eukaryotic cells?", ["Mitochondrion", "Chloroplast", "Cell wall", "Golgi body"], 0],
+                ["Which organelle carries out photosynthesis in plant cells?", ["Chloroplast", "Mitochondrion", "Nucleus", "Ribosome"], 0],
+                ["What is chlorophyll's main role in photosynthesis?", ["Absorb light energy", "Digest proteins", "Carry oxygen in blood", "Store genetic information"], 0],
+                ["Which substances are used by plants as raw materials for photosynthesis?", ["Carbon dioxide and water", "Oxygen and glucose", "Nitrogen and protein", "Salt and oxygen"], 0],
+                ["Which blood cells mainly carry oxygen around the body?", ["Red blood cells", "Platelets", "Neurons", "Skin cells"], 0],
+                ["What is the heart's main function?", ["Pump blood", "Filter urine", "Exchange gases with air", "Produce digestive enzymes"], 0],
+                ["Which organs filter blood and produce urine?", ["Kidneys", "Lungs", "Stomach", "Pancreas"], 0],
+                ["Where does gas exchange occur in the lungs?", ["Alveoli", "Tracheal cartilage", "Diaphragm", "Ribs"], 0],
+                ["What is the main function of a neuron?", ["Transmit nerve impulses", "Make red blood cells", "Absorb water from soil", "Digest starch in the stomach"], 0],
+                ["What does DNA carry in living cells?", ["Genetic instructions", "Only stored fat", "Oxygen for breathing", "Electrical current for muscles"], 0],
+                ["A gene is best described as:", ["A segment of DNA associated with a functional product or trait", "A whole organ", "A type of blood cell", "A chemical used only in digestion"], 0],
+                ["What role do decomposers play in an ecosystem?", ["Break down dead organisms and wastes", "Make sunlight", "Stop nutrient cycling", "Produce rocks"], 0],
+                ["Which organism is a producer in a typical food chain?", ["Green plant", "Mushroom", "Hawk", "Earthworm"], 0],
+                ["In a food-chain arrow, the arrow generally points toward the organism that:", ["Receives energy by eating the previous organism", "Provides energy to the Sun", "Breaks down the arrow", "Has the smallest population"], 0],
+                ["Pollination is the transfer of pollen from:", ["Anther to stigma", "Root to leaf", "Stigma to root", "Seed to fruit"], 0],
+                ["Which plant tissue transports water and minerals from roots?", ["Xylem", "Phloem", "Epidermis only", "Pollen"], 0],
+                ["Which plant tissue transports sugars made during photosynthesis?", ["Phloem", "Xylem", "Root cap", "Stomatal pore"], 0],
+                ["What is a major function of stomata in leaves?", ["Allow gas exchange", "Absorb minerals from soil", "Make seeds", "Anchor the plant"], 0],
+                ["What is insulin's main effect on blood glucose?", ["It helps lower blood glucose", "It turns glucose into oxygen", "It raises blood glucose in every situation", "It carries oxygen in red blood cells"], 0],
+                ["How do vaccines help protect against particular infections?", ["They prepare the immune system to recognize a pathogen", "They replace all white blood cells", "They kill every microbe in the body permanently", "They provide oxygen to tissues"], 0],
+                ["What is an enzyme?", ["A biological catalyst", "A type of bone", "A unit of heredity", "A blood vessel"], 0],
+                ["Bacteria are prokaryotes because they:", ["Lack a membrane-bound nucleus", "Have no genetic material", "Are all multicellular", "Have chloroplasts in every cell"], 0],
+                ["During osmosis, water moves across a selectively permeable membrane toward the solution with:", ["Higher solute concentration", "Lower solute concentration", "No dissolved particles in every case", "Higher temperature only"], 0],
+                ["What is the main purpose of meiosis in humans?", ["Produce gametes with half the usual chromosome number", "Make identical body cells for growth", "Digest food", "Transport oxygen"], 0],
+                ["Natural selection can make a population better adapted when:", ["Inherited variations affect survival or reproduction", "Every individual changes traits by choice", "Organisms stop reproducing", "The environment never changes"], 0],
+                ["An ecosystem includes:", ["Living organisms and their physical environment", "Only animals", "Only plants", "Only the climate"], 0],
+                ["A food web is:", ["A set of interconnected food chains", "A single organism's digestive system", "A list of non-living minerals only", "A type of cell membrane"], 0],
+                ["How many chromosomes are normally found in most human body cells?", ["23", "46", "48", "92"], 1]
+            ],
+            "Computer Science": [
+                ["How many digits does the binary number system use?", ["2", "8", "10", "16"], 0],
+                ["How many bits are in a standard byte?", ["4", "8", "16", "32"], 1],
+                ["What is a CPU primarily designed to do?", ["Execute instructions", "Display pixels only", "Store files permanently", "Connect a keyboard mechanically"], 0],
+                ["Which statement about RAM is generally true?", ["It is volatile working memory", "It stores data permanently without power", "It is a type of printer", "It is always slower than a hard drive"], 0],
+                ["What is an algorithm?", ["A finite sequence of steps for solving a problem", "A computer's physical screen", "A programming language keyword only", "A file storage device"], 0],
+                ["In programming, a variable is commonly used to:", ["Refer to a value that a program can use or change", "Cool the processor", "Connect two monitors", "Encrypt every network packet"], 0],
+                ["Which values are used by a Boolean data type?", ["True and false", "Red and blue", "Any image only", "Letters only"], 0],
+                ["What does a loop do in a program?", ["Repeats a block of instructions", "Deletes the operating system", "Turns source code into electricity", "Prevents all conditions"], 0],
+                ["What is the purpose of an if/else statement?", ["Choose between actions based on a condition", "Repeat instructions a fixed number of times only", "Store a picture", "Connect to a database automatically"], 0],
+                ["What is HTML mainly used for on a web page?", ["Describe page structure and content", "Control the computer's power supply", "Manage a router's antenna", "Store every password securely"], 0],
+                ["What is CSS mainly used for?", ["Style and lay out web pages", "Define a computer's processor", "Encrypt a hard drive", "Query a relational database"], 0],
+                ["Which Python command displays text in a simple program?", ["print()", "showText[]", "echo<>", "display{}"], 0],
+                ["What is a computer network protocol?", ["A set of rules for communication", "A kind of monitor", "A physical storage chip", "A programming variable"], 0],
+                ["What is HTTP commonly used for?", ["Transferring web resources", "Measuring processor temperature", "Formatting a hard drive", "Creating a spreadsheet formula"], 0],
+                ["What does an IP address identify?", ["A network interface or host for communication", "A website's visual theme", "A file's author only", "A program's loop count"], 0],
+                ["What does DNS do?", ["Maps domain names to network addresses", "Compresses every image", "Detects all programming errors", "Creates database tables"], 0],
+                ["What is a URL?", ["An address identifying a resource on a network", "A type of CPU", "A Boolean value", "A programming loop"], 0],
+                ["What is a database management system used for?", ["Store, organize, and query data", "Cool computer hardware", "Replace all network protocols", "Display only video"], 0],
+                ["In a relational database, data is commonly organized into:", ["Tables with rows and columns", "Audio tracks", "Pixels and frames", "Unordered electrical signals"], 0],
+                ["What should a primary key do in a database table?", ["Uniquely identify each record", "Repeat in every row", "Store only images", "Hide the table from all queries"], 0],
+                ["What is SQL commonly used to do?", ["Query and manage relational data", "Style web pages", "Edit sound waves", "Control a computer mouse"], 0],
+                ["What does encryption do to information?", ["Transforms it to help prevent unauthorized reading", "Deletes every copy", "Guarantees the sender's identity by itself", "Converts it into a public web page"], 0],
+                ["A phishing message typically tries to:", ["Trick someone into revealing sensitive information", "Improve a computer's cooling", "Back up files automatically", "Update a monitor's resolution"], 0],
+                ["What does a firewall commonly do?", ["Filter network traffic according to rules", "Create physical copies of files", "Translate every program into HTML", "Increase screen brightness"], 0],
+                ["Why are backups useful?", ["They help restore data after loss or damage", "They prevent all hardware failures", "They make passwords unnecessary", "They replace an operating system"], 0],
+                ["What is a core role of an operating system?", ["Manage hardware and provide services for applications", "Write every user's documents", "Replace the CPU", "Connect only to the internet"], 0],
+                ["Why might a computer use a cache?", ["To keep frequently needed data available more quickly", "To permanently remove old files", "To prevent any program from running", "To increase the size of a keyboard"], 0],
+                ["A LAN usually covers:", ["A limited local area such as a home, school, or office", "Every network in the world", "Only satellites in orbit", "A single computer with no connections"], 0],
+                ["Open-source software generally makes its source code:", ["Available under a license that permits specified use or modification", "Secret from every user", "Impossible to copy under any conditions", "Readable only by the CPU"], 0],
+                ["In many programming languages, what is the index of the first item in an array?", ["0", "1", "-1", "It is always the array length"], 0]
+            ]
+        };
+
+        const ACTIVE_QUESTION_DATA = {
+            Gujarati: [
+                ["‘સૂર્ય’નો સમાનાર્થી શબ્દ કયો છે?", ["ચંદ્ર", "રવિ", "પવન", "તારો"], 1],
+                ["‘દિવસ’નો વિરુદ્ધાર્થી શબ્દ કયો છે?", ["સવાર", "રાત", "બપોર", "પ્રકાશ"], 1],
+                ["‘પુસ્તકો’નું એકવચન કયું છે?", ["પુસ્તક", "પુસ્તકો", "પુસ્તકી", "પુસ્તકનું"], 0],
+                ["‘બાળક’નું બહુવચન કયું છે?", ["બાળક", "બાળકો", "બાળકી", "બાળકને"], 1],
+                ["‘રમેશ પુસ્તક વાંચે છે.’ વાક્યમાં ક્રિયાપદ કયું છે?", ["રમેશ", "પુસ્તક", "વાંચે છે", "આ"], 2],
+                ["‘સુંદર ફૂલ ખીલ્યું.’ વાક્યમાં વિશેષણ કયું છે?", ["સુંદર", "ફૂલ", "ખીલ્યું", "વાક્ય"], 0],
+                ["‘હું શાળાએ જાઉં છું.’ વાક્ય કયા કાળમાં છે?", ["ભૂતકાળ", "વર્તમાનકાળ", "ભવિષ્યકાળ", "આજ્ઞાર્થ"], 1],
+                ["‘જળ’નો અર્થ શું થાય છે?", ["આગ", "પાણી", "હવા", "માટી"], 1],
+                ["‘વિજય’નો વિરુદ્ધાર્થી શબ્દ કયો છે?", ["જીત", "પરાજય", "હિંમત", "આનંદ"], 1],
+                ["‘મિત્ર’નો સમાનાર્થી શબ્દ કયો છે?", ["શત્રુ", "સખા", "માર્ગ", "વૃક્ષ"], 1],
+                ["‘સત્ય’નો વિરુદ્ધાર્થી શબ્દ કયો છે?", ["સાચું", "અસત્ય", "ન્યાય", "ધર્મ"], 1],
+                ["પ્રશ્ન પૂછતા વાક્યના અંતે કયું ચિહ્ન મૂકાય છે?", ["પૂર્ણવિરામ", "અલ્પવિરામ", "પ્રશ્નાર્થ ચિહ્ન", "વિસ્મયાદિબોધક"], 2],
+                ["સામાન્ય નિવેદનના અંતે કયું ચિહ્ન મૂકાય છે?", ["અલ્પવિરામ (,)", "પ્રશ્નાર્થ (?)", "પૂર્ણવિરામ (.)", "અવતરણ ચિહ્ન"], 2],
+                ["‘તે શાળાએ ગઈ.’ વાક્યમાં સર્વનામ કયું છે?", ["શાળાએ", "ગઈ", "તે", "વાક્ય"], 2],
+                ["‘ગાય’ કયા લિંગનો શબ્દ છે?", ["પુલ્લિંગ", "સ્ત્રીલિંગ", "નપુંસકલિંગ", "બહુવચન"], 1],
+                ["‘છોકરો’નું સ્ત્રીલિંગ કયું છે?", ["છોકરી", "છોકરાઓ", "છોકરાપણું", "છોકરો"], 0],
+                ["‘ફૂલ’નું બહુવચન કયું છે?", ["ફૂલો", "ફૂલને", "ફૂલનું", "ફૂલથી"], 0],
+                ["‘તે ઝડપથી દોડે છે.’ વાક્યમાં ‘ઝડપથી’ શું બતાવે છે?", ["નામ", "ક્રિયા કેવી રીતે થાય છે", "વ્યક્તિનું નામ", "વાક્યનો કાળ"], 1],
+                ["‘અને’ શબ્દનું મુખ્ય કાર્ય શું છે?", ["શબ્દો કે વાક્યો જોડવું", "પ્રશ્ન પૂછવો", "નામ બતાવવું", "કાળ બતાવવો"], 0],
+                ["અક્ષરોના સમૂહથી સામાન્ય રીતે શું બને છે?", ["વાક્ય", "શબ્દ", "કથા", "વિરામ"], 1],
+                ["શબ્દોના યોગ્ય સમૂહથી શું બને છે?", ["અક્ષર", "વાક્ય", "ધ્વનિ", "ચિહ્ન"], 1],
+                ["કવિતા લખનાર વ્યક્તિને શું કહેવાય?", ["કવિ", "ચિત્રકાર", "ખેડૂત", "વૈદ્ય"], 0],
+                ["‘નદી વહે છે.’ વાક્યમાં કર્તા કોણ છે?", ["વહે", "છે", "નદી", "વાક્ય"], 2],
+                ["‘મારું ઘર મોટું છે.’ વાક્યમાં વિશેષણ કયું છે?", ["મારું", "ઘર", "મોટું", "છે"], 2],
+                ["‘પરંતુ’ કયો શબ્દપ્રકાર છે?", ["સંયોજક", "સર્વનામ", "ક્રિયાપદ", "વિશેષણ"], 0],
+                ["‘આજે’ શબ્દ કઈ માહિતી દર્શાવે છે?", ["સ્થળ", "સમય", "રંગ", "વ્યક્તિ"], 1],
+                ["‘પંખી’નું બહુવચન કયું છે?", ["પંખીઓ", "પંખીના", "પંખીને", "પંખીથી"], 0],
+                ["‘કાળો’નું સ્ત્રીલિંગ કયું છે?", ["કાળાં", "કાળી", "કાળીપણું", "કાળા"], 1],
+                ["‘અમે રમવા જઈશું.’ વાક્ય કયા કાળમાં છે?", ["ભૂતકાળ", "વર્તમાનકાળ", "ભવિષ્યકાળ", "આજ્ઞાર્થ"], 2],
+                ["‘અરે વાહ!’ સામાન્ય રીતે કયો ભાવ દર્શાવે છે?", ["પ્રશ્ન", "આશ્ચર્ય કે હર્ષ", "નકાર", "આદેશ"], 1]
+            ],
+            Maths: ARCHIVED_QUESTION_DATA.Mathematics,
+            GK: [
+                ["ભારતની રાજધાની કઈ છે?", ["મુંબઈ", "નવી દિલ્હી", "અમદાવાદ", "કોલકાતા"], 1],
+                ["ભારતનું ચલણ કયું છે?", ["રૂપિયો", "યેન", "યુરો", "ડોલર"], 0],
+                ["ભારતનું રાષ્ટ્રીય પ્રાણી કયું છે?", ["સિંહ", "વાઘ", "હાથી", "ચિત્તો"], 1],
+                ["ભારતનું રાષ્ટ્રીય પક્ષી કયું છે?", ["કબૂતર", "મોર", "ગરુડ", "કાગડો"], 1],
+                ["ભારતનું રાષ્ટ્રીય ફૂલ કયું છે?", ["ગુલાબ", "કમળ", "સૂર્યમુખી", "મોગરો"], 1],
+                ["ભારતનું રાષ્ટ્રગાન કોણે રચ્યું?", ["રવીન્દ્રનાથ ટાગોર", "બંકિમચંદ્ર ચટ્ટોપાધ્યાય", "સરોજિની નાયડુ", "સુબ્રમણ્યમ ભારતી"], 0],
+                ["‘વંદે માતરમ્’ ગીતના રચયિતા કોણ છે?", ["મહાત્મા ગાંધી", "બંકિમચંદ્ર ચટ્ટોપાધ્યાય", "રવીન્દ્રનાથ ટાગોર", "જવાહરલાલ નહેરુ"], 1],
+                ["ભારતમાં પ્રજાસત્તાક દિવસ ક્યારે ઉજવાય છે?", ["15 ઑગસ્ટ", "26 જાન્યુઆરી", "2 ઑક્ટોબર", "1 મે"], 1],
+                ["ભારતમાં સ્વાતંત્ર્ય દિવસ ક્યારે ઉજવાય છે?", ["26 જાન્યુઆરી", "15 ઑગસ્ટ", "5 સપ્ટેમ્બર", "14 નવેમ્બર"], 1],
+                ["ભારતનું બંધારણ કઈ તારીખે અમલમાં આવ્યું?", ["15 ઑગસ્ટ 1947", "26 જાન્યુઆરી 1950", "26 નવેમ્બર 1949", "2 ઑક્ટોબર 1950"], 1],
+                ["ગુજરાતની રાજધાની કઈ છે?", ["સુરત", "ગાંધીનગર", "રાજકોટ", "વડોદરા"], 1],
+                ["ગુજરાત રાજ્યની સ્થાપના દિવસ ક્યારે છે?", ["1 મે 1960", "15 ઑગસ્ટ 1947", "26 જાન્યુઆરી 1950", "1 નવેમ્બર 1956"], 0],
+                ["સાબરમતી આશ્રમ કયા શહેરમાં આવેલો છે?", ["ભુજ", "અમદાવાદ", "સુરત", "જૂનાગઢ"], 1],
+                ["સ્ટેચ્યૂ ઑફ યુનિટી ગુજરાતના કયા સ્થળે આવેલું છે?", ["દ્વારકા", "એકતા નગર", "પોરબંદર", "પાલિતાણા"], 1],
+                ["ગીર રાષ્ટ્રીય ઉદ્યાન કયા પ્રાણી માટે જાણીતું છે?", ["એશિયાઈ સિંહ", "વાઘ", "એકશિંગી ગેંડો", "હિમચિત્તો"], 0],
+                ["સરદાર સરોવર બંધ કઈ નદી પર બાંધવામાં આવ્યો છે?", ["તાપી", "નર્મદા", "સાબરમતી", "મહી"], 1],
+                ["વિશ્વનો સૌથી મોટો મહાસાગર કયો છે?", ["હિંદ મહાસાગર", "અટલાન્ટિક મહાસાગર", "પ્રશાંત મહાસાગર", "આર્કટિક મહાસાગર"], 2],
+                ["સૌરમંડળમાં ‘લાલ ગ્રહ’ તરીકે કયો ગ્રહ ઓળખાય છે?", ["શુક્ર", "મંગળ", "બુધ", "ગુરુ"], 1],
+                ["પૃથ્વીની સૌથી નજીકનો તારો કયો છે?", ["ધ્રુવતારો", "સૂર્ય", "સિરિયસ", "ચંદ્ર"], 1],
+                ["પૃથ્વીનો કુદરતી ઉપગ્રહ કયો છે?", ["મંગળ", "ચંદ્ર", "શુક્ર", "સૂર્ય"], 1],
+                ["સામાન્ય દબાણે શુદ્ધ પાણી આશરે કયા તાપમાને થીજી જાય છે?", ["0°C", "10°C", "50°C", "100°C"], 0],
+                ["લીલા છોડ પોતાનો ખોરાક મુખ્યત્વે કઈ પ્રક્રિયા દ્વારા બનાવે છે?", ["શ્વસન", "પ્રકાશસંશ્લેષણ", "બાષ્પીભવન", "પાચન"], 1],
+                ["માનવ શરીરનું સૌથી મોટું અંગ કયું છે?", ["હૃદય", "ત્વચા", "યકૃત", "ફેફસાં"], 1],
+                ["સંયુક્ત રાષ્ટ્રસંઘનું મુખ્ય મથક કયા શહેરમાં છે?", ["જિનીવા", "ન્યૂયોર્ક", "પેરિસ", "લંડન"], 1],
+                ["વિશ્વ પર્યાવરણ દિવસ ક્યારે મનાવવામાં આવે છે?", ["5 જૂન", "21 જૂન", "5 સપ્ટેમ્બર", "10 ડિસેમ્બર"], 0],
+                ["આંતરરાષ્ટ્રીય યોગ દિવસ ક્યારે મનાવવામાં આવે છે?", ["1 મે", "21 જૂન", "15 ઑગસ્ટ", "2 ઑક્ટોબર"], 1],
+                ["WHOનું પૂરું નામ શું છે?", ["World Health Organization", "World History Office", "World Housing Organization", "World Heritage Office"], 0],
+                ["ચંદ્રયાન-3એ કયા આકાશી પિંડ પર સફળ સોફ્ટ લેન્ડિંગ કર્યું?", ["મંગળ", "ચંદ્ર", "શુક્ર", "સૂર્ય"], 1],
+                ["ભારતીય સંસદનાં બે ગૃહ કયાં છે?", ["લોકસભા અને રાજ્યસભા", "વિધાનસભા અને ગ્રામસભા", "રાજ્યસભા અને પંચાયત", "લોકસભા અને નગરપાલિકા"], 0],
+                ["ભારતનું રાષ્ટ્રીય વૃક્ષ કયું છે?", ["લીમડો", "વડ", "પીપળો", "આંબો"], 1]
+            ],
+            English: [
+                ["What is the plural of child?", ["Childs", "Children", "Childes", "Childrens"], 1],
+                ["What is the past tense of go?", ["Goed", "Gone", "Went", "Going"], 2],
+                ["Choose the correct article: ___ umbrella.", ["A", "An", "The a", "No article can be used"], 1],
+                ["What is the opposite of hot?", ["Warm", "Cold", "Dry", "Bright"], 1],
+                ["Which word is a synonym of happy?", ["Joyful", "Angry", "Tired", "Quiet"], 0],
+                ["She ___ to school every day.", ["go", "going", "goes", "gone"], 2],
+                ["They ___ playing now.", ["is", "are", "was", "be"], 1],
+                ["In the phrase ‘a blue sky,’ which word is the adjective?", ["a", "blue", "sky", "the"], 1],
+                ["In ‘He ran quickly,’ which word is the adverb?", ["He", "ran", "quickly", "none"], 2],
+                ["Which pronoun can replace ‘Rina’ in ‘Rina is reading’?", ["He", "She", "They", "We"], 1],
+                ["Which of these is a noun?", ["Book", "Quickly", "Under", "And"], 0],
+                ["Which punctuation mark usually ends a direct question?", [".", ",", "?", ":"], 2],
+                ["Which is a proper noun?", ["city", "Ahmedabad", "river", "teacher"], 1],
+                ["What is the plural of box?", ["Boxs", "Boxes", "Boxies", "Boxen"], 1],
+                ["What is the comparative form of tall?", ["Tallest", "More tall", "Taller", "Talling"], 2],
+                ["What is the superlative form of tall?", ["Taller", "Tallest", "Most taller", "More tall"], 1],
+                ["The book is ___ the table.", ["on", "quickly", "because", "beautiful"], 0],
+                ["Which word is a conjunction?", ["And", "Blue", "Run", "Softly"], 0],
+                ["Choose the present continuous sentence.", ["I read every day.", "I am reading now.", "I read yesterday.", "I will read tomorrow."], 1],
+                ["What should usually begin with a capital letter in English?", ["The first word of a sentence", "Every article", "Every preposition", "Every word after a comma"], 0],
+                ["Choose the correct article: He is ___ honest person.", ["a", "an", "the a", "no article"], 1],
+                ["What is the plural of leaf?", ["Leafs", "Leaves", "Leafes", "Leavs"], 1],
+                ["What is the opposite of early?", ["Soon", "Late", "Fast", "First"], 1],
+                ["Which pair are homophones?", ["Sea / see", "Book / boot", "Cat / cut", "Run / ran"], 0],
+                ["She ___ tomorrow.", ["travel", "travels yesterday", "will travel", "travelled"], 2],
+                ["Which form shows that the book belongs to Rina?", ["Rinas book", "Rina book's", "Rina's book", "Rinas' book"], 2],
+                ["What is the collective noun in ‘a flock of birds’?", ["birds", "flock", "of", "a"], 1],
+                ["There are ___ books on the shelf.", ["much", "many", "anyone", "little"], 1],
+                ["Choose the correct article: She studies at ___ university.", ["a", "an", "the an", "no article"], 0],
+                ["Which sentence is grammatically correct?", ["He have a red bicycle.", "He has a red bicycle.", "He having a red bicycle.", "He are a red bicycle."], 1]
+            ]
+        };
+
+        let questionBank = [];
+        let testQuestions = []; // Final shuffled exam questions
+        let userAnswers = {}; // Mapping of testQuestionIndex -> selectedOptionIndex
+        let isSubmitted = false;
+
+        // DOM Elements
+        const elTestContainer = document.getElementById('test-container');
+        const elGlobalProgress = document.getElementById('global-progress');
+        const elProgressBar = document.getElementById('progress-bar');
+        const elResultsPanel = document.getElementById('results-panel');
+        const elBottomSubmit = document.getElementById('bottom-submit-container');
+
+
+        // 2. Fisher-Yates Shuffle Algorithm (The core requirement for true randomness)
+        function shuffleArray(array) {
+            const arr = [...array]; // Work on a copy
+            let currentIndex = arr.length, randomIndex;
+
+            // While there remain elements to shuffle.
+            while (currentIndex > 0) {
+                // Pick a remaining element.
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                // And swap it with the current element.
+                [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+            }
+            return arr;
+        }
+
+        // 3. Build the four fixed, answer-keyed subject banks.
+        function generateDatabase() {
+            CORE_SUBJECTS.forEach(subjectInfo => {
+                ACTIVE_QUESTION_DATA[subjectInfo.name].forEach(([text, options, correctIndex], index) => {
+                    questionBank.push({
+                        id: `${subjectInfo.name.toLowerCase().replaceAll(' ', '-')}-${index + 1}`,
+                        subject: subjectInfo.name,
+                        subjectClass: subjectInfo.class,
+                        text,
+                        options,
+                        correctIndex
+                    });
+                });
+            });
+        }
+
+
+        // 4. Randomly select 30 from each subject bank, then shuffle all 150 together.
+        function generateTest() {
+            const selectedQuestions = [];
+            SUBJECTS.forEach(subjectInfo => {
+                const subjectQs = questionBank.filter(q => q.subject === subjectInfo.name);
+                if (subjectQs.length < QUESTIONS_TO_SELECT_PER_SUBJECT) {
+                    throw new Error(`${subjectInfo.name} needs at least ${QUESTIONS_TO_SELECT_PER_SUBJECT} questions.`);
+                }
+                selectedQuestions.push(
+                    ...shuffleArray(subjectQs).slice(0, QUESTIONS_TO_SELECT_PER_SUBJECT)
+                );
+            });
+
+            testQuestions = shuffleArray(selectedQuestions);
+            if (testQuestions.length !== SUBJECTS.length * QUESTIONS_TO_SELECT_PER_SUBJECT) {
+                throw new Error('The test did not generate the expected 150 questions.');
+            }
+            TOTAL_QUESTIONS = testQuestions.length;
+            document.querySelectorAll('.total-questions').forEach(el => {
+                el.textContent = TOTAL_QUESTIONS;
+            });
+            document.getElementById('final-total').textContent = TOTAL_QUESTIONS;
+        }
+
+        // 5. Render all selected questions in a scrollable list
+        function renderTestUI() {
+            // String concatenation keeps rendering the full question list straightforward.
+            // String concatenation is very fast and safe here since data is locally generated.
+            let htmlContent = '';
+
+            testQuestions.forEach((q, index) => {
+                const qNumber = index + 1;
+                const questionText = q.subject === 'Balvikas' ? escapeHTML(q.text) : q.text;
+                
+                let optionsHTML = '';
+                q.options.forEach((optText, optIndex) => {
+                    const letter = String.fromCharCode(65 + optIndex); // A, B, C, D
+                    const inputId = `q_${index}_opt_${optIndex}`;
+                    
+                    optionsHTML += `
+                        <div class="relative">
+                            <input type="radio" name="question_${index}" id="${inputId}" value="${optIndex}" onchange="handleSelection(${index}, ${optIndex})">
+                            <label for="${inputId}" class="option-label" id="label_${inputId}">
+                                <div class="option-marker">${letter}</div>
+                                <span class="font-medium text-slate-700 flex-1">${escapeHTML(optText)}</span>
+                                
+                                <!-- Correct Icon -->
+                                <svg class="status-icon icon-check w-7 h-7 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                <!-- Incorrect Icon -->
+                                <svg class="status-icon icon-cross w-7 h-7 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </label>
+                        </div>
+                    `;
+                });
+
+                // Generate Question Card with Subject Pill
+                htmlContent += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 fade-in hover:shadow-md transition-shadow" style="animation-delay: ${Math.min(index * 10, 500)}ms">
+                        
+                        <div class="flex justify-between items-start mb-6 gap-4">
+                            <div class="flex gap-4 items-start">
+                                <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 font-black text-xl flex items-center justify-center flex-shrink-0 shadow-inner">${qNumber}</div>
+                                 <div class="text-lg font-semibold text-slate-800 pt-1 leading-relaxed">${questionText}</div>
+                            </div>
+                            
+                            <!-- Subject Tag/Pill -->
+                            <div class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider whitespace-nowrap flex-shrink-0 ${q.subjectClass}">
+                                ${q.subject.replace('-', ' ')}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-0 sm:pl-16">
+                            ${optionsHTML}
+                        </div>
+                    </div>
+                `;
+            });
+
+            elTestContainer.innerHTML = htmlContent;
+        }
+
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        // 6. Handle User Selection
+        function handleSelection(questionIndex, optionIndex) {
+            if (isSubmitted) return; // Prevent changes if submitted
+            
+            userAnswers[questionIndex] = optionIndex;
+            updateProgress();
+            
+            // Add a subtle pop animation to the global progress counter
+            elGlobalProgress.classList.remove('pulse-once');
+            void elGlobalProgress.offsetWidth; // trigger reflow
+            elGlobalProgress.classList.add('pulse-once');
+        }
+
+        // 7. Update Progress UI
+        function updateProgress() {
+            const answeredCount = Object.keys(userAnswers).length;
+            elGlobalProgress.innerText = answeredCount;
+            
+            // Update bar
+            const percentage = (answeredCount / TOTAL_QUESTIONS) * 100;
+            elProgressBar.style.width = `${percentage}%`;
+        }
+
+
+        // 8. Custom Modal for submission confirmation (Replacing native alert/confirm)
+        function attemptSubmit() {
+            if (isSubmitted) return;
+
+            const answeredCount = Object.keys(userAnswers).length;
+            
+            if (answeredCount < TOTAL_QUESTIONS) {
+                showModal(
+                    "Incomplete Exam",
+                    `You have answered <strong>${answeredCount}</strong> out of <strong>${TOTAL_QUESTIONS}</strong> questions.<br>Unanswered questions will be automatically marked as incorrect. Are you sure you want to finish?`,
+                    "Go Back",
+                    "Submit Exam Anyway"
+                );
+            } else {
+                executeEvaluation();
+            }
+        }
+
+        function showModal(title, message, cancelText, confirmText) {
+            const modalHTML = `
+                <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 fade-in">
+                    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center border border-slate-100 transform scale-100 transition-transform">
+                        <div class="w-20 h-20 bg-orange-50 border-4 border-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-black text-slate-800 mb-3 tracking-tight">${title}</h3>
+                        <p class="text-slate-600 mb-8 leading-relaxed">${message}</p>
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button onclick="closeModal()" class="px-6 py-3.5 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors w-full sm:w-auto">
+                                ${cancelText}
+                            </button>
+                            <button onclick="closeModal(); executeEvaluation();" class="px-6 py-3.5 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-md w-full sm:w-auto">
+                                ${confirmText}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('custom-modal');
+            if (modal) modal.remove();
+        }
+
+
+        // 9. Evaluate Test and Update UI
+        function executeEvaluation() {
+            isSubmitted = true;
+            
+            // Hide submit buttons
+            document.getElementById('header-submit-btn').style.display = 'none';
+            elBottomSubmit.style.display = 'none';
+            
+            let totalScore = 0;
+            const subjectScores = {};
+            SUBJECTS.forEach(sub => subjectScores[sub.name] = 0);
+
+            // Grade questions and update DOM
+            testQuestions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const correctAnswer = q.correctIndex;
+
+                if (userAnswer === correctAnswer) {
+                    totalScore++;
+                    subjectScores[q.subject]++;
+                }
+
+                // Update styling for all 4 options of this question
+                for (let i = 0; i < 4; i++) {
+                    const labelId = `label_q_${index}_opt_${i}`;
+                    const inputId = `q_${index}_opt_${i}`;
+                    const labelEl = document.getElementById(labelId);
+                    const inputEl = document.getElementById(inputId);
+
+                    if (!labelEl || !inputEl) continue;
+
+                    // Disable interactions
+                    inputEl.disabled = true;
+                    labelEl.classList.add('disabled');
+
+                    // Apply evaluation classes
+                    if (i === correctAnswer) {
+                        if (userAnswer === correctAnswer) {
+                            labelEl.classList.add('correct');
+                        } else {
+                            // User missed it, highlight as correct answer
+                            labelEl.classList.add('missed-correct');
+                            labelEl.innerHTML += `<span class="ml-auto bg-green-100 text-green-800 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded border border-green-200">Actual Answer</span>`;
+                        }
+                    } else if (i === userAnswer && userAnswer !== correctAnswer) {
+                        // User clicked this, but it's wrong
+                        labelEl.classList.add('incorrect');
+                    }
+                }
+            });
+
+            // Populate Results Panel
+            document.getElementById('final-score').innerText = totalScore;
+            const percentage = Math.round((totalScore / TOTAL_QUESTIONS) * 100);
+            document.getElementById('final-percentage').innerText = `${percentage}%`;
+
+            // Subject Breakdown
+            let breakdownHTML = '';
+            SUBJECTS.forEach(sub => {
+                const subScore = subjectScores[sub.name];
+                const subTotal = testQuestions.filter(q => q.subject === sub.name).length;
+                const subPercent = subTotal ? Math.round((subScore / subTotal) * 100) : 0;
+                let colorClass = subPercent >= 70 ? 'text-green-600' : (subPercent >= 40 ? 'text-orange-500' : 'text-red-500');
+                
+                breakdownHTML += `
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm text-center col-span-1">
+                        <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 whitespace-nowrap overflow-hidden text-ellipsis">${sub.name}</div>
+                        <div class="text-3xl font-black ${colorClass}">${subScore}<span class="text-xs text-slate-400 font-bold ml-1">/${subTotal}</span></div>
+                    </div>
+                `;
+            });
+            document.getElementById('subject-breakdown').innerHTML = breakdownHTML;
+
+            // Show results panel and scroll to it
+            elResultsPanel.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+
+        // 10. Bootstrapping the app
+        window.onload = async function() {
+            generateDatabase();
+            try {
+                const response = await fetch(BALVIKAS_DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`Could not load Balvikas questions (${response.status}).`);
+                }
+                const balvikasQuestions = await response.json();
+                if (!Array.isArray(balvikasQuestions) || balvikasQuestions.length !== 1000) {
+                    throw new Error('The Balvikas JSON file must contain all 1,000 questions.');
+                }
+                balvikasQuestions.forEach(item => {
+                    if (typeof item.question !== 'string' ||
+                        !Array.isArray(item.options) ||
+                        item.options.length !== 4 ||
+                        !Number.isInteger(item.correctIndex) ||
+                        item.correctIndex < 0 ||
+                        item.correctIndex > 3) {
+                        throw new Error(`Invalid Balvikas question data at item ${item.id}.`);
+                    }
+                    questionBank.push({
+                        id: `balvikas-${item.id}`,
+                        subject: 'Balvikas',
+                        subjectClass: 'badge-Balvikas',
+                        text: item.question,
+                        options: item.options,
+                        correctIndex: item.correctIndex
+                    });
+                });
+                generateTest();
+                renderTestUI();
+            } catch (error) {
+                console.error(error);
+                elTestContainer.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6">
+                        <h2 class="font-bold text-lg mb-2">Unable to load Balvikas questions</h2>
+                        <p>Keep <strong>balvikas_1790933418838.json</strong> in the same folder as this HTML file and open the page through a local web server.</p>
+                    </div>`;
+                document.getElementById('header-submit-btn').disabled = true;
+                elBottomSubmit.querySelector('button').disabled = true;
+            }
+        };
+
+    </script>
+</body>
+</html>
