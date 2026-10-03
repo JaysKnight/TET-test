@@ -204,7 +204,7 @@
                 <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3"><div class="font-bold text-sky-900">Maths MCQ</div><div class="text-xs text-sky-700">30 per test</div></div>
                 <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3"><div class="font-bold text-green-900">GK MCQ</div><div class="text-xs text-green-700">30 per test</div></div>
                 <div class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3"><div class="font-bold text-violet-900">English MCQ</div><div class="text-xs text-violet-700">30 per test</div></div>
-                <div class="rounded-xl border border-pink-200 bg-pink-50 px-4 py-3"><div class="font-bold text-pink-900">Balvikas MCQ</div><div class="text-xs text-pink-700">30 selected from 1,190</div></div>
+                <div class="rounded-xl border border-pink-200 bg-pink-50 px-4 py-3"><div class="font-bold text-pink-900">Balvikas MCQ</div><div class="text-xs text-pink-700">30 selected from 1,625</div></div>
             </div>
         </section>
         
@@ -690,8 +690,8 @@
                     throw new Error(`Could not load Balvikas questions (${response.status}).`);
                 }
                 const balvikasQuestions = await response.json();
-                if (!Array.isArray(balvikasQuestions) || balvikasQuestions.length !== 1190) {
-                    throw new Error('The Balvikas JSON file must contain all 1,190 questions.');
+                if (!Array.isArray(balvikasQuestions) || balvikasQuestions.length !== 1625) {
+                    throw new Error('The Balvikas JSON file must contain all 1,625 questions.');
                 }
                 balvikasQuestions.forEach(item => {
                     if (typeof item.question !== 'string' ||
