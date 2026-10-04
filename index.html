@@ -260,10 +260,6 @@
         const GUJARATI_DATA_URL = './Gujarati.json';
         let TOTAL_QUESTIONS = 0;
         
-        const CORE_SUBJECTS = SUBJECTS.filter(subject => subject.name !== 'Gujarati');
-       
-        
-   
         // Previous subject banks retained as source material; only ACTIVE_QUESTION_DATA is used.
         // Each entry is [question, options, correctOptionIndex].
        
@@ -655,89 +651,70 @@
 
 
         // 10. Bootstrapping the app
-        window.onload = async function() {
-            generateDatabase();
-            try {
-                const response = await fetch(BALVIKAS_DATA_URL);
-                if (!response.ok) {
-                    throw new Error(`Could not load Balvikas questions (${response.status}).`);
-                }
-                const balvikasQuestions = await response.json();
-                if (!Array.isArray(balvikasQuestions) || balvikasQuestions.length !== 1625) {
-                    throw new Error('The Balvikas JSON file must contain all 1,625 questions.');
-                }
-                balvikasQuestions.forEach(item => {
-                    if (typeof item.question !== 'string' ||
-                        !Array.isArray(item.options) ||
-                        item.options.length !== 4 ||
-                        !Number.isInteger(item.correctIndex) ||
-                        item.correctIndex < 0 ||
-                        item.correctIndex > 3) {
-                        throw new Error(`Invalid Balvikas question data at item ${item.id}.`);
-                    }
-                    questionBank.push({
-                        id: `balvikas-${item.id}`,
-                        subject: 'Balvikas',
-                        subjectClass: 'badge-Balvikas',
-                        text: item.question,
-                        options: item.options,
-                        correctIndex: item.correctIndex
-                    });
-                });
-                generateTest();
-                renderTestUI();
-            } catch (error) {
-                console.error(error);
-                elTestContainer.innerHTML = `
-                    <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6">
-                        <h2 class="font-bold text-lg mb-2">Unable to load Balvikas questions</h2>
-                        <p>Keep <strong>balvikas_1790933418838.json</strong> in the same folder as this HTML file and open the page through a local web server.</p>
-                    </div>`;
-                document.getElementById('header-submit-btn').disabled = true;
-                elBottomSubmit.querySelector('button').disabled = true;
-            }
-              generateDatabase();
-            try {
-                const response = await fetch(GUJARATI_DATA_URL);
-                if (!response.ok) {
-                    throw new Error(`Could not load gujarati questions (${response.status}).`);
-                }
-                const balvikasQuestions = await response.json();
-                if (!Array.isArray(gujaratiQuestions) || gujaratiQuestions.length !== 1269) {
-                    throw new Error('The Gujarati JSON file must contain all 1,269 questions.');
-                }
-                gujaratiQuestions.forEach(item => {
-                    if (typeof item.question !== 'string' ||
-                        !Array.isArray(item.options) ||
-                        item.options.length !== 4 ||
-                        !Number.isInteger(item.correctIndex) ||
-                        item.correctIndex < 0 ||
-                        item.correctIndex > 3) {
-                        throw new Error(`Invalid Gujarati question data at item ${item.id}.`);
-                    }
-                    questionBank.push({
-                        id: `gujarati-${item.id}`,
-                        subject: 'Gujarati',
-                        subjectClass: 'badge-Gujarati',
-                        text: item.question,
-                        options: item.options,
-                        correctIndex: item.correctIndex
-                    });
-                });
-                generateTest();
-                renderTestUI();
-            } catch (error) {
-                console.error(error);
-                elTestContainer.innerHTML = `
-                    <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6">
-                        <h2 class="font-bold text-lg mb-2">Unable to load Gujarati questions</h2>
-                        <p>Keep <strong>Gujarati.json</strong> in the same folder as this HTML file and open the page through a local web server.</p>
-                    </div>`;
-                document.getElementById('header-submit-btn').disabled = true;
-                elBottomSubmit.querySelector('button').disabled = true;
-            }
-        },
+       window.onload = async function () {
+    generateDatabase();
 
+    const sources = [
+        {
+            subject: 'Gujarati',
+            subjectClass: 'badge-Gujarati',
+            url: GUJARATI_DATA_URL
+        },
+        {
+            subject: 'Balvikas',
+            subjectClass: 'badge-Balvikas',
+            url: BALVIKAS_DATA_URL
+        }
+    ];
+
+    try {
+        for (const source of sources) {
+            const response = await fetch(source.url);
+            if (!response.ok) {
+                throw new Error(`Could not load ${source.subject} questions (${response.status}).`);
+            }
+
+            const questions = await response.json();
+            if (!Array.isArray(questions) ||
+                questions.length < QUESTIONS_TO_SELECT_PER_SUBJECT) {
+                throw new Error(`${source.subject} must have at least 30 questions.`);
+            }
+
+            questions.forEach(item => {
+                if (!Number.isInteger(item.id) ||
+                    typeof item.question !== 'string' ||
+                    !Array.isArray(item.options) ||
+                    item.options.length !== 4 ||
+                    !Number.isInteger(item.correctIndex) ||
+                    item.correctIndex < 0 ||
+                    item.correctIndex >= item.options.length) {
+                    throw new Error(`Invalid ${source.subject} question at item ${item.id}.`);
+                }
+
+                questionBank.push({
+                    id: `${source.subject.toLowerCase()}-${item.id}`,
+                    subject: source.subject,
+                    subjectClass: source.subjectClass,
+                    text: item.question,
+                    options: item.options,
+                    correctIndex: item.correctIndex
+                });
+            });
+        }
+
+        generateTest();
+        renderTestUI();
+    } catch (error) {
+        console.error(error);
+        elTestContainer.innerHTML = `
+            <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6">
+                <h2 class="font-bold text-lg mb-2">Unable to load question files</h2>
+                <p>Check that Gujarati.json and balvikas_1790933418838.json are valid and available beside this HTML file.</p>
+            </div>`;
+        document.getElementById('header-submit-btn').disabled = true;
+        elBottomSubmit.querySelector('button').disabled = true;
+    }
+};
     </script>
 </body>
 </html>
