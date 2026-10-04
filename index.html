@@ -200,7 +200,7 @@
                 <p class="text-sm text-slate-500">Each test draws 30 from every bank, then shuffles all 150.</p>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"><div class="font-bold text-amber-900">Gujarati MCQ</div><div class="text-xs text-amber-700">30 per test</div></div>
+                <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"><div class="font-bold text-amber-900">Gujarati MCQ</div><div class="text-xs text-amber-700">30 selected from 1,273</div></div>
                 <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3"><div class="font-bold text-sky-900">Maths MCQ</div><div class="text-xs text-sky-700">30 per test</div></div>
                 <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3"><div class="font-bold text-green-900">GK MCQ</div><div class="text-xs text-green-700">30 per test</div></div>
                 <div class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3"><div class="font-bold text-violet-900">English MCQ</div><div class="text-xs text-violet-700">30 per test</div></div>
@@ -258,44 +258,16 @@
         const QUESTIONS_TO_SELECT_PER_SUBJECT = 30; // Pick 30 per subject
         const BALVIKAS_DATA_URL = './balvikas_1790933418838.json';
         let TOTAL_QUESTIONS = 0;
-
+        
+        const CORE_SUBJECTS = SUBJECTS.filter(subject => subject.name !== 'Gujarati');
+        const QUESTIONS_TO_SELECT_PER_SUBJECT = 30; // Pick 30 per subject
+        const BALVIKAS_DATA_URL = './Gujarati.json';
+        let TOTAL_QUESTIONS = 0;
         // Previous subject banks retained as source material; only ACTIVE_QUESTION_DATA is used.
         // Each entry is [question, options, correctOptionIndex].
        
         const ACTIVE_QUESTION_DATA = {
-            Gujarati: [
-                ["‘સૂર્ય’નો સમાનાર્થી શબ્દ કયો છે?", ["ચંદ્ર", "રવિ", "પવન", "તારો"], 1],
-                ["‘દિવસ’નો વિરુદ્ધાર્થી શબ્દ કયો છે?", ["સવાર", "રાત", "બપોર", "પ્રકાશ"], 1],
-                ["‘પુસ્તકો’નું એકવચન કયું છે?", ["પુસ્તક", "પુસ્તકો", "પુસ્તકી", "પુસ્તકનું"], 0],
-                ["‘બાળક’નું બહુવચન કયું છે?", ["બાળક", "બાળકો", "બાળકી", "બાળકને"], 1],
-                ["‘રમેશ પુસ્તક વાંચે છે.’ વાક્યમાં ક્રિયાપદ કયું છે?", ["રમેશ", "પુસ્તક", "વાંચે છે", "આ"], 2],
-                ["‘સુંદર ફૂલ ખીલ્યું.’ વાક્યમાં વિશેષણ કયું છે?", ["સુંદર", "ફૂલ", "ખીલ્યું", "વાક્ય"], 0],
-                ["‘હું શાળાએ જાઉં છું.’ વાક્ય કયા કાળમાં છે?", ["ભૂતકાળ", "વર્તમાનકાળ", "ભવિષ્યકાળ", "આજ્ઞાર્થ"], 1],
-                ["‘જળ’નો અર્થ શું થાય છે?", ["આગ", "પાણી", "હવા", "માટી"], 1],
-                ["‘વિજય’નો વિરુદ્ધાર્થી શબ્દ કયો છે?", ["જીત", "પરાજય", "હિંમત", "આનંદ"], 1],
-                ["‘મિત્ર’નો સમાનાર્થી શબ્દ કયો છે?", ["શત્રુ", "સખા", "માર્ગ", "વૃક્ષ"], 1],
-                ["‘સત્ય’નો વિરુદ્ધાર્થી શબ્દ કયો છે?", ["સાચું", "અસત્ય", "ન્યાય", "ધર્મ"], 1],
-                ["પ્રશ્ન પૂછતા વાક્યના અંતે કયું ચિહ્ન મૂકાય છે?", ["પૂર્ણવિરામ", "અલ્પવિરામ", "પ્રશ્નાર્થ ચિહ્ન", "વિસ્મયાદિબોધક"], 2],
-                ["સામાન્ય નિવેદનના અંતે કયું ચિહ્ન મૂકાય છે?", ["અલ્પવિરામ (,)", "પ્રશ્નાર્થ (?)", "પૂર્ણવિરામ (.)", "અવતરણ ચિહ્ન"], 2],
-                ["‘તે શાળાએ ગઈ.’ વાક્યમાં સર્વનામ કયું છે?", ["શાળાએ", "ગઈ", "તે", "વાક્ય"], 2],
-                ["‘ગાય’ કયા લિંગનો શબ્દ છે?", ["પુલ્લિંગ", "સ્ત્રીલિંગ", "નપુંસકલિંગ", "બહુવચન"], 1],
-                ["‘છોકરો’નું સ્ત્રીલિંગ કયું છે?", ["છોકરી", "છોકરાઓ", "છોકરાપણું", "છોકરો"], 0],
-                ["‘ફૂલ’નું બહુવચન કયું છે?", ["ફૂલો", "ફૂલને", "ફૂલનું", "ફૂલથી"], 0],
-                ["‘તે ઝડપથી દોડે છે.’ વાક્યમાં ‘ઝડપથી’ શું બતાવે છે?", ["નામ", "ક્રિયા કેવી રીતે થાય છે", "વ્યક્તિનું નામ", "વાક્યનો કાળ"], 1],
-                ["‘અને’ શબ્દનું મુખ્ય કાર્ય શું છે?", ["શબ્દો કે વાક્યો જોડવું", "પ્રશ્ન પૂછવો", "નામ બતાવવું", "કાળ બતાવવો"], 0],
-                ["અક્ષરોના સમૂહથી સામાન્ય રીતે શું બને છે?", ["વાક્ય", "શબ્દ", "કથા", "વિરામ"], 1],
-                ["શબ્દોના યોગ્ય સમૂહથી શું બને છે?", ["અક્ષર", "વાક્ય", "ધ્વનિ", "ચિહ્ન"], 1],
-                ["કવિતા લખનાર વ્યક્તિને શું કહેવાય?", ["કવિ", "ચિત્રકાર", "ખેડૂત", "વૈદ્ય"], 0],
-                ["‘નદી વહે છે.’ વાક્યમાં કર્તા કોણ છે?", ["વહે", "છે", "નદી", "વાક્ય"], 2],
-                ["‘મારું ઘર મોટું છે.’ વાક્યમાં વિશેષણ કયું છે?", ["મારું", "ઘર", "મોટું", "છે"], 2],
-                ["‘પરંતુ’ કયો શબ્દપ્રકાર છે?", ["સંયોજક", "સર્વનામ", "ક્રિયાપદ", "વિશેષણ"], 0],
-                ["‘આજે’ શબ્દ કઈ માહિતી દર્શાવે છે?", ["સ્થળ", "સમય", "રંગ", "વ્યક્તિ"], 1],
-                ["‘પંખી’નું બહુવચન કયું છે?", ["પંખીઓ", "પંખીના", "પંખીને", "પંખીથી"], 0],
-                ["‘કાળો’નું સ્ત્રીલિંગ કયું છે?", ["કાળાં", "કાળી", "કાળીપણું", "કાળા"], 1],
-                ["‘અમે રમવા જઈશું.’ વાક્ય કયા કાળમાં છે?", ["ભૂતકાળ", "વર્તમાનકાળ", "ભવિષ્યકાળ", "આજ્ઞાર્થ"], 2],
-                ["‘અરે વાહ!’ સામાન્ય રીતે કયો ભાવ દર્શાવે છે?", ["પ્રશ્ન", "આશ્ચર્ય કે હર્ષ", "નકાર", "આદેશ"], 1]
-            ],
-            Maths: [
+         Maths: [
                 ["Solve 3x + 5 = 20.", ["3", "5", "7", "8"], 1],
                 ["What is the area of a rectangle 8 cm long and 5 cm wide?", ["13 cm²", "26 cm²", "40 cm²", "80 cm²"], 2],
                 ["What is the square root of 81?", ["7", "8", "9", "12"], 2],
@@ -719,6 +691,46 @@
                     <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6">
                         <h2 class="font-bold text-lg mb-2">Unable to load Balvikas questions</h2>
                         <p>Keep <strong>balvikas_1790933418838.json</strong> in the same folder as this HTML file and open the page through a local web server.</p>
+                    </div>`;
+                document.getElementById('header-submit-btn').disabled = true;
+                elBottomSubmit.querySelector('button').disabled = true;
+            },
+              generateDatabase();
+            try {
+                const response = await fetch(GUJARATI_DATA_URL);
+                if (!response.ok) {
+                    throw new Error(`Could not load gujarati questions (${response.status}).`);
+                }
+                const balvikasQuestions = await response.json();
+                if (!Array.isArray(gujaratiQuestions) || gujaratiQuestions.length !== 1273) {
+                    throw new Error('The Gujarati JSON file must contain all 1,273 questions.');
+                }
+                gujaratiQuestions.forEach(item => {
+                    if (typeof item.question !== 'string' ||
+                        !Array.isArray(item.options) ||
+                        item.options.length !== 4 ||
+                        !Number.isInteger(item.correctIndex) ||
+                        item.correctIndex < 0 ||
+                        item.correctIndex > 3) {
+                        throw new Error(`Invalid Gujarati question data at item ${item.id}.`);
+                    }
+                    questionBank.push({
+                        id: `gujarati-${item.id}`,
+                        subject: 'Gujarati',
+                        subjectClass: 'badge-Gujarati',
+                        text: item.question,
+                        options: item.options,
+                        correctIndex: item.correctIndex
+                    });
+                });
+                generateTest();
+                renderTestUI();
+            } catch (error) {
+                console.error(error);
+                elTestContainer.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6">
+                        <h2 class="font-bold text-lg mb-2">Unable to load Gujarati questions</h2>
+                        <p>Keep <strong>Gujarati.json</strong> in the same folder as this HTML file and open the page through a local web server.</p>
                     </div>`;
                 document.getElementById('header-submit-btn').disabled = true;
                 elBottomSubmit.querySelector('button').disabled = true;
