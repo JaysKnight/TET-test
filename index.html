@@ -254,15 +254,16 @@
             { name: 'Balvikas', class: 'badge-Balvikas' }
         ];
         
-        const CORE_SUBJECTS = SUBJECTS.filter(subject => subject.name !== 'Balvikas');
+        const CORE_SUBJECTS =SUBJECTS.filter(subject => !['Gujarati', 'Balvikas'].includes(subject.name));
         const QUESTIONS_TO_SELECT_PER_SUBJECT = 30; // Pick 30 per subject
         const BALVIKAS_DATA_URL = './balvikas_1790933418838.json';
+        const GUJARATI_DATA_URL = './Gujarati.json';
         let TOTAL_QUESTIONS = 0;
         
         const CORE_SUBJECTS = SUBJECTS.filter(subject => subject.name !== 'Gujarati');
-        const QUESTIONS_TO_SELECT_PER_SUBJECT = 30; // Pick 30 per subject
-        const BALVIKAS_DATA_URL = './Gujarati.json';
-        let TOTAL_QUESTIONS = 0;
+       
+        
+   
         // Previous subject banks retained as source material; only ACTIVE_QUESTION_DATA is used.
         // Each entry is [question, options, correctOptionIndex].
        
@@ -694,7 +695,7 @@
                     </div>`;
                 document.getElementById('header-submit-btn').disabled = true;
                 elBottomSubmit.querySelector('button').disabled = true;
-            },
+            }
               generateDatabase();
             try {
                 const response = await fetch(GUJARATI_DATA_URL);
@@ -735,7 +736,7 @@
                 document.getElementById('header-submit-btn').disabled = true;
                 elBottomSubmit.querySelector('button').disabled = true;
             }
-        };
+        },
 
     </script>
 </body>
