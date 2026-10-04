@@ -256,7 +256,7 @@
         
         const CORE_SUBJECTS =SUBJECTS.filter(subject => !['Gujarati', 'Balvikas'].includes(subject.name));
         const QUESTIONS_TO_SELECT_PER_SUBJECT = 30; // Pick 30 per subject
-        const BALVIKAS_DATA_URL = './balvikas_1790933418838.json';
+        const BALVIKAS_DATA_URL = './Balvikas.json';
         const GUJARATI_DATA_URL = './Gujarati.json';
         let TOTAL_QUESTIONS = 0;
         
@@ -709,7 +709,7 @@
         elTestContainer.innerHTML = `
             <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6">
                 <h2 class="font-bold text-lg mb-2">Unable to load question files</h2>
-                <p>Check that Gujarati.json and balvikas_1790933418838.json are valid and available beside this HTML file.</p>
+                <p>Check that Gujarati.json and Balvikas.json are valid and available beside this HTML file.</p>
             </div>`;
         document.getElementById('header-submit-btn').disabled = true;
         elBottomSubmit.querySelector('button').disabled = true;
