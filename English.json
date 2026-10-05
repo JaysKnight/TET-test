@@ -611,9 +611,20 @@
       "Those",
       "These",
       "This",
-      "That  B 57.  But this was one of ________ rare occasions when he did. A) That B) Those C) These D) This"
+      "That "
     ],
     "correctIndex": 1
+  },
+   {
+    "id": 57,
+    "question": "But this was one of ________ rare occasions when he did.",
+    "options": [
+      "That",
+      "Those",
+      "These",
+      "This"
+    ],
+        "correctIndex": 1
   },
   {
     "id": 58,
@@ -1051,9 +1062,20 @@
       "by, with",
       "with, with",
       "on, with",
-      "by, by 98.  The lobster took his hand ________ his great pincer-like claws and pinched it so hard that Hari yelled ________ pain. A) By, in B) In, in C) To, by D) At, to"
+      "by, by"
     ],
     "correctIndex": 0
+  },
+  {
+    "id": 98,
+    "question": "The lobster took his hand ________ his great pincer-like claws and pinched it so hard that Hari yelled ________ pain.",
+    "options": [
+      "By, in",
+      "In, in",
+      "To, by",
+      "At, to"
+    ],
+    "correctIndex": 1
   },
   {
     "id": 99,
@@ -1260,7 +1282,18 @@
       "in order to",
       "from",
       "with a view to",
-      "none of these  118.  Books must be kept according ________ a prescribed form. A) From B) To C) By D) Into"
+      "none of these"
+    ],
+    "correctIndex": 0
+  },
+   {
+    "id": 118,
+    "question": "Books must be kept according ________ a prescribed form.",
+    "options": [
+      "From",
+      "To",
+      "By",
+      "Into"
     ],
     "correctIndex": 1
   },
@@ -1491,7 +1524,18 @@
       "Could",
       "Can",
       "Will",
-      "Would  140.  She says that she ________ marry him. A) Will B) May C) Shall D) Can"
+      "Would"
+    ],
+    "correctIndex": 0
+  },
+   {
+    "id": 140,
+    "question": "She says that she ________ marry him.",
+    "options": [
+      "Will",
+      "May",
+      "Shall",
+      "Can"
     ],
     "correctIndex": 0
   },
@@ -1689,9 +1733,20 @@
       "A",
       "An",
       "The",
-      "No article  C 159.  ________ S.T. Bus. (Use proper Determiner) A) A B) The C) An D) No article"
+      "No article"
     ],
     "correctIndex": 0
+  },
+   {
+    "id": 159,
+    "question": " ________ S.T. Bus. (Use proper Determiner)",
+    "options": [
+      "A",
+      "The",
+      "An",
+      "No article"
+    ],
+    "correctIndex": 2
   },
   {
     "id": 160,
@@ -3130,7 +3185,18 @@
       "Tea is not drank by him.",
       "Tea is not drank by he.",
       "Tea is not drink by him.",
-      "Tea is not drunk by him. D 291.  Nancy said, \"I may leave tomorrow.\" (Change into Indirect Speech) A) Nancy said that she might leave the next day. B) Nancy said that she might leave tomorrow. C) Nancy asked if she should leave the next day. D) Nancy informed me to leave tomorrow."
+      "Tea is not drunk by him."
+    ],
+    "correctIndex": 2
+  },
+   {
+    "id": 291,
+    "question": "Nancy said, \"I may leave tomorrow.\" (Change into Indirect Speech)",
+    "options": [
+      "Nancy said that she might leave the next day.",
+      "Nancy said that she might leave tomorrow.",
+      "Nancy asked if she should leave the next day.",
+      "Nancy informed me to leave tomorrow."
     ],
     "correctIndex": 0
   },
@@ -3372,7 +3438,18 @@
       "Sit",
       "Sitted",
       "Siting",
-      "Sitting D 314.  I like his ________. A) Swim B) Swimed C) Swims D) Swimming"
+      "Sitting"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 314,
+    "question": "I like his ________.",
+    "options": [
+      "Swim",
+      "Swimed",
+      "Swims",
+      "Swimming"
     ],
     "correctIndex": 3
   },
@@ -3625,9 +3702,20 @@
       "visit",
       "visits",
       "visiting",
-      "visited   A 338.  I ________ and he sings. A) dances B) dancing C) dance D) danced"
+      "visited"
     ],
-    "correctIndex": 2
+    "correctIndex": 0
+  },
+   {
+    "id": 338,
+    "question": "I ________ and he sings.",
+    "options": [
+      "dances",
+      "dancing",
+      "dance",
+      "danced"
+    ],
+    "correctIndex": 0
   },
   {
     "id": 339,
@@ -3845,9 +3933,20 @@
       "If",
       "That",
       "Whether",
-      "None of these  B 359.  We were late for the show ________ we did not take a cab. A) But B) Or C) And D) Then"
+      "None of these"
     ],
     "correctIndex": 2
+  },
+  {
+    "id": 359,
+    "question": "We were late for the show ________ we did not take a cab.",
+    "options": [
+      "But",
+      "Or",
+      "And",
+      "Then"
+    ],
+    "correctIndex": 3
   },
   {
     "id": 360,
@@ -4287,7 +4386,7 @@
       "In, at",
       "At, at"
     ],
-    "correctIndex": 2
+    "correctIndex": 1
   },
   {
     "id": 400,
@@ -4296,7 +4395,18 @@
       "At",
       "To",
       "In",
-      "By  C 401.  If you have any query, write to us ________ the given address. A) In B) To C) From D) At"
+      "By"
+    ],
+    "correctIndex": 2
+  },
+   {
+    "id": 401,
+    "question": "If you have any query, write to us ________ the given address.",
+    "options": [
+      "In",
+      "To",
+      "From",
+      "At"
     ],
     "correctIndex": 3
   },
