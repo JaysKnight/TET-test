@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>150-Question Mixed-Subject MCQ Test</title>
     
+    <script>
+        (function () {
+            try {
+                var savedTheme = localStorage.getItem('tet-exam-theme');
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (savedTheme === 'dark' || (!savedTheme && prefersDark)) document.documentElement.classList.add('dark');
+            } catch (error) {}
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -161,6 +170,59 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+
+
+        /* Exam timer */
+        #exam-clock.timer-warning { color: #b45309; }
+        #exam-clock.timer-critical { color: #dc2626; animation: pulseOnce 0.9s ease-in-out infinite; }
+
+        /* Dark theme */
+        html.dark { color-scheme: dark; }
+        html.dark body { background-color: #0b1220 !important; color: #e2e8f0 !important; transition: background-color 180ms ease, color 180ms ease; }
+        html.dark header { background-color: rgba(15, 23, 42, 0.96) !important; border-color: #334155 !important; }
+        html.dark .bg-white { background-color: #111827 !important; }
+        html.dark .bg-slate-50 { background-color: #1e293b !important; }
+        html.dark .bg-slate-100 { background-color: #334155 !important; }
+        html.dark .bg-blue-50, html.dark [class~="bg-blue-50/50"], html.dark .bg-red-50, html.dark .bg-amber-50, html.dark .bg-sky-50, html.dark .bg-green-50, html.dark .bg-violet-50, html.dark .bg-pink-50, html.dark .bg-orange-50 { background-color: #172033 !important; }
+        html.dark .border-blue-100, html.dark .border-red-200, html.dark .border-orange-100, html.dark .border-amber-200, html.dark .border-sky-200, html.dark .border-green-200, html.dark .border-violet-200, html.dark .border-pink-200 { border-color: #334155 !important; }
+        html.dark .text-red-800 { color: #fecaca !important; }
+        html.dark .border-slate-100, html.dark .border-slate-200, html.dark .border-slate-300 { border-color: #334155 !important; }
+        html.dark .text-slate-800, html.dark .text-slate-700, html.dark .text-slate-600 { color: #e2e8f0 !important; }
+        html.dark .text-slate-500, html.dark .text-slate-400 { color: #94a3b8 !important; }
+        html.dark .text-blue-800 { color: #bfdbfe !important; }
+        html.dark .text-blue-600 { color: #60a5fa !important; }
+        html.dark .text-blue-300 { color: #93c5fd !important; }
+        html.dark .text-green-600 { color: #4ade80 !important; }
+        html.dark .text-orange-500 { color: #fb923c !important; }
+        html.dark .text-red-500 { color: #f87171 !important; }
+        html.dark .option-label { background-color: #111827 !important; border-color: #334155; color: #e2e8f0 !important; }
+        html.dark .option-label:hover:not(.disabled) { background-color: #1e293b !important; border-color: #64748b; }
+        html.dark input[type="radio"]:checked + .option-label { background-color: #172554 !important; border-color: #3b82f6 !important; }
+        html.dark .option-marker { background-color: #0f172a !important; border-color: #475569; color: #cbd5e1; }
+        html.dark .option-label.correct { background-color: #052e16 !important; border-color: #22c55e !important; color: #bbf7d0 !important; }
+        html.dark .option-label.incorrect { background-color: #450a0a !important; border-color: #ef4444 !important; color: #fecaca !important; }
+        html.dark .option-label.missed-correct { background-color: #052e16 !important; border-color: #22c55e !important; color: #bbf7d0 !important; }
+        html.dark .option-label.missed-correct .option-marker { background-color: #0f172a !important; color: #4ade80 !important; }
+        html.dark .badge-Gujarati { background-color: #422006; color: #fde68a; border-color: #78350f; }
+        html.dark .badge-Maths { background-color: #082f49; color: #bae6fd; border-color: #075985; }
+        html.dark .badge-GK { background-color: #052e16; color: #bbf7d0; border-color: #166534; }
+        html.dark .badge-English { background-color: #2e1065; color: #ddd6fe; border-color: #5b21b6; }
+        html.dark .badge-Balvikas { background-color: #500724; color: #fbcfe8; border-color: #9d174d; }
+        html.dark main > section > .grid > div, html.dark #subject-breakdown > div { background-color: #172033 !important; border-color: #334155 !important; }
+        html.dark .text-amber-900 { color: #fde68a !important; }
+        html.dark .text-amber-700 { color: #fcd34d !important; }
+        html.dark .text-sky-900 { color: #bae6fd !important; }
+        html.dark .text-sky-700 { color: #7dd3fc !important; }
+        html.dark .text-green-900, html.dark .text-green-800 { color: #bbf7d0 !important; }
+        html.dark .text-green-700 { color: #86efac !important; }
+        html.dark .text-violet-900 { color: #ddd6fe !important; }
+        html.dark .text-violet-700 { color: #c4b5fd !important; }
+        html.dark .text-pink-900 { color: #fbcfe8 !important; }
+        html.dark .text-pink-700 { color: #f9a8d4 !important; }
+        html.dark .bg-green-100 { background-color: #14532d !important; }
+        html.dark .border-green-200 { border-color: #166534 !important; }
+        html.dark #exam-clock.timer-warning { color: #fbbf24 !important; }
+        html.dark #exam-clock.timer-critical { color: #f87171 !important; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -172,7 +234,7 @@
                 <p class="text-sm text-slate-500 font-medium mt-0.5">30 questions from each subject, shuffled every test</p>
             </div>
             
-            <div class="flex items-center gap-4 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-200 shadow-inner">
+            <div class="flex flex-wrap justify-center items-center gap-x-2 gap-y-2 bg-slate-50 p-2 sm:gap-4 sm:px-5 sm:py-2.5 rounded-2xl border border-slate-200 shadow-inner max-w-full">
                 <div class="flex flex-col items-center justify-center">
                     <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Answered</span>
                     <div class="text-xl font-black text-blue-600 leading-none">
@@ -180,8 +242,15 @@
                     </div>
                 </div>
                 <div class="h-10 w-px bg-slate-300 mx-1"></div>
-                <button onclick="attemptSubmit()" id="header-submit-btn" class="bg-slate-800 hover:bg-black text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+                <div class="flex flex-col items-center justify-center min-w-[66px]">
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-0.5">Time left</span>
+                    <time id="exam-clock" class="text-xl font-black text-slate-800 leading-none tabular-nums" aria-label="120 minutes remaining" aria-live="off">120:00</time>
+                </div>
+                <button onclick="attemptSubmit()" id="header-submit-btn" class="bg-slate-800 hover:bg-black text-white font-bold py-2.5 px-3 sm:px-6 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
                     Submit Test
+                </button>
+                <button id="theme-toggle" type="button" title="Toggle dark mode" aria-label="Switch to dark mode" aria-pressed="false" class="h-10 min-w-10 px-2 rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors inline-flex items-center justify-center gap-1.5">
+                    <span id="theme-toggle-icon" aria-hidden="true">☾</span><span id="theme-toggle-label" class="hidden sm:inline text-sm font-bold">Dark</span>
                 </button>
             </div>
         </div>
@@ -270,6 +339,9 @@
         let testQuestions = []; // Final shuffled exam questions
         let userAnswers = {}; // Mapping of testQuestionIndex -> selectedOptionIndex
         let isSubmitted = false;
+        const EXAM_DURATION_SECONDS = 120 * 60;
+        let examDeadline = 0;
+        let examTimerInterval = null;
 
         // DOM Elements
         const elTestContainer = document.getElementById('test-container');
@@ -277,6 +349,57 @@
         const elProgressBar = document.getElementById('progress-bar');
         const elResultsPanel = document.getElementById('results-panel');
         const elBottomSubmit = document.getElementById('bottom-submit-container');
+        const examClock = document.getElementById('exam-clock');
+        const themeToggleButton = document.getElementById('theme-toggle');
+        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+        const themeToggleLabel = document.getElementById('theme-toggle-label');
+
+        function syncThemeToggle() {
+            const darkEnabled = document.documentElement.classList.contains('dark');
+            document.documentElement.style.colorScheme = darkEnabled ? 'dark' : 'light';
+            themeToggleButton.setAttribute('aria-label', 'Switch to ' + (darkEnabled ? 'light' : 'dark') + ' mode');
+            themeToggleButton.setAttribute('aria-pressed', String(darkEnabled));
+            themeToggleButton.title = darkEnabled ? 'Switch to light mode' : 'Switch to dark mode';
+            themeToggleIcon.textContent = darkEnabled ? '☀' : '☾';
+            themeToggleLabel.textContent = darkEnabled ? 'Light' : 'Dark';
+        }
+
+        function setExamTheme(darkEnabled) {
+            document.documentElement.classList.toggle('dark', darkEnabled);
+            syncThemeToggle();
+            try { localStorage.setItem('tet-exam-theme', darkEnabled ? 'dark' : 'light'); } catch (error) {}
+        }
+
+        syncThemeToggle();
+        themeToggleButton.addEventListener('click', function () {
+            setExamTheme(!document.documentElement.classList.contains('dark'));
+        });
+
+        function updateExamClock() {
+            if (!examClock || !examDeadline) return;
+            const secondsRemaining = Math.max(0, Math.ceil((examDeadline - Date.now()) / 1000));
+            const minutes = Math.floor(secondsRemaining / 60);
+            const seconds = secondsRemaining % 60;
+            examClock.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            examClock.setAttribute('aria-label', minutes + ' minutes and ' + seconds + ' seconds remaining');
+            examClock.classList.toggle('timer-warning', secondsRemaining <= 600 && secondsRemaining > 60);
+            examClock.classList.toggle('timer-critical', secondsRemaining <= 60);
+            if (secondsRemaining === 0 && !isSubmitted) executeEvaluation();
+        }
+
+        function startExamTimer() {
+            if (!examClock || examTimerInterval !== null) return;
+            examDeadline = Date.now() + EXAM_DURATION_SECONDS * 1000;
+            updateExamClock();
+            examTimerInterval = window.setInterval(updateExamClock, 1000);
+        }
+
+        function stopExamTimer() {
+            if (examTimerInterval !== null) {
+                window.clearInterval(examTimerInterval);
+                examTimerInterval = null;
+            }
+        }
 
 
         // 2. Fisher-Yates Shuffle Algorithm (The core requirement for true randomness)
@@ -478,6 +601,7 @@
         // 9. Evaluate Test and Update UI
         function executeEvaluation() {
             isSubmitted = true;
+            stopExamTimer();
             
             // Hide submit buttons
             document.getElementById('header-submit-btn').style.display = 'none';
@@ -623,6 +747,7 @@
 
         generateTest();
         renderTestUI();
+        startExamTimer();
     } catch (error) {
         console.error(error);
         elTestContainer.innerHTML = `
@@ -630,6 +755,7 @@
                 <h2 class="font-bold text-lg mb-2">Unable to load question files</h2>
                 <p>Check that Gujarati.json , Maths.json , GK.json , English.json and Balvikas.json are valid and available beside this HTML file.</p>
             </div>`;
+        document.getElementById('exam-clock').textContent = '--:--';
         document.getElementById('header-submit-btn').disabled = true;
         elBottomSubmit.querySelector('button').disabled = true;
     }
