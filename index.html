@@ -201,9 +201,9 @@
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"><div class="font-bold text-amber-900">Gujarati MCQ</div><div class="text-xs text-amber-700">30 selected from 1,460</div></div>
-                <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3"><div class="font-bold text-sky-900">Maths MCQ</div><div class="text-xs text-sky-700">30 per test</div></div>
-                <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3"><div class="font-bold text-green-900">GK MCQ</div><div class="text-xs text-green-700">30 per test</div></div>
-                <div class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3"><div class="font-bold text-violet-900">English MCQ</div><div class="text-xs text-violet-700">30 per test</div></div>
+                <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3"><div class="font-bold text-sky-900">Maths MCQ</div><div class="text-xs text-sky-700">30 selected from 30</div></div>
+                <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3"><div class="font-bold text-green-900">GK MCQ</div><div class="text-xs text-green-700">30 selected from 30</div></div>
+                <div class="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3"><div class="font-bold text-violet-900">English MCQ</div><div class="text-xs text-violet-700">30 selected from 30</div></div>
                 <div class="rounded-xl border border-pink-200 bg-pink-50 px-4 py-3"><div class="font-bold text-pink-900">Balvikas MCQ</div><div class="text-xs text-pink-700">30 selected from 1,625</div></div>
             </div>
         </section>
@@ -254,114 +254,18 @@
             { name: 'Balvikas', class: 'badge-Balvikas' }
         ];
         
-        const CORE_SUBJECTS =SUBJECTS.filter(subject => !['Gujarati', 'Balvikas'].includes(subject.name));
+        const CORE_SUBJECTS =SUBJECTS.filter(subject => !['Gujarati', 'Balvikas','Maths', 'GK','English'].includes(subject.name));
         const QUESTIONS_TO_SELECT_PER_SUBJECT = 30; // Pick 30 per subject
         const BALVIKAS_DATA_URL = './Balvikas.json';
         const GUJARATI_DATA_URL = './Gujarati.json';
+        const GUJARATI_DATA_URL = './Maths.json';
+        const GUJARATI_DATA_URL = './GK.json';
+        const GUJARATI_DATA_URL = './English.json';
         let TOTAL_QUESTIONS = 0;
         
         // Previous subject banks retained as source material; only ACTIVE_QUESTION_DATA is used.
         // Each entry is [question, options, correctOptionIndex].
        
-        const ACTIVE_QUESTION_DATA = {
-         Maths: [
-                ["Solve 3x + 5 = 20.", ["3", "5", "7", "8"], 1],
-                ["What is the area of a rectangle 8 cm long and 5 cm wide?", ["13 cm²", "26 cm²", "40 cm²", "80 cm²"], 2],
-                ["What is the square root of 81?", ["7", "8", "9", "12"], 2],
-                ["A triangle has angles of 50° and 60°. What is its third angle?", ["60°", "70°", "80°", "90°"], 1],
-                ["What is 25% of 240?", ["40", "50", "60", "80"], 2],
-                ["What is the mean of 6, 8, 10, and 12?", ["8", "9", "10", "12"], 1],
-                ["What is 3/4 + 1/8?", ["4/8", "5/8", "6/8", "7/8"], 3],
-                ["Two numbers are in the ratio 2:3 and add to 25. What is the smaller number?", ["5", "10", "15", "20"], 1],
-                ["What is the circumference of a circle with radius 7 cm? Use π = 22/7.", ["14 cm", "22 cm", "44 cm", "49 cm"], 2],
-                ["What is the probability of getting heads in one toss of a fair coin?", ["0", "1/4", "1/2", "1"], 2],
-                ["Solve 2x - 3 = 11.", ["5", "6", "7", "8"], 2],
-                ["Which fraction is equal to 0.6?", ["1/2", "3/5", "2/3", "3/4"], 1],
-                ["What is the perimeter of a square with side 6 cm?", ["12 cm", "18 cm", "24 cm", "36 cm"], 2],
-                ["What is 5³?", ["25", "75", "125", "625"], 2],
-                ["What is 40% of 90?", ["18", "27", "36", "45"], 2],
-                ["What is the perimeter of a rectangle 9 cm long and 4 cm wide?", ["13 cm", "26 cm", "36 cm", "72 cm"], 1],
-                ["What is 12 × 15?", ["150", "170", "180", "190"], 2],
-                ["What is 144 ÷ 12?", ["10", "11", "12", "14"], 2],
-                ["Simplify 3x + 2x.", ["5x", "6x", "x²", "5 + x"], 0],
-                ["Expand (x + 2)(x + 3).", ["x² + 5x + 6", "x² + 6x + 5", "x² + x + 6", "2x² + 5"], 0],
-                ["A triangle has base 12 cm and height 5 cm. What is its area?", ["17 cm²", "30 cm²", "60 cm²", "120 cm²"], 1],
-                ["What is the median of 2, 5, 7, 9, and 12?", ["5", "6", "7", "9"], 2],
-                ["How many metres are in 1.5 kilometres?", ["150 m", "1,500 m", "15,000 m", "150,000 m"], 1],
-                ["What is the volume of a cube with side 4 cm?", ["16 cm³", "32 cm³", "64 cm³", "96 cm³"], 2],
-                ["Which decimal is equal to 7/10?", ["0.07", "0.7", "7.1", "70"], 1],
-                ["Solve x/5 = 9.", ["14", "35", "40", "45"], 3],
-                ["What is the sum of the interior angles of a triangle?", ["90°", "180°", "270°", "360°"], 1],
-                ["If y = 3x + 2, what is y when x = 4?", ["10", "12", "14", "16"], 2],
-                ["Which of these numbers is prime?", ["21", "27", "29", "33"], 2],
-                ["A right triangle has legs of 6 cm and 8 cm. What is its hypotenuse?", ["9 cm", "10 cm", "12 cm", "14 cm"], 1]
-            ],
-            GK: [
-                ["ભારતની રાજધાની કઈ છે?", ["મુંબઈ", "નવી દિલ્હી", "અમદાવાદ", "કોલકાતા"], 1],
-                ["ભારતનું ચલણ કયું છે?", ["રૂપિયો", "યેન", "યુરો", "ડોલર"], 0],
-                ["ભારતનું રાષ્ટ્રીય પ્રાણી કયું છે?", ["સિંહ", "વાઘ", "હાથી", "ચિત્તો"], 1],
-                ["ભારતનું રાષ્ટ્રીય પક્ષી કયું છે?", ["કબૂતર", "મોર", "ગરુડ", "કાગડો"], 1],
-                ["ભારતનું રાષ્ટ્રીય ફૂલ કયું છે?", ["ગુલાબ", "કમળ", "સૂર્યમુખી", "મોગરો"], 1],
-                ["ભારતનું રાષ્ટ્રગાન કોણે રચ્યું?", ["રવીન્દ્રનાથ ટાગોર", "બંકિમચંદ્ર ચટ્ટોપાધ્યાય", "સરોજિની નાયડુ", "સુબ્રમણ્યમ ભારતી"], 0],
-                ["‘વંદે માતરમ્’ ગીતના રચયિતા કોણ છે?", ["મહાત્મા ગાંધી", "બંકિમચંદ્ર ચટ્ટોપાધ્યાય", "રવીન્દ્રનાથ ટાગોર", "જવાહરલાલ નહેરુ"], 1],
-                ["ભારતમાં પ્રજાસત્તાક દિવસ ક્યારે ઉજવાય છે?", ["15 ઑગસ્ટ", "26 જાન્યુઆરી", "2 ઑક્ટોબર", "1 મે"], 1],
-                ["ભારતમાં સ્વાતંત્ર્ય દિવસ ક્યારે ઉજવાય છે?", ["26 જાન્યુઆરી", "15 ઑગસ્ટ", "5 સપ્ટેમ્બર", "14 નવેમ્બર"], 1],
-                ["ભારતનું બંધારણ કઈ તારીખે અમલમાં આવ્યું?", ["15 ઑગસ્ટ 1947", "26 જાન્યુઆરી 1950", "26 નવેમ્બર 1949", "2 ઑક્ટોબર 1950"], 1],
-                ["ગુજરાતની રાજધાની કઈ છે?", ["સુરત", "ગાંધીનગર", "રાજકોટ", "વડોદરા"], 1],
-                ["ગુજરાત રાજ્યની સ્થાપના દિવસ ક્યારે છે?", ["1 મે 1960", "15 ઑગસ્ટ 1947", "26 જાન્યુઆરી 1950", "1 નવેમ્બર 1956"], 0],
-                ["સાબરમતી આશ્રમ કયા શહેરમાં આવેલો છે?", ["ભુજ", "અમદાવાદ", "સુરત", "જૂનાગઢ"], 1],
-                ["સ્ટેચ્યૂ ઑફ યુનિટી ગુજરાતના કયા સ્થળે આવેલું છે?", ["દ્વારકા", "એકતા નગર", "પોરબંદર", "પાલિતાણા"], 1],
-                ["ગીર રાષ્ટ્રીય ઉદ્યાન કયા પ્રાણી માટે જાણીતું છે?", ["એશિયાઈ સિંહ", "વાઘ", "એકશિંગી ગેંડો", "હિમચિત્તો"], 0],
-                ["સરદાર સરોવર બંધ કઈ નદી પર બાંધવામાં આવ્યો છે?", ["તાપી", "નર્મદા", "સાબરમતી", "મહી"], 1],
-                ["વિશ્વનો સૌથી મોટો મહાસાગર કયો છે?", ["હિંદ મહાસાગર", "અટલાન્ટિક મહાસાગર", "પ્રશાંત મહાસાગર", "આર્કટિક મહાસાગર"], 2],
-                ["સૌરમંડળમાં ‘લાલ ગ્રહ’ તરીકે કયો ગ્રહ ઓળખાય છે?", ["શુક્ર", "મંગળ", "બુધ", "ગુરુ"], 1],
-                ["પૃથ્વીની સૌથી નજીકનો તારો કયો છે?", ["ધ્રુવતારો", "સૂર્ય", "સિરિયસ", "ચંદ્ર"], 1],
-                ["પૃથ્વીનો કુદરતી ઉપગ્રહ કયો છે?", ["મંગળ", "ચંદ્ર", "શુક્ર", "સૂર્ય"], 1],
-                ["સામાન્ય દબાણે શુદ્ધ પાણી આશરે કયા તાપમાને થીજી જાય છે?", ["0°C", "10°C", "50°C", "100°C"], 0],
-                ["લીલા છોડ પોતાનો ખોરાક મુખ્યત્વે કઈ પ્રક્રિયા દ્વારા બનાવે છે?", ["શ્વસન", "પ્રકાશસંશ્લેષણ", "બાષ્પીભવન", "પાચન"], 1],
-                ["માનવ શરીરનું સૌથી મોટું અંગ કયું છે?", ["હૃદય", "ત્વચા", "યકૃત", "ફેફસાં"], 1],
-                ["સંયુક્ત રાષ્ટ્રસંઘનું મુખ્ય મથક કયા શહેરમાં છે?", ["જિનીવા", "ન્યૂયોર્ક", "પેરિસ", "લંડન"], 1],
-                ["વિશ્વ પર્યાવરણ દિવસ ક્યારે મનાવવામાં આવે છે?", ["5 જૂન", "21 જૂન", "5 સપ્ટેમ્બર", "10 ડિસેમ્બર"], 0],
-                ["આંતરરાષ્ટ્રીય યોગ દિવસ ક્યારે મનાવવામાં આવે છે?", ["1 મે", "21 જૂન", "15 ઑગસ્ટ", "2 ઑક્ટોબર"], 1],
-                ["WHOનું પૂરું નામ શું છે?", ["World Health Organization", "World History Office", "World Housing Organization", "World Heritage Office"], 0],
-                ["ચંદ્રયાન-3એ કયા આકાશી પિંડ પર સફળ સોફ્ટ લેન્ડિંગ કર્યું?", ["મંગળ", "ચંદ્ર", "શુક્ર", "સૂર્ય"], 1],
-                ["ભારતીય સંસદનાં બે ગૃહ કયાં છે?", ["લોકસભા અને રાજ્યસભા", "વિધાનસભા અને ગ્રામસભા", "રાજ્યસભા અને પંચાયત", "લોકસભા અને નગરપાલિકા"], 0],
-                ["ભારતનું રાષ્ટ્રીય વૃક્ષ કયું છે?", ["લીમડો", "વડ", "પીપળો", "આંબો"], 1]
-            ],
-            English: [
-                ["What is the plural of child?", ["Childs", "Children", "Childes", "Childrens"], 1],
-                ["What is the past tense of go?", ["Goed", "Gone", "Went", "Going"], 2],
-                ["Choose the correct article: ___ umbrella.", ["A", "An", "The a", "No article can be used"], 1],
-                ["What is the opposite of hot?", ["Warm", "Cold", "Dry", "Bright"], 1],
-                ["Which word is a synonym of happy?", ["Joyful", "Angry", "Tired", "Quiet"], 0],
-                ["She ___ to school every day.", ["go", "going", "goes", "gone"], 2],
-                ["They ___ playing now.", ["is", "are", "was", "be"], 1],
-                ["In the phrase ‘a blue sky,’ which word is the adjective?", ["a", "blue", "sky", "the"], 1],
-                ["In ‘He ran quickly,’ which word is the adverb?", ["He", "ran", "quickly", "none"], 2],
-                ["Which pronoun can replace ‘Rina’ in ‘Rina is reading’?", ["He", "She", "They", "We"], 1],
-                ["Which of these is a noun?", ["Book", "Quickly", "Under", "And"], 0],
-                ["Which punctuation mark usually ends a direct question?", [".", ",", "?", ":"], 2],
-                ["Which is a proper noun?", ["city", "Ahmedabad", "river", "teacher"], 1],
-                ["What is the plural of box?", ["Boxs", "Boxes", "Boxies", "Boxen"], 1],
-                ["What is the comparative form of tall?", ["Tallest", "More tall", "Taller", "Talling"], 2],
-                ["What is the superlative form of tall?", ["Taller", "Tallest", "Most taller", "More tall"], 1],
-                ["The book is ___ the table.", ["on", "quickly", "because", "beautiful"], 0],
-                ["Which word is a conjunction?", ["And", "Blue", "Run", "Softly"], 0],
-                ["Choose the present continuous sentence.", ["I read every day.", "I am reading now.", "I read yesterday.", "I will read tomorrow."], 1],
-                ["What should usually begin with a capital letter in English?", ["The first word of a sentence", "Every article", "Every preposition", "Every word after a comma"], 0],
-                ["Choose the correct article: He is ___ honest person.", ["a", "an", "the a", "no article"], 1],
-                ["What is the plural of leaf?", ["Leafs", "Leaves", "Leafes", "Leavs"], 1],
-                ["What is the opposite of early?", ["Soon", "Late", "Fast", "First"], 1],
-                ["Which pair are homophones?", ["Sea / see", "Book / boot", "Cat / cut", "Run / ran"], 0],
-                ["She ___ tomorrow.", ["travel", "travels yesterday", "will travel", "travelled"], 2],
-                ["Which form shows that the book belongs to Rina?", ["Rinas book", "Rina book's", "Rina's book", "Rinas' book"], 2],
-                ["What is the collective noun in ‘a flock of birds’?", ["birds", "flock", "of", "a"], 1],
-                ["There are ___ books on the shelf.", ["much", "many", "anyone", "little"], 1],
-                ["Choose the correct article: She studies at ___ university.", ["a", "an", "the an", "no article"], 0],
-                ["Which sentence is grammatically correct?", ["He have a red bicycle.", "He has a red bicycle.", "He having a red bicycle.", "He are a red bicycle."], 1]
-            ]
-        };
-
         let questionBank = [];
         let testQuestions = []; // Final shuffled exam questions
         let userAnswers = {}; // Mapping of testQuestionIndex -> selectedOptionIndex
@@ -664,6 +568,21 @@
             subject: 'Balvikas',
             subjectClass: 'badge-Balvikas',
             url: BALVIKAS_DATA_URL
+        },
+         {
+            subject: 'Maths',
+            subjectClass: 'badge-Maths',
+            url: MATHS_DATA_URL
+        },
+         {
+            subject: 'GK',
+            subjectClass: 'badge-GK',
+            url: GK_DATA_URL
+        }, 
+        {
+            subject: 'English',
+            subjectClass: 'badge-English',
+            url: ENGLISH_DATA_URL
         }
     ];
 
@@ -709,7 +628,7 @@
         elTestContainer.innerHTML = `
             <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6">
                 <h2 class="font-bold text-lg mb-2">Unable to load question files</h2>
-                <p>Check that Gujarati.json and Balvikas.json are valid and available beside this HTML file.</p>
+                <p>Check that Gujarati.json , Maths.json , GK.json , English.json and Balvikas.json are valid and available beside this HTML file.</p>
             </div>`;
         document.getElementById('header-submit-btn').disabled = true;
         elBottomSubmit.querySelector('button').disabled = true;
