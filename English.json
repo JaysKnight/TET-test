@@ -1,332 +1,5502 @@
 [
   {
     "id": 1,
-    "question": "What is the plural of child?",
+    "question": "A word that indicates a physical action, a mental action, or a state of being is known as",
     "options": [
-      "Childs",
-      "Children",
-      "Childes",
-      "Childrens"
+      "Noun",
+      "Verb",
+      "Adjective",
+      "Pronoun"
     ],
     "correctIndex": 1
   },
   {
     "id": 2,
-    "question": "What is the past tense of go?",
+    "question": "What kind of article is \"the\"? (Which indicates something specific)",
     "options": [
-      "Goed",
-      "Gone",
-      "Went",
-      "Going"
+      "Definite",
+      "Indefinite",
+      "Not clear",
+      "None"
     ],
-    "correctIndex": 2
+    "correctIndex": 0
   },
   {
     "id": 3,
-    "question": "Choose the correct article: ___ umbrella.",
+    "question": "________ is a word used in place of a noun.",
     "options": [
-      "A",
-      "An",
-      "The a",
-      "No article can be used"
+      "A noun",
+      "A pronoun",
+      "An adverb",
+      "A preposition"
     ],
     "correctIndex": 1
   },
   {
     "id": 4,
-    "question": "What is the opposite of hot?",
+    "question": "An ________ is a word or phrase that expresses a strong feeling or emotion.",
     "options": [
-      "Warm",
-      "Cold",
-      "Dry",
-      "Bright"
+      "Interjection",
+      "Verb",
+      "Preposition",
+      "Noun"
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": 5,
-    "question": "Which word is a synonym of happy?",
+    "question": "A group of letters that expresses a particular meaning is known as:",
     "options": [
-      "Joyful",
-      "Angry",
-      "Tired",
-      "Quiet"
+      "Word",
+      "Sentence",
+      "Preposition",
+      "None of these"
     ],
     "correctIndex": 0
   },
   {
     "id": 6,
-    "question": "She ___ to school every day.",
+    "question": "A group of words containing a subject and a verb, that expresses a meaningful structure is known as:",
     "options": [
-      "go",
-      "going",
-      "goes",
-      "gone"
+      "Phrase",
+      "Noun",
+      "Word",
+      "Sentence"
     ],
-    "correctIndex": 2
+    "correctIndex": 3
   },
   {
     "id": 7,
-    "question": "They ___ playing now.",
+    "question": "________ is a naming word.",
     "options": [
-      "is",
-      "are",
-      "was",
-      "be"
-    ],
-    "correctIndex": 1
-  },
-  {
-    "id": 8,
-    "question": "In the phrase ‘a blue sky,’ which word is the adjective?",
-    "options": [
-      "a",
-      "blue",
-      "sky",
-      "the"
-    ],
-    "correctIndex": 1
-  },
-  {
-    "id": 9,
-    "question": "In ‘He ran quickly,’ which word is the adverb?",
-    "options": [
-      "He",
-      "ran",
-      "quickly",
-      "none"
+      "Conjunction",
+      "Interjection",
+      "Noun",
+      "Adverb"
     ],
     "correctIndex": 2
   },
   {
-    "id": 10,
-    "question": "Which pronoun can replace ‘Rina’ in ‘Rina is reading’?",
+    "id": 8,
+    "question": "How many sounds are there in the English language?",
     "options": [
-      "He",
-      "She",
-      "They",
-      "We"
+      "20",
+      "24",
+      "44",
+      "26"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 9,
+    "question": "'Article is also known as ________.",
+    "options": [
+      "Determiners",
+      "Auxiliary",
+      "Preposition",
+      "Verb"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 10,
+    "question": "'A' and 'AN' are ________ articles.",
+    "options": [
+      "Definite",
+      "Indefinite",
+      "Proper",
+      "None of these"
     ],
     "correctIndex": 1
   },
   {
     "id": 11,
-    "question": "Which of these is a noun?",
+    "question": "I saw a ________ of fish near the beach.",
     "options": [
-      "Book",
-      "Quickly",
-      "Under",
-      "And"
+      "Colony",
+      "School",
+      "Flock",
+      "Bask"
     ],
-    "correctIndex": 0
+    "correctIndex": 1
   },
   {
     "id": 12,
-    "question": "Which punctuation mark usually ends a direct question?",
+    "question": "Which nouns are the names of particular persons, animals, places or things?",
     "options": [
-      ".",
-      ",",
-      "?",
-      ":"
+      "abstract",
+      "proper",
+      "common",
+      "collective"
     ],
-    "correctIndex": 2
+    "correctIndex": 1
   },
   {
     "id": 13,
-    "question": "Which is a proper noun?",
+    "question": "'Wisdom' is the example of -",
     "options": [
-      "city",
-      "Ahmedabad",
-      "river",
-      "teacher"
+      "abstract noun",
+      "proper noun",
+      "common noun",
+      "collective noun"
     ],
-    "correctIndex": 1
+    "correctIndex": 0
   },
   {
     "id": 14,
-    "question": "What is the plural of box?",
+    "question": "'The Ganga' is the example of -",
     "options": [
-      "Boxs",
-      "Boxes",
-      "Boxies",
-      "Boxen"
-    ],
-    "correctIndex": 1
-  },
-  {
-    "id": 15,
-    "question": "What is the comparative form of tall?",
-    "options": [
-      "Tallest",
-      "More tall",
-      "Taller",
-      "Talling"
+      "abstract noun",
+      "common noun",
+      "proper noun",
+      "collective noun"
     ],
     "correctIndex": 2
   },
   {
-    "id": 16,
-    "question": "What is the superlative form of tall?",
+    "id": 15,
+    "question": "'Sadness' is the example of -",
     "options": [
-      "Taller",
-      "Tallest",
-      "Most taller",
-      "More tall"
+      "abstract noun",
+      "proper noun",
+      "common noun",
+      "collective noun"
     ],
-    "correctIndex": 1
+    "correctIndex": 0
+  },
+  {
+    "id": 16,
+    "question": "India is our nation. Here 'nation' is an example of -",
+    "options": [
+      "abstract noun",
+      "proper noun",
+      "common noun",
+      "collective noun"
+    ],
+    "correctIndex": 2
   },
   {
     "id": 17,
-    "question": "The book is ___ the table.",
+    "question": "Which noun below is a collective noun?",
     "options": [
-      "on",
-      "quickly",
-      "because",
-      "beautiful"
+      "Actor",
+      "President",
+      "Caravan",
+      "None of these"
     ],
-    "correctIndex": 0
+    "correctIndex": 2
   },
   {
     "id": 18,
-    "question": "Which word is a conjunction?",
+    "question": "Which noun below is not a material noun?",
     "options": [
-      "And",
-      "Blue",
-      "Run",
-      "Softly"
-    ],
-    "correctIndex": 0
-  },
-  {
-    "id": 19,
-    "question": "Choose the present continuous sentence.",
-    "options": [
-      "I read every day.",
-      "I am reading now.",
-      "I read yesterday.",
-      "I will read tomorrow."
+      "silver",
+      "student",
+      "water",
+      "paper"
     ],
     "correctIndex": 1
   },
   {
-    "id": 20,
-    "question": "What should usually begin with a capital letter in English?",
+    "id": 19,
+    "question": "Which noun below is a common noun?",
     "options": [
-      "The first word of a sentence",
-      "Every article",
-      "Every preposition",
-      "Every word after a comma"
+      "lion",
+      "tiger",
+      "crocodile",
+      "bird"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 20,
+    "question": "Which noun below is a countable noun?",
+    "options": [
+      "building",
+      "cement",
+      "sand",
+      "water"
     ],
     "correctIndex": 0
   },
   {
     "id": 21,
-    "question": "Choose the correct article: He is ___ honest person.",
+    "question": "Find out opposite gender of - Monk",
     "options": [
-      "a",
-      "an",
-      "the a",
-      "no article"
+      "Countess",
+      "Nun",
+      "Elf",
+      "Monkey"
     ],
     "correctIndex": 1
   },
   {
     "id": 22,
-    "question": "What is the plural of leaf?",
+    "question": "Find out opposite gender of - Senor",
     "options": [
-      "Leafs",
-      "Leaves",
-      "Leafes",
-      "Leavs"
+      "Senory",
+      "Senorite",
+      "Senorita",
+      "Senorica"
     ],
-    "correctIndex": 1
+    "correctIndex": 2
   },
   {
     "id": 23,
-    "question": "What is the opposite of early?",
+    "question": "Find out opposite gender of - lad",
     "options": [
-      "Soon",
-      "Late",
-      "Fast",
-      "First"
+      "Las",
+      "Lass",
+      "Less",
+      "Last"
     ],
     "correctIndex": 1
   },
   {
     "id": 24,
-    "question": "Which pair are homophones?",
+    "question": "Find out opposite gender of - Duke",
     "options": [
-      "Sea / see",
-      "Book / boot",
-      "Cat / cut",
-      "Run / ran"
+      "Dukess",
+      "Duchess",
+      "Duckess",
+      "Duck"
     ],
-    "correctIndex": 0
+    "correctIndex": 1
   },
   {
     "id": 25,
-    "question": "She ___ tomorrow.",
+    "question": "Find out opposite gender of - Heir",
     "options": [
-      "travel",
-      "travels yesterday",
-      "will travel",
-      "travelled"
+      "Heri",
+      "Heire",
+      "Heires",
+      "Heiress"
     ],
-    "correctIndex": 2
+    "correctIndex": 3
   },
   {
     "id": 26,
-    "question": "Which form shows that the book belongs to Rina?",
+    "question": "Find out opposite gender of - Witch",
     "options": [
-      "Rinas book",
-      "Rina book's",
-      "Rina's book",
-      "Rinas' book"
+      "Lizard",
+      "Wizard",
+      "Wizared",
+      "Abbot"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 27,
+    "question": "Find out opposite gender of - Landlord",
+    "options": [
+      "Tenant",
+      "Land woman",
+      "Land lady",
+      "Land female"
     ],
     "correctIndex": 2
   },
   {
-    "id": 27,
-    "question": "What is the collective noun in ‘a flock of birds’?",
-    "options": [
-      "birds",
-      "flock",
-      "of",
-      "a"
-    ],
-    "correctIndex": 1
-  },
-  {
     "id": 28,
-    "question": "There are ___ books on the shelf.",
+    "question": "Find out opposite gender of - Tailor",
     "options": [
-      "much",
-      "many",
-      "anyone",
-      "little"
+      "Tailoress",
+      "Seamstress",
+      "Gentleman",
+      "A and B both"
     ],
-    "correctIndex": 1
+    "correctIndex": 3
   },
   {
     "id": 29,
-    "question": "Choose the correct article: She studies at ___ university.",
+    "question": "Find out opposite gender of - Tom - Cat",
     "options": [
-      "a",
-      "an",
-      "the an",
-      "no article"
+      "Tommy cat",
+      "She cat",
+      "Tom Catty",
+      "Tommy catty"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 30,
+    "question": "Find out opposite gender of - Drone",
+    "options": [
+      "Hive",
+      "Swarm",
+      "Bee",
+      "Drony"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 31,
+    "question": "Give plural form of - \"Storey\"",
+    "options": [
+      "Stories",
+      "Storeys",
+      "Storeyes",
+      "Storiess"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 32,
+    "question": "Give plural form of - \"Petroleum\"",
+    "options": [
+      "Petrolea",
+      "Petrolias",
+      "Petroleums",
+      "Petroliums"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 33,
+    "question": "Give plural form of - \"elf\"",
+    "options": [
+      "Elfs",
+      "Elves",
+      "Elvess",
+      "Elvies"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 34,
+    "question": "Give plural form of - \"Goose\"",
+    "options": [
+      "Geese",
+      "Gooses",
+      "Goosies",
+      "Gice"
     ],
     "correctIndex": 0
   },
   {
-    "id": 30,
-    "question": "Which sentence is grammatically correct?",
+    "id": 35,
+    "question": "Give plural form of - \"Diagnosis\"",
     "options": [
-      "He have a red bicycle.",
-      "He has a red bicycle.",
-      "He having a red bicycle.",
-      "He are a red bicycle."
+      "Diagnosis",
+      "Diagnosess",
+      "Diagnoses",
+      "Diagnocises"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 36,
+    "question": "Give plural form of - \"Tornado\"",
+    "options": [
+      "Tornadoes",
+      "Tornados",
+      "Tornadoss",
+      "Tornadice"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 37,
+    "question": "Choose the correct pair:",
+    "options": [
+      "Salary - Salaries",
+      "Solo - Solos",
+      "Piano - Pianos",
+      "All of the above"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 38,
+    "question": "Choose the correct pair:",
+    "options": [
+      "Echo - Echoess",
+      "Maid-servant - Maids-servants",
+      "Turf - Turfs",
+      "Alumnus - Alumnie"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 39,
+    "question": "Choose the incorrect pair:",
+    "options": [
+      "Basis - Bases",
+      "Datum - Datums",
+      "Genius - Genii",
+      "Medium - Media"
     ],
     "correctIndex": 1
+  },
+  {
+    "id": 40,
+    "question": "Choose the incorrect pair:",
+    "options": [
+      "Radius - Radi",
+      "Terminus - Termini",
+      "Syllabus - Syllabi",
+      "Stadium - Stadiums"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 41,
+    "question": "So, the Hail came. ________ was dressed in grey, and ________ breath was like ice.",
+    "options": [
+      "He, his",
+      "It, its",
+      "She, her",
+      "It, her"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 42,
+    "question": "Margot and ________ were sent to Aachen to stay with our grandmother.",
+    "options": [
+      "Me",
+      "My",
+      "I",
+      "None of these"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 43,
+    "question": "It could be an example of how humans and animals can coexist without harming ________.",
+    "options": [
+      "Each other",
+      "Each other's",
+      "One another",
+      "One another's"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 44,
+    "question": "________ is the only tree in all my parks.",
+    "options": [
+      "Your",
+      "Yours",
+      "You",
+      "None of these"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 45,
+    "question": "People also sing, dance, play games and enjoy ________.",
+    "options": [
+      "Himself",
+      "themself",
+      "Themselves",
+      "Oneself"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 46,
+    "question": "One should learn to defend ________ against bullies.",
+    "options": [
+      "Herself",
+      "Itself",
+      "Himself",
+      "Oneself"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 47,
+    "question": "Chandani herself was astonished that she had been able to say it. (\"herself\" Identify the pronoun)",
+    "options": [
+      "Reflexive",
+      "Emphatic",
+      "Relative",
+      "Reciprocal"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 48,
+    "question": "So the old man went gleefully home to share his joy with ________ dear old wife.",
+    "options": [
+      "its",
+      "her",
+      "his",
+      "their"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 49,
+    "question": "When the daimio himself was almost directly under him, he threw a handful of ashes over the tree, which did not change a particle. (\"himself\" Identify)",
+    "options": [
+      "Personal pronoun",
+      "Reciprocal pronoun",
+      "Emphatic pronoun",
+      "Reflexive pronoun"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 50,
+    "question": "He is sharpening his pencil. (\"his\" Identify)",
+    "options": [
+      "Pronoun",
+      "Adverb",
+      "Preposition",
+      "None of these"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 51,
+    "question": "In ________ days I was a great admirer of beauty and I believed in making myself look handsome.",
+    "options": [
+      "That",
+      "These",
+      "This",
+      "Those"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 52,
+    "question": "________ were grey, actually, with dust. You could see the clear mark of every toe on the front part of ________ slipper.",
+    "options": [
+      "These, both",
+      "That, all",
+      "Those, each",
+      "Those, few"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 53,
+    "question": "Some are looking out of the window. (\"Some\" Identify)",
+    "options": [
+      "Pronoun",
+      "Verb",
+      "Adverb",
+      "Adjective"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 54,
+    "question": "He becomes the conduit of communication between ________ poles of the Universe.",
+    "options": [
+      "Three",
+      "Both",
+      "Four",
+      "Two"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 55,
+    "question": "________ her parents had died.",
+    "options": [
+      "Both",
+      "All",
+      "Some",
+      "More"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 56,
+    "question": "________ days children have no respect for elders.",
+    "options": [
+      "Those",
+      "These",
+      "This",
+      "That  B 57.  But this was one of ________ rare occasions when he did. A) That B) Those C) These D) This"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 58,
+    "question": "________ has a story to tell.",
+    "options": [
+      "Each one",
+      "Few",
+      "Every of",
+      "All"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 59,
+    "question": "________ the projects are wonderful.",
+    "options": [
+      "Each",
+      "Both",
+      "Every",
+      "One"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 60,
+    "question": "The people of India are richer than ________ of Africa.",
+    "options": [
+      "That",
+      "These",
+      "Those",
+      "This"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 61,
+    "question": "One must take care of ________ health.",
+    "options": [
+      "His",
+      "Her",
+      "One's",
+      "Their"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 62,
+    "question": "Everyone should mind ________ own business.",
+    "options": [
+      "Her",
+      "His",
+      "One's",
+      "Their"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 63,
+    "question": "Anyone can do this if ________ tries.",
+    "options": [
+      "She",
+      "They",
+      "One",
+      "He"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 64,
+    "question": "Everyone can get ________ health checked up in a hospital.",
+    "options": [
+      "His",
+      "Her",
+      "Their",
+      "None of these"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 65,
+    "question": "Can you please answer the phone? ________ is calling.",
+    "options": [
+      "Everything",
+      "No one",
+      "Someone",
+      "None"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 66,
+    "question": "The building is empty. There is ________ inside it.",
+    "options": [
+      "Everybody",
+      "Somebody",
+      "Anybody",
+      "Nobody"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 67,
+    "question": "I can't meet you tomorrow because I have ________ important to do.",
+    "options": [
+      "Somebody",
+      "Nothing",
+      "Something",
+      "No body"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 68,
+    "question": "I know your secret. I won't tell ________.",
+    "options": [
+      "Nothing",
+      "None",
+      "Nobody",
+      "Anybody"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 69,
+    "question": "Don't trust ________.",
+    "options": [
+      "Anyone",
+      "Someone",
+      "No one",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 70,
+    "question": "________ knocked at the door.",
+    "options": [
+      "Somebody",
+      "Nothing",
+      "Something",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 71,
+    "question": "He is Chirag, ________ is my brother.",
+    "options": [
+      "Whom",
+      "That",
+      "Who",
+      "Which"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 72,
+    "question": "Man is the only animal ________ laughs.",
+    "options": [
+      "Which",
+      "Who",
+      "That",
+      "Whose"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 73,
+    "question": "Mr. Mathur was the most eloquent speaker ________ I ever heard.",
+    "options": [
+      "That",
+      "Whom",
+      "Who",
+      "Which"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 74,
+    "question": "My parents have given me everything ________ they had.",
+    "options": [
+      "Which",
+      "Who",
+      "Whose",
+      "That"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 75,
+    "question": "They, ________ in glass house, should not throw stones.",
+    "options": [
+      "That, lives",
+      "Who, live",
+      "Who, lives",
+      "That, live"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 76,
+    "question": "This is one of the best suggestions ________ have been ever made by you.",
+    "options": [
+      "Which",
+      "What",
+      "That",
+      "Whom"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 77,
+    "question": "The only person ________ can read and write English well is my friend.",
+    "options": [
+      "Who",
+      "That",
+      "What",
+      "Whose"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 78,
+    "question": "Students ________ failed in the test have to take the re-test.",
+    "options": [
+      "Which",
+      "That",
+      "Who",
+      "B and C both"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 79,
+    "question": "A Woman can do everything ________ a man can do.",
+    "options": [
+      "What",
+      "Which",
+      "That",
+      "Whom"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 80,
+    "question": "The Terrorist, ________ was chained grumble at the D.S.P who was taking him to prison.",
+    "options": [
+      "That",
+      "Who",
+      "Whom",
+      "Which"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 81,
+    "question": "My younger brother is good ________ Mathematics.",
+    "options": [
+      "at",
+      "on",
+      "in",
+      "with"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 82,
+    "question": "Rama is good ________ dancing.",
+    "options": [
+      "on",
+      "at",
+      "for",
+      "about"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 83,
+    "question": "The film will start ________ 7 pm.",
+    "options": [
+      "At",
+      "In",
+      "For",
+      "On"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 84,
+    "question": "Dipti is good ________ Science.",
+    "options": [
+      "about",
+      "in",
+      "at",
+      "of"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 85,
+    "question": "I forgot my danger and smiled feebly ________ myself.",
+    "options": [
+      "on",
+      "to",
+      "At",
+      "By"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 86,
+    "question": "Karuna noticed that the teacher was standing by her side, smiling ________ her.",
+    "options": [
+      "by",
+      "to",
+      "with",
+      "at"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 87,
+    "question": "The Final game is ________ Narendra Modi stadium.",
+    "options": [
+      "In",
+      "At",
+      "With",
+      "To"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 88,
+    "question": "They finally reached ________ the museum.",
+    "options": [
+      "At",
+      "To",
+      "By",
+      "None of these"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 89,
+    "question": "Every dog is a lion ________ home.",
+    "options": [
+      "at",
+      "In",
+      "With",
+      "From"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 90,
+    "question": "If a donkey brays at you, don't bray ________ him.",
+    "options": [
+      "At",
+      "To",
+      "From",
+      "By"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 91,
+    "question": "Dipti must be back home ________ 10 O'clock.",
+    "options": [
+      "by",
+      "till",
+      "for",
+      "to"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 92,
+    "question": "I am just going out to shop. I'll be back ________ 15 minutes.",
+    "options": [
+      "from",
+      "in",
+      "on",
+      "for"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 93,
+    "question": "Viswanathan Anand was born ________ 11th December, 1969.",
+    "options": [
+      "at",
+      "in",
+      "on",
+      "with"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 94,
+    "question": "I got my parcel ........ Monday.",
+    "options": [
+      "since",
+      "for",
+      "to",
+      "on"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 95,
+    "question": "Someone has pasted a notice ________ the wall.",
+    "options": [
+      "over",
+      "behind",
+      "with",
+      "on"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 96,
+    "question": "Everyone has to be at work ________ 9:00 a.m.",
+    "options": [
+      "of",
+      "by",
+      "on",
+      "from"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 97,
+    "question": "The pig was killed ________ the hunter ________ the gun.",
+    "options": [
+      "by, with",
+      "with, with",
+      "on, with",
+      "by, by 98.  The lobster took his hand ________ his great pincer-like claws and pinched it so hard that Hari yelled ________ pain. A) By, in B) In, in C) To, by D) At, to"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 99,
+    "question": "Long, long ago, in the land of Kangleipak ________ Manipur.",
+    "options": [
+      "At",
+      "On",
+      "In",
+      "From"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 100,
+    "question": "I would rather travel ________ train than ________ plane.",
+    "options": [
+      "On, on",
+      "On, by",
+      "In, by",
+      "By, by"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 101,
+    "question": "I heartily agree ________ her on this.",
+    "options": [
+      "To",
+      "With",
+      "Of",
+      "From"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 102,
+    "question": "Tushar got angry ________ me because of my remark.",
+    "options": [
+      "To",
+      "From",
+      "In",
+      "With"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 103,
+    "question": "The blankets are made ________ wool and the sheets ________ cotton.",
+    "options": [
+      "For, from",
+      "By, with",
+      "With, from",
+      "From, from"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 104,
+    "question": "The frame is made ________ steel.",
+    "options": [
+      "Of",
+      "From",
+      "To",
+      "With"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 105,
+    "question": "The police are trying to tie up his escape ________ prison.",
+    "options": [
+      "To",
+      "In",
+      "From",
+      "Within"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 106,
+    "question": "Dev is suffering ________ a serious illness.",
+    "options": [
+      "From",
+      "To",
+      "In",
+      "By"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 107,
+    "question": "I am proud ________ my Indian roots.",
+    "options": [
+      "To",
+      "Of",
+      "For",
+      "In"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 108,
+    "question": "They died ________ thirst or starvation.",
+    "options": [
+      "From",
+      "To",
+      "In",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 109,
+    "question": "Thousands of people have died ________ hunger.",
+    "options": [
+      "From",
+      "Of",
+      "To",
+      "In"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 110,
+    "question": "Jenny asked her to abide ________ her a while longer.",
+    "options": [
+      "With",
+      "To",
+      "In",
+      "From"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 111,
+    "question": "I noticed a certain reluctance ________ the teachers.",
+    "options": [
+      "Among",
+      "To",
+      "Into",
+      "With"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 112,
+    "question": "Sudhir was sitting ________ a group of children, telling them a story.",
+    "options": [
+      "Among",
+      "Amongst",
+      "Within",
+      "From"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 113,
+    "question": "Southwest is ________ to northeast.",
+    "options": [
+      "Opposite",
+      "Between",
+      "Into",
+      "To"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 114,
+    "question": "Cars must not park ________ the entrance.",
+    "options": [
+      "Before",
+      "Opposite",
+      "In from of",
+      "In front of"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 115,
+    "question": "He has bought a piece of land ________ building a house.",
+    "options": [
+      "So that",
+      "In order to",
+      "With a view to",
+      "Because of"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 116,
+    "question": "The government plans to cut taxes ________ stimulate the economy.",
+    "options": [
+      "With a view to",
+      "Because of",
+      "In order to",
+      "So that"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 117,
+    "question": "The police beat the door down ________ get into the building.",
+    "options": [
+      "in order to",
+      "from",
+      "with a view to",
+      "none of these  118.  Books must be kept according ________ a prescribed form. A) From B) To C) By D) Into"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 119,
+    "question": "Many smokers who are chemically addicted ________ nicotine cannot cut down easily.",
+    "options": [
+      "From",
+      "With",
+      "To",
+      "By"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 120,
+    "question": "Lions belong ________ the cat family.",
+    "options": [
+      "From",
+      "To",
+      "Into",
+      "By"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 121,
+    "question": "She watched him walk ________ the platform.",
+    "options": [
+      "Into",
+      "Onto",
+      "By",
+      "With"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 122,
+    "question": "In hospital he'll be ________ observation all the time.",
+    "options": [
+      "Under",
+      "Below",
+      "To",
+      "Within"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 123,
+    "question": "The President is ________ intense pressure to resign.",
+    "options": [
+      "Into",
+      "Under",
+      "With",
+      "By"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 124,
+    "question": "You resemble ________ your mother very closely.",
+    "options": [
+      "To",
+      "Into",
+      "For",
+      "No preposition is required"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 125,
+    "question": "He ordered ________ coffee to be sent up.",
+    "options": [
+      "To",
+      "For",
+      "By",
+      "Omission"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 126,
+    "question": "Keshvi visited ________ the school with the aim ________ seeing the library.",
+    "options": [
+      "To, of",
+      "Into, for",
+      "Omission, of",
+      "To, by"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 127,
+    "question": "His idea for going ________ abroad was brushed aside by his father.",
+    "options": [
+      "Into",
+      "To",
+      "By",
+      "Omission"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 128,
+    "question": "She eventually married ________ her childhood friend.",
+    "options": [
+      "To",
+      "Omission",
+      "With",
+      "By"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 129,
+    "question": "He's ________ 80, but is still very active.",
+    "options": [
+      "Over",
+      "Into",
+      "For",
+      "Under"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 130,
+    "question": "Rohan dived ________ the surface of the water.",
+    "options": [
+      "To",
+      "Up to",
+      "Upon",
+      "Below"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 131,
+    "question": "One..... not blame anyone without knowing the facts.",
+    "options": [
+      "Can",
+      "Should",
+      "Are",
+      "Might"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 132,
+    "question": "________ you prosper in your life!",
+    "options": [
+      "May",
+      "Can",
+      "Might",
+      "Would"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 133,
+    "question": "We...... help you at any cost.",
+    "options": [
+      "May",
+      "Can",
+      "Shall",
+      "Will"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 134,
+    "question": "Run away or you ________ be punished.",
+    "options": [
+      "Shall",
+      "Will",
+      "Can",
+      "May"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 135,
+    "question": "We ________ climb Mount Everest.",
+    "options": [
+      "May",
+      "Can",
+      "Is",
+      "Do"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 136,
+    "question": "You ________ clear your accounts before March.",
+    "options": [
+      "Shall",
+      "May",
+      "Can",
+      "Do"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 137,
+    "question": "We ________ respect our parents and teachers.",
+    "options": [
+      "Ought to",
+      "Will",
+      "May",
+      "have to"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 138,
+    "question": "The box was so heavy that I ________ lift it.",
+    "options": [
+      "Can",
+      "Could",
+      "Shall",
+      "May"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 139,
+    "question": "He said I ________ use his car whenever I wanted.",
+    "options": [
+      "Could",
+      "Can",
+      "Will",
+      "Would  140.  She says that she ________ marry him. A) Will B) May C) Shall D) Can"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 141,
+    "question": "When Jenny was two, he ________ already speak very well.",
+    "options": [
+      "might",
+      "could",
+      "can",
+      "should"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 142,
+    "question": "He ________ visit his grandparents' house during holidays.",
+    "options": [
+      "dare to",
+      "ought to",
+      "would",
+      "might"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 143,
+    "question": "________ I talk to the manager?",
+    "options": [
+      "Might",
+      "May",
+      "Could",
+      "Shall"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 144,
+    "question": "\"We ________ definitely look into the matter\", the officer affirmed.",
+    "options": [
+      "need to",
+      "shall",
+      "will",
+      "dare to"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 145,
+    "question": "________ you pass me the salt and pepper?",
+    "options": [
+      "Will",
+      "Can",
+      "Shall",
+      "Ought"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 146,
+    "question": "We ________ reach by 7 PM before the ceremony starts.",
+    "options": [
+      "must",
+      "might",
+      "could",
+      "dare"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 147,
+    "question": "He ________ be shy during his college days.",
+    "options": [
+      "used to",
+      "need to",
+      "ought to",
+      "could"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 148,
+    "question": "I am unable to find my phone. I ________ have lost it on the way back.",
+    "options": [
+      "should",
+      "could",
+      "might",
+      "ought to"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 149,
+    "question": "You ________ visit the doctor before the condition worsens.",
+    "options": [
+      "can",
+      "could",
+      "must",
+      "might"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 150,
+    "question": "You ________ be informed about the results soon.",
+    "options": [
+      "might",
+      "will",
+      "ought to",
+      "can"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 151,
+    "question": "It is good to have some friends both in ________ heaven and ________ hell.",
+    "options": [
+      "A, a",
+      "The, a",
+      "An, no article",
+      "No article, no article"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 152,
+    "question": "________ gold chain gleamed around his leathery neck, and ________ diamond ring glittered on his hand.",
+    "options": [
+      "A, a",
+      "A, the",
+      "No article, a",
+      "The, no article"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 153,
+    "question": "If someone doesn't wear ________ uniform to school.",
+    "options": [
+      "A",
+      "No article",
+      "The",
+      "An"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 154,
+    "question": "This tree was the home of ________ flock of wild geese.",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 155,
+    "question": "________ hunter can come up and kill us all.",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 156,
+    "question": "The hunter climbed the tree with the help of ________ ladder.",
+    "options": [
+      "The",
+      "A",
+      "An",
+      "No article"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 157,
+    "question": "The tourists were amazed to see ________ beautiful Taj Mahal.",
+    "options": [
+      "A",
+      "The",
+      "An",
+      "No article"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 158,
+    "question": "I prefer to study ________ book.",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article  C 159.  ________ S.T. Bus. (Use proper Determiner) A) A B) The C) An D) No article"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 160,
+    "question": "________ One Day Match. (Use proper article)",
+    "options": [
+      "An",
+      "The",
+      "A",
+      "No article"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 161,
+    "question": "Fronika bought ________ ink-pot, ________ bag and ________ umbrella yesterday.",
+    "options": [
+      "A, an, the",
+      "A, an, a",
+      "An, a, an",
+      "An, the, the"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 162,
+    "question": "Nature looks beautiful in ________ spring.",
+    "options": [
+      "No article, no article",
+      "An, the",
+      "The, the",
+      "No article, the"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 163,
+    "question": "Burmese are ________ Buddhists.",
+    "options": [
+      "The, no article",
+      "No article, the",
+      "A, the",
+      "The, the"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 164,
+    "question": "________ BJP is ________ national party.",
+    "options": [
+      "The, the",
+      "The, a",
+      "A, the",
+      "No article, the"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 165,
+    "question": "India defeated Pakistan in ________ last cricket match.",
+    "options": [
+      "A, the, the",
+      "An, a, the",
+      "No article, no article, the",
+      "No article, the, the"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 166,
+    "question": "Brave children are awarded cash prizes, free school education and ________ certificate from ________ Prime Minister of India.",
+    "options": [
+      "A, the",
+      "A, a",
+      "No article, no article",
+      "The, the"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 167,
+    "question": "________ Vande-Bharat express will arrive on ________ second platform.",
+    "options": [
+      "The, a",
+      "A, the",
+      "No article, the",
+      "The, the"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 168,
+    "question": "I was sitting in ________ taxi yesterday.",
+    "options": [
+      "An",
+      "A",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 169,
+    "question": "The farmer's wife was ________ unpopular boy.",
+    "options": [
+      "An",
+      "A",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 170,
+    "question": "Hari was ________ kind-hearted woman.",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 171,
+    "question": "Do you play ________ chess?",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article is required"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 172,
+    "question": "________ cotton, ________ jute and ________ wheat are grown in our country.",
+    "options": [
+      "A, an, a",
+      "No article, no article, no article",
+      "No article, a, the",
+      "The, the, the"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 173,
+    "question": "Ahmedabad is ________ Manchester of Gujarat.",
+    "options": [
+      "A",
+      "The",
+      "An",
+      "No article is required"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 174,
+    "question": "________ Parliament has passed the bill.",
+    "options": [
+      "A",
+      "An",
+      "No article",
+      "The"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 175,
+    "question": "________ red and ________ white rose looks beautiful.",
+    "options": [
+      "A, no article",
+      "A, a",
+      "The, a",
+      "No article, the"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 176,
+    "question": "________ President and ________ S.D.O is coming.",
+    "options": [
+      "The, no article",
+      "The, the",
+      "No article, the",
+      "The, an"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 177,
+    "question": "________ Cancer is a severe disease.",
+    "options": [
+      "A",
+      "The",
+      "An",
+      "No article"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 178,
+    "question": "________ December is the last month of the year.",
+    "options": [
+      "A",
+      "No article",
+      "The",
+      "An"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 179,
+    "question": "Kalidas was ________ poet and ________ dramatist.",
+    "options": [
+      "A, the",
+      "The, the",
+      "The, no article",
+      "A, no article"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 180,
+    "question": "________ Hindustan Times gives ________ latest news.",
+    "options": [
+      "A, an",
+      "The, the",
+      "The, no article",
+      "A, the"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 181,
+    "question": "Open the window,....?",
+    "options": [
+      "don' you",
+      "wan't you",
+      "will you",
+      "should you"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 182,
+    "question": "I have already taken a tea,......................?",
+    "options": [
+      "didn't I",
+      "haven't I",
+      "did I",
+      "have I"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 183,
+    "question": "I am working hard on this book.............?",
+    "options": [
+      "don't I",
+      "amn't I",
+      "aren't I",
+      "can't i"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 184,
+    "question": "He was asleep.................?",
+    "options": [
+      "was he",
+      "wasn't he",
+      "didn't he",
+      "did he"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 185,
+    "question": "Let us start now, .......?",
+    "options": [
+      "shall we",
+      "should we",
+      "shan't we",
+      "would we"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 186,
+    "question": "The bishnois of rajsthan protect trees and animals,................?",
+    "options": [
+      "have they",
+      "weren't they",
+      "do they",
+      "don't they"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 187,
+    "question": "Everyone wanted a ticket,....................?",
+    "options": [
+      "didn't they",
+      "didn't he",
+      "weren't they",
+      "haven't they"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 188,
+    "question": "Let,s take a little rest before we start again .................?",
+    "options": [
+      "will we",
+      "should we",
+      "shall we",
+      "needn't she"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 189,
+    "question": "Anjali dances very well,.................?",
+    "options": [
+      "does she",
+      "doesn't she",
+      "aren't she",
+      "isn't she"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 190,
+    "question": "Both Ram and shyam are engineers...................?",
+    "options": [
+      "isn't he",
+      "isn't she",
+      "are they",
+      "aren't they"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 191,
+    "question": "Shweta as well as her friends, is invited to the party, ....................?",
+    "options": [
+      "is she",
+      "isn't she",
+      "are they",
+      "aren't they"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 192,
+    "question": "________?",
+    "options": [
+      "wasn't they",
+      "weren't they",
+      "wasn't he",
+      "weren't he"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 193,
+    "question": "I am innocent, ....................?",
+    "options": [
+      "aren't I",
+      "amn't I",
+      "do I",
+      "am I"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 194,
+    "question": "We are ready to face the difficulties, ....................?",
+    "options": [
+      "are we",
+      "are't we",
+      "aren't we",
+      "don't we"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 195,
+    "question": "The students have played well, ....................?",
+    "options": [
+      "haven't they",
+      "have they",
+      "has they",
+      "don't they"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 196,
+    "question": "Beena and Dipti won't go there, ....................?",
+    "options": [
+      "shan't they",
+      "won't they",
+      "shall they",
+      "will they"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 197,
+    "question": "He dare not talk to me, ....................?",
+    "options": [
+      "dare he",
+      "daren't he",
+      "need he",
+      "isn't he"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 198,
+    "question": "You dare not come here, ....................?",
+    "options": [
+      "dare you",
+      "don't you",
+      "are you",
+      "none of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 199,
+    "question": "She used to walk in the evening, ....................?",
+    "options": [
+      "did she",
+      "didn't she",
+      "used she",
+      "none of these"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 200,
+    "question": "Nobody is ready, ....................?",
+    "options": [
+      "aren't they",
+      "are they",
+      "is nobody",
+      "isn't he"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 201,
+    "question": "Sanskrit is more difficult than English. (Change into positive degree)",
+    "options": [
+      "English is not so much difficult as Sanskrit",
+      "English is not so difficult as Sanskrit",
+      "English is as difficult as Sanskrit.",
+      "Sanskrit is not so difficult as English."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 202,
+    "question": "In summer, days are longer than nights. (Change into positive degree)",
+    "options": [
+      "Days are as long as nights.",
+      "In summer, nights are as long as days.",
+      "In summer, nights are not so long as days",
+      "In summer, day are so long as nights"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 203,
+    "question": "Iron is as useful as copper. (Use the comparative degree)",
+    "options": [
+      "Copper is not useful than Iron.",
+      "Copper is more useful than Iron",
+      "Iron is more than copper",
+      "Copper is not more useful than iron."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 204,
+    "question": "Cure is not so good as prevention. (Change the degree)",
+    "options": [
+      "Prevention is better than cure.",
+      "Cure is better than prevention",
+      "Prevention is not better than cure.",
+      "Prevention is not so better as cure."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 205,
+    "question": "No other festival in Rajasthan is so famous as Holi. (Change into superlative degree)",
+    "options": [
+      "Rajasthan is the most famous in Holi festival",
+      "Holi is the famous most in Rajasthan.",
+      "Holi is the most famous festival in Rajasthan",
+      "Holi is one of the most famous festivals in Rajasthan."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 206,
+    "question": "Give comparative adjective of - 'Noble'",
+    "options": [
+      "Noblest",
+      "Nobler",
+      "More noble",
+      "Noblerer"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 207,
+    "question": "Give comparative adjective of - 'Dim'",
+    "options": [
+      "Dimer",
+      "Dimmer",
+      "Dimmest",
+      "More dim"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 208,
+    "question": "Give comparative adjective of - 'Holy'",
+    "options": [
+      "Holier",
+      "Holiest",
+      "Holyer",
+      "More holy"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 209,
+    "question": "Give comparative adjective of - 'In'",
+    "options": [
+      "Inner",
+      "Innerest",
+      "More inn",
+      "Iner"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 210,
+    "question": "Give comparative adjective of - 'Nigh'",
+    "options": [
+      "Nigher",
+      "More nigh",
+      "Nigheer",
+      "Nigherr"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 211,
+    "question": "My mother is ________ than my father.",
+    "options": [
+      "Older",
+      "Younger",
+      "Strong",
+      "Tall"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 212,
+    "question": "An elephant is ________ than a cow.",
+    "options": [
+      "Smaller",
+      "Bigger",
+      "Longer",
+      "Shorter"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 213,
+    "question": "Most students think that Mathematics is ________ than other subjects.",
+    "options": [
+      "More expensive",
+      "More beautiful",
+      "More diligent",
+      "More difficult"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 214,
+    "question": "Milk is ________ than any other food.",
+    "options": [
+      "nourishing",
+      "more nourishing",
+      "most nourishing",
+      "none"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 215,
+    "question": "Solomon was ________ than any other king.",
+    "options": [
+      "wise",
+      "wiser",
+      "wisest",
+      "none"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 216,
+    "question": "I can't hear you. Please speak ________.",
+    "options": [
+      "louder",
+      "loudest",
+      "more loud",
+      "the most loud"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 217,
+    "question": "I have no ________ questions.",
+    "options": [
+      "farther",
+      "further",
+      "farthest",
+      "furthest"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 218,
+    "question": "They have three sons and two daughters. Rossy is ________ of their children.",
+    "options": [
+      "most young",
+      "the younger",
+      "the youngest",
+      "younger"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 219,
+    "question": "Red apples are usually ________ than green apples.",
+    "options": [
+      "more sweeter",
+      "most sweet",
+      "sweeter",
+      "sweetest"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 220,
+    "question": "Take the ________ of the two routes.",
+    "options": [
+      "short",
+      "shorter",
+      "shortest",
+      "none"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 221,
+    "question": "I shall teach you if you ________",
+    "options": [
+      "come",
+      "will come",
+      "have come",
+      "came"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 222,
+    "question": "She ________ to the cinema every Sunday.",
+    "options": [
+      "goes",
+      "gone",
+      "go",
+      "is going"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 223,
+    "question": "The boys will play if the headmaster ________ them.",
+    "options": [
+      "will allow",
+      "allows",
+      "allow",
+      "allowed"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 224,
+    "question": "Don't leave until you ________ this work.",
+    "options": [
+      "finished",
+      "have finished",
+      "finish",
+      "to finish"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 225,
+    "question": "Our examination ________ in March.",
+    "options": [
+      "was commence",
+      "is commencing",
+      "commences",
+      "None"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 226,
+    "question": "He said that the sun ________ in the west.",
+    "options": [
+      "will set",
+      "sets",
+      "set",
+      "setting"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 227,
+    "question": "He often ________ me to dinner.",
+    "options": [
+      "invites",
+      "invite",
+      "inviting",
+      "is inviting"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 228,
+    "question": "This magazine ________ twice a month.",
+    "options": [
+      "appear",
+      "appears",
+      "had appeared",
+      "is appearing"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 229,
+    "question": "He hardly ________ a cigarette.",
+    "options": [
+      "smoking",
+      "is smoke",
+      "smokes",
+      "is smoking"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 230,
+    "question": "Honesty ________ from the heart.",
+    "options": [
+      "coming",
+      "is coming",
+      "did",
+      "comes"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 231,
+    "question": "She ________ doing her home work for an hour.",
+    "options": [
+      "has",
+      "was",
+      "is",
+      "has been"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 232,
+    "question": "I ________ in Nagpur since 1993.",
+    "options": [
+      "lives",
+      "am living",
+      "will live",
+      "have lived"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 233,
+    "question": "The dog ________ since midnight.",
+    "options": [
+      "is barking",
+      "has been barking",
+      "was barking",
+      "had been barking"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 234,
+    "question": "The train ________ already ________.",
+    "options": [
+      "did, leave",
+      "has, left",
+      "will, left",
+      "None"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 235,
+    "question": "He ________ just now.",
+    "options": [
+      "has arrived",
+      "arrives",
+      "arrived",
+      "None"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 236,
+    "question": "Don't talk while you ________.",
+    "options": [
+      "eat",
+      "are eat",
+      "are eating",
+      "are eaten"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 237,
+    "question": "The U.S.A ________ to launch a unique satellite next month.",
+    "options": [
+      "is going",
+      "will go",
+      "was going",
+      "has gone"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 238,
+    "question": "Be silent, the classes ________.",
+    "options": [
+      "go",
+      "have gone",
+      "are going",
+      "is going"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 239,
+    "question": "Bharati ________ the Prime Minister next month.",
+    "options": [
+      "is going to meet",
+      "is meet",
+      "is met",
+      "will meeting"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 240,
+    "question": "Don't disturb me, I ________ an interesting story.",
+    "options": [
+      "read",
+      "to read",
+      "have read",
+      "am reading"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 241,
+    "question": "The Vivek Express ________ an hour ago.",
+    "options": [
+      "will leave",
+      "leaves",
+      "left",
+      "has left"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 242,
+    "question": "Colombus ________ America.",
+    "options": [
+      "had discovered",
+      "discovered",
+      "has discovered",
+      "will discover"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 243,
+    "question": "The director had come out of the office before I ________.",
+    "options": [
+      "arrived",
+      "arrives",
+      "arrive",
+      "had arrived"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 244,
+    "question": "My father said that he ________ to Darbhanga.",
+    "options": [
+      "is going",
+      "was going",
+      "were going",
+      "will be going"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 245,
+    "question": "While Anil ________ on bed, a snake bit him.",
+    "options": [
+      "had sleep",
+      "slept",
+      "was sleeping",
+      "None"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 246,
+    "question": "He behaves as if he ________ my boss.",
+    "options": [
+      "were",
+      "is",
+      "was",
+      "will be"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 247,
+    "question": "My young brother ________ to Mumbai last month.",
+    "options": [
+      "will go",
+      "go",
+      "went",
+      "has went"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 248,
+    "question": "Once upon a time, there ________ a lion in the forest.",
+    "options": [
+      "was living",
+      "lived",
+      "had lived",
+      "lives"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 249,
+    "question": "If you ________ earlier, you would meet him.",
+    "options": [
+      "come",
+      "comes",
+      "came",
+      "have come"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 250,
+    "question": "I found this ring as I ________ in the garden.",
+    "options": [
+      "dug",
+      "was dugging",
+      "was digging",
+      "had dugged"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 251,
+    "question": "He became sorry after he ________ me.",
+    "options": [
+      "Insulting",
+      "Insults",
+      "Have been insulted",
+      "Had insulted"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 252,
+    "question": "All the tickets of lottery ________ before I went there.",
+    "options": [
+      "Has sold",
+      "Have sell",
+      "Have sold",
+      "Had been sold"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 253,
+    "question": "If you work hard, you ________.",
+    "options": [
+      "Will passed",
+      "Shall be passed",
+      "Will pass",
+      "Passes"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 254,
+    "question": "I ________ for jobs since May, 2013.",
+    "options": [
+      "Haved applied",
+      "Having applied",
+      "Has been applying",
+      "Had been applying"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 255,
+    "question": "We ________ to a new apartment the next week.",
+    "options": [
+      "Shall shifted",
+      "Will shift",
+      "Are shift",
+      "Shifts"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 256,
+    "question": "The enemy ________ us and fled away at once.",
+    "options": [
+      "See",
+      "Seen",
+      "Saw",
+      "Was seeing"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 257,
+    "question": "I ________ a box of books from my friend yesterday.",
+    "options": [
+      "Received",
+      "Receives",
+      "Is received",
+      "Receive"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 258,
+    "question": "It was cold, so I ________ my coat.",
+    "options": [
+      "Wore",
+      "Wears",
+      "Worn",
+      "Weared"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 259,
+    "question": "Raju ________ home from America in the next month.",
+    "options": [
+      "Returned",
+      "Is returning",
+      "Will return",
+      "Shall return"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 260,
+    "question": "We ________ to see the cricket match in T.V., but there was no electricity.",
+    "options": [
+      "Has been waiting",
+      "Were waiting",
+      "Had been waiting",
+      "Are Waiting"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 261,
+    "question": "I ________ this book since morning.",
+    "options": [
+      "had been reading",
+      "has been reading",
+      "have had read",
+      "shall be reading"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 262,
+    "question": "The Council ________ made its decision.",
+    "options": [
+      "have",
+      "have had",
+      "has",
+      "having"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 263,
+    "question": "The quality of products ________ over time.",
+    "options": [
+      "are degrading",
+      "has been degrading",
+      "have degrading",
+      "were degraded"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 264,
+    "question": "By the time she was fifteen, she ________ a beautiful singer.",
+    "options": [
+      "shall become",
+      "become",
+      "had become",
+      "has becoming"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 265,
+    "question": "This servant ________ (work) with us for ten years.",
+    "options": [
+      "works",
+      "has been working",
+      "is working",
+      "does work"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 266,
+    "question": "He ________ (be) weak in English in the beginning.",
+    "options": [
+      "Being",
+      "been",
+      "was",
+      "had been"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 267,
+    "question": "He ________ (buy) a car one month ago.",
+    "options": [
+      "bought",
+      "has bought",
+      "has been buying",
+      "had been buying"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 268,
+    "question": "When he ________ (meet) you, he will love you.",
+    "options": [
+      "will meet",
+      "is meeting",
+      "meets",
+      "has met"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 269,
+    "question": "The earth ________ (move) around the sun.",
+    "options": [
+      "is moving",
+      "has been moving",
+      "moves",
+      "moving"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 270,
+    "question": "If you ________ (be) hungry, you can eat.",
+    "options": [
+      "being",
+      "are",
+      "have been",
+      "will be"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 271,
+    "question": "They made him king.",
+    "options": [
+      "He was making king by them",
+      "He was king making",
+      "He was made king",
+      "He was king by them"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 272,
+    "question": "Someone has picked my pocket.",
+    "options": [
+      "My pocket have been picked by someone.",
+      "My pocket has been picked by someone.",
+      "My pocket has been picked.",
+      "My pocket has been picked by one."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 273,
+    "question": "All his friends laughed at him.",
+    "options": [
+      "He was laughed by his friends at.",
+      "He was laughed at by all his friends.",
+      "He was laughed by at his all friends.",
+      "He laughed at by all his friends."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 274,
+    "question": "He handed her a cheque.",
+    "options": [
+      "A cheque was handed to her.",
+      "She was handed a cheque.",
+      "A and B both.",
+      "A cheque was being handed over to him by her."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 275,
+    "question": "The dog chased the cat.",
+    "options": [
+      "The cat was chased by the dog.",
+      "The cat is chased by the dog.",
+      "The cat was been chased by the dog.",
+      "The cat is being chased by the dog."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 276,
+    "question": "The mason is building the wall.",
+    "options": [
+      "The wall is built by the mason.",
+      "The wall is being built  by the mason.",
+      "The wall is been being built by the mason.",
+      "The wall was being built by the mason."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 277,
+    "question": "Mr. Sandip teaches us grammar.",
+    "options": [
+      "Grammar is taught to us by Mr. Sandip.",
+      "We are taught grammar by Mr. Sandip.",
+      "Grammar is being taught to us by Mr. Sandip.",
+      "A and B both"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 278,
+    "question": "Dhondu will bring the pony.",
+    "options": [
+      "The pony will be brought by Dhondu",
+      "The pony will been bought by Dhondu",
+      "The pony would be brought by Dhondu",
+      "The pony will being brought by Dhondu"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 279,
+    "question": "He was praised by his father. (Change into Active Voice)",
+    "options": [
+      "His father praised his.",
+      "His father praised him.",
+      "He praised his father.",
+      "He was praised by father."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 280,
+    "question": "We have to finish it.",
+    "options": [
+      "It has to be finish by us.",
+      "It have to be finished by us.",
+      "It has to be finished by us.",
+      "We have to be finished by us."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 281,
+    "question": "Who wrote the bible?",
+    "options": [
+      "By whom was written bible?",
+      "By who was written the bible?",
+      "By whom was the bible written?",
+      "Who was written the bible by?"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 282,
+    "question": "I am to learn music.",
+    "options": [
+      "Music is learnt by me.",
+      "Music is to be learnt by I.",
+      "Music was to learnt by me.",
+      "Music is to be learnt by me."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 283,
+    "question": "Did you attend the meeting?",
+    "options": [
+      "Is the meeting attended by you?",
+      "Did the meeting attended by you?",
+      "Yes, the meeting was attended by me.",
+      "Was the meeting attended by you?"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 284,
+    "question": "Do you see pine trees in Kerala?",
+    "options": [
+      "Are pine trees seen in Kerala?",
+      "Were pine trees seen in Kerala?",
+      "Yes, we see pine trees in Kerala.",
+      "None of these."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 285,
+    "question": "Change the voice.",
+    "options": [
+      "You should change the voice.",
+      "You can change the voice.",
+      "You are requested that you should change the voice.",
+      "Let the voice be changed."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 286,
+    "question": "She has to finish this work.",
+    "options": [
+      "This work has to be finished by her.",
+      "She has been finished this work.",
+      "This work had been finish by she.",
+      "This work have to be finished by her."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 287,
+    "question": "What are you doing?",
+    "options": [
+      "What is done by you?",
+      "What was done by you?",
+      "What are done by you?",
+      "What is being done by you?"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 288,
+    "question": "They asked me my name.",
+    "options": [
+      "My name is asked by them.",
+      "I was asked my name by them.",
+      "I asked my name by them.",
+      "I am asked my name by them."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 289,
+    "question": "Do you see films ?",
+    "options": [
+      "Are films been seen by you?",
+      "Are films seen by you?",
+      "Is films being seen by I?",
+      "Are films saw by you?"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 290,
+    "question": "He does not drink tea.",
+    "options": [
+      "Tea is not drank by him.",
+      "Tea is not drank by he.",
+      "Tea is not drink by him.",
+      "Tea is not drunk by him. D 291.  Nancy said, \"I may leave tomorrow.\" (Change into Indirect Speech) A) Nancy said that she might leave the next day. B) Nancy said that she might leave tomorrow. C) Nancy asked if she should leave the next day. D) Nancy informed me to leave tomorrow."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 292,
+    "question": "Keshav said, \"Rita is busy right now.\" (Change into Indirect Speech)",
+    "options": [
+      "Keshav said Rita was busy.",
+      "Keshav said that Rita was busy then.",
+      "Keshav said Rita had been busy.",
+      "Keshav informed that Rita is busy."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 293,
+    "question": "He said, \"I have been a great mentor.\" (Change into Indirect Speech)",
+    "options": [
+      "He said that he had been a great mentor.",
+      "He said that he was a great mentor.",
+      "He exclaimed that he was a great mentor.",
+      "He said that he has been a great mentor."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 294,
+    "question": "Vidhi said, \"We went for a summer trip.\" (Change into Indirect Speech)",
+    "options": [
+      "Vidhi said that they went for a summer trip.",
+      "Vidhi said that they were on a summer trip.",
+      "Vidhi said that they had gone for a summer trip.",
+      "Vidhi said they went for a summer trip."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 295,
+    "question": "\"I am going out tonight.\" Manisha said. (Change into Indirect Speech)",
+    "options": [
+      "Manisha said that she was going out tonight.",
+      "Manisha said that she was going out that night.",
+      "Manisha said she was going out that night.",
+      "Manisha said that she will be going out that night."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 296,
+    "question": "Ravi said, \"The concert ended yesterday.\" (Change into Indirect Speech)",
+    "options": [
+      "Ravi said that the concert had ended yesterday.",
+      "Ravi said that the concert ended the day before.",
+      "Ravi said that the concert had ended the previous day.",
+      "Ravi said that the concert ended already."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 297,
+    "question": "She said, \"They will be leaving soon.\" (Change into Indirect Speech)",
+    "options": [
+      "She said that they would leave soon.",
+      "She said that they are leaving.",
+      "She said that they would be leaving soon.",
+      "She said that they will leave soon."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 298,
+    "question": "The teacher said, \"The wind is a renewable energy source.\" (Change into Indirect Speech)",
+    "options": [
+      "The teacher said that the wind was a renewable energy source.",
+      "The teacher said that the wind is a renewable energy source.",
+      "The teacher told that the wind is a renewable energy source.",
+      "The teacher tells that the wind was a renewable energy source."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 299,
+    "question": "Richa said, \"I must attend the meeting.\" (Change into Indirect Speech)",
+    "options": [
+      "Richa said that she had to attend the meeting.",
+      "Richa said that it was must that she attend the meeting.",
+      "Richa said if she must attend the meeting.",
+      "Richa said that she would attend the meeting."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 300,
+    "question": "The maid said, \"I gave them the address.\" (Change into Indirect Speech)",
+    "options": [
+      "The maid asked whether she should have given the address to them.",
+      "The maid said that she had given them the address.",
+      "The maid said that she would give them the address.",
+      "The maid said to give the address to them."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 301,
+    "question": "He said to Prashant, \"May you prosper! \"",
+    "options": [
+      "He wished that Prashant should prosper.",
+      "He wished that Prashant may prosper.",
+      "He wished that Prashant might her prospered.",
+      "He wished Prashant that he might prosper."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 302,
+    "question": "The teacher said, \"Akbar was born in India.\"",
+    "options": [
+      "The said that Akbar had been born in India.",
+      "The teacher says that Akbar was born in India.",
+      "The teacher said that Akbar was born in India.",
+      "The teacher will say the Akbar was born in India."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 303,
+    "question": "Suhana, \"Did you see the hockey match on television last night?\"",
+    "options": [
+      "Suhana asked me whether I saw the hockey match on television on earlier night.",
+      "Suhana asked me whether I had seen hockey match on television on earlier night.",
+      "Suhana asked me whether I see the hockey match on television on last night.",
+      "Suhana asked me whether I had seen the hockey match on television on last night."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 304,
+    "question": "The teacher said to Keshav, \"Congratulations! Wish you success in life.",
+    "options": [
+      "The teacher congratulated Keshav and said wish you success in life.",
+      "The teacher wished congratulations and success in life to Keshav.",
+      "The teacher congratulation to Keshav and said wished him success in life.",
+      "The teacher congratulated Keshav and wished him success in life."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 305,
+    "question": "Priyanka said to me, \"Can you give me your pen?\"",
+    "options": [
+      "Priyanka asked me can I give her my pen.",
+      "Priyanka asked me if I can give me your pen.",
+      "Priyanka asked me if I could give her my pen.",
+      "Priyanka asked me if I gave her my pen."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 306,
+    "question": "Akansha told Isha, \"What a beautiful dress you are wearing!\"",
+    "options": [
+      "Akansha told Isha that she was wearing a very beautiful dress.",
+      "Akansha exclaimed that Isha is wearing beautiful dress.",
+      "Akansha exclaimed that is a beautiful the dress.",
+      "Akansha told Isha that was a beautiful dress."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 307,
+    "question": "Garima said, \"Why didn't you attend the flag hoisting ceremony, Rajesh\"?",
+    "options": [
+      "Garima asked Rajesh why hadn't he attended the flag hoisting ceremony.",
+      "Garima asked Rajesh why he hadn't attended the flag hoisting ceremony.",
+      "Garima asked Rajesh why didn't he attend the flag hoisting ceremony.",
+      "Garima asked Rajesh why he didn't attend the flag hoisting ceremony."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 308,
+    "question": "He said, \"Meghna, do you want to buy a house in Delhi\".",
+    "options": [
+      "He told Meghna if she want to buy a house in Delhi.",
+      "He asked that did she want to buy a house in Delhi.",
+      "He asked Meghna if she want to buy a house in Delhi.",
+      "He asked Meghna if she wanted to buy a house in Delhi."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 309,
+    "question": "I said to my friend, \"Can I borrow your laptop for one day\"?",
+    "options": [
+      "I asked my friend if I could borrow his laptop for one day.",
+      "I asked my friend if I could borrow you laptop for one day.",
+      "I asked my friends if I can borrow his laptop for one day.",
+      "I asked friend if I can borrow his laptop for one my day."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 310,
+    "question": "My mother said, \"God is everywhere\".",
+    "options": [
+      "My mother said that God is everywhere.",
+      "My mother has said that God is everywhere.",
+      "My mother said God id everywhere.",
+      "My mother said that God was everywhere."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 311,
+    "question": "________ is injurious to health.",
+    "options": [
+      "Smoke",
+      "Smoking",
+      "Smoked",
+      "None o these"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 312,
+    "question": "She is fond of ________.",
+    "options": [
+      "Paint",
+      "To be painted",
+      "Painting",
+      "Paints"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 313,
+    "question": "Do you mind my ________ here?",
+    "options": [
+      "Sit",
+      "Sitted",
+      "Siting",
+      "Sitting D 314.  I like his ________. A) Swim B) Swimed C) Swims D) Swimming"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 315,
+    "question": "'Jawan' is worth ________.",
+    "options": [
+      "Watch",
+      "Watched",
+      "Watching",
+      "Watches"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 316,
+    "question": "I enjoy ________ the Ramayana to them.",
+    "options": [
+      "Teach",
+      "Teaching",
+      "Teaches",
+      "Taught"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 317,
+    "question": "It's no good ________ with them.",
+    "options": [
+      "Argue",
+      "Arguing",
+      "Argued",
+      "Argueing"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 318,
+    "question": "It's not worth ________.",
+    "options": [
+      "Citing",
+      "Cite",
+      "Cited",
+      "To citing"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 319,
+    "question": "His cycle needs ________.",
+    "options": [
+      "Repair",
+      "To be repairing",
+      "Repairing",
+      "Repaired"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 320,
+    "question": "Her hair requires ________.",
+    "options": [
+      "Cuting",
+      "Cutting",
+      "Cut",
+      "To cut"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 321,
+    "question": "________! the cake is so delicious.",
+    "options": [
+      "Yummy",
+      "Alas",
+      "Oh",
+      "Oops"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 322,
+    "question": "________! my friend Madhav is no more.",
+    "options": [
+      "Wow",
+      "Oops",
+      "Ouch",
+      "Alas"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 323,
+    "question": "________! Our team have won the match.",
+    "options": [
+      "Hurrah",
+      "Tut tut",
+      "Ashame",
+      "Wow"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 324,
+    "question": "________! You are dismissed.",
+    "options": [
+      "Tut tut",
+      "Behold",
+      "Wow",
+      "Ah"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 325,
+    "question": "________! I broke the glass.",
+    "options": [
+      "Oops",
+      "Wow",
+      "Yay",
+      "Oh"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 326,
+    "question": "________! I have won lottery.",
+    "options": [
+      "Yay",
+      "Oh",
+      "What",
+      "Alas"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 327,
+    "question": "________! How are you?",
+    "options": [
+      "Bye",
+      "Hey",
+      "Alas",
+      "Wow"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 328,
+    "question": "________! I forget my charger.",
+    "options": [
+      "Wow",
+      "Aww",
+      "Oh",
+      "Oops"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 329,
+    "question": "________ That's really great news.",
+    "options": [
+      "Hey!",
+      "Ah!",
+      "Yay!",
+      "Wow!"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 330,
+    "question": "________ I spilled my coffee all over the table.",
+    "options": [
+      "Aww!",
+      "Oops!",
+      "Uh!",
+      "wow!"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 331,
+    "question": "The ruler and the minister ________ killed.",
+    "options": [
+      "was",
+      "have been",
+      "has been",
+      "is"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 332,
+    "question": "The poor ________ suffered a lot due to the pandemic.",
+    "options": [
+      "have",
+      "are",
+      "is",
+      "has"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 333,
+    "question": "The teacher and the students ________ arrived.",
+    "options": [
+      "has",
+      "have",
+      "will",
+      "are"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 334,
+    "question": "Many people ________ registered for the course.",
+    "options": [
+      "have",
+      "has",
+      "having",
+      "is"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 335,
+    "question": "Two-thirds of the pantry ________ full.",
+    "options": [
+      "are",
+      "were",
+      "have",
+      "is"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 336,
+    "question": "Jenny, with his members, ________ really well.",
+    "options": [
+      "sing",
+      "singing",
+      "have sung",
+      "sings"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 337,
+    "question": "We should definitely ________ that lake.",
+    "options": [
+      "visit",
+      "visits",
+      "visiting",
+      "visited   A 338.  I ________ and he sings. A) dances B) dancing C) dance D) danced"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 339,
+    "question": "Neither she nor I ________ involved.",
+    "options": [
+      "am",
+      "are",
+      "is",
+      "were"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 340,
+    "question": "The men ________ against the popular opinion.",
+    "options": [
+      "was",
+      "were",
+      "has",
+      "is"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 341,
+    "question": "We were late for the show ________ we did not take a cab.",
+    "options": [
+      "But",
+      "Or",
+      "And",
+      "Then"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 342,
+    "question": "Neither my mother ________ my father will be able to attend the party on Saturday.",
+    "options": [
+      "Or",
+      "Not",
+      "And",
+      "Nor"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 343,
+    "question": "The cricket was lazy ________ the ant was busy.",
+    "options": [
+      "Yet",
+      "And",
+      "But",
+      "So"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 344,
+    "question": "She is weak ________ she does a lot of work.",
+    "options": [
+      "And",
+      "Yet",
+      "Because",
+      "So"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 345,
+    "question": "________ he is clever, he often makes mistakes.",
+    "options": [
+      "Despite",
+      "Since",
+      "Although",
+      "Yet"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 346,
+    "question": "Go home immediately ________ your father is looking for you.",
+    "options": [
+      "After",
+      "So that",
+      "Because",
+      "But"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 347,
+    "question": "Look after your health ________ you should repent later on.",
+    "options": [
+      "As",
+      "Because",
+      "Till",
+      "Lest"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 348,
+    "question": "We are available online ________ not offline.",
+    "options": [
+      "And",
+      "Or",
+      "So",
+      "Yet"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 349,
+    "question": "I read a newspaper ________ I finds it interesting.",
+    "options": [
+      "So",
+      "Because",
+      "Thus",
+      "None of these"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 350,
+    "question": "He was so tired ________ he could not walk.",
+    "options": [
+      "And",
+      "But",
+      "That",
+      "Since"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 351,
+    "question": "Pritesh is happy ________ he is very poor.",
+    "options": [
+      "But",
+      "So",
+      "And",
+      "Though"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 352,
+    "question": "Dipesh passed the examination ________ he worked hard.",
+    "options": [
+      "So",
+      "Yet",
+      "Although",
+      "Because"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 353,
+    "question": "You can travel by rail ________ by air.",
+    "options": [
+      "And",
+      "So",
+      "Or",
+      "But"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 354,
+    "question": "He ran hard ________ he should miss the train.",
+    "options": [
+      "Lest",
+      "And",
+      "But",
+      "So"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 355,
+    "question": "No sooner does Mayur arrive ________ he begins to study.",
+    "options": [
+      "Then",
+      "Than",
+      "When",
+      "But"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 356,
+    "question": "My brother won both a prize ________ a scholarship.",
+    "options": [
+      "And",
+      "Or",
+      "But",
+      "Unless"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 357,
+    "question": "Time ________ tide wait for no man.",
+    "options": [
+      "But",
+      "Or",
+      "And",
+      "None of these"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 358,
+    "question": "I do not doubt ________ he was there.",
+    "options": [
+      "If",
+      "That",
+      "Whether",
+      "None of these  B 359.  We were late for the show ________ we did not take a cab. A) But B) Or C) And D) Then"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 360,
+    "question": "Neither my mother ________ my father will be able to attend the party on Saturday.",
+    "options": [
+      "Or",
+      "Not",
+      "And",
+      "Nor"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 361,
+    "question": "There is a stack of books in our college. Here the word 'stack' is an example of....",
+    "options": [
+      "abstract noun",
+      "proper noun",
+      "common noun",
+      "collective noun"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 362,
+    "question": "Collective noun of: A ________ of pea-cocks.",
+    "options": [
+      "Cluster",
+      "Muster",
+      "Ball",
+      "Pack"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 363,
+    "question": "Collective noun of: A ________ of ladies.",
+    "options": [
+      "Bevy",
+      "Crew",
+      "Pride",
+      "Swarm"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 364,
+    "question": "Collective noun of: A ________ of arrows.",
+    "options": [
+      "Quiver",
+      "Shoal",
+      "Range",
+      "Pile"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 365,
+    "question": "Collective noun of: A ________ of ants.",
+    "options": [
+      "Bask",
+      "Colony",
+      "Litter",
+      "Barrel"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 366,
+    "question": "Collective noun of: A ________ of dancers.",
+    "options": [
+      "Ambush",
+      "Hive",
+      "Troop",
+      "Troupe"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 367,
+    "question": "Give Singular form of - \"Mesdames\"",
+    "options": [
+      "Miss",
+      "Mister",
+      "Master",
+      "Madam"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 368,
+    "question": "Give Singular form of - \"Bacteria\"",
+    "options": [
+      "Bacteries",
+      "Bacterius",
+      "Bacterium",
+      "Bacteriaes"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 369,
+    "question": "Give Singular form of - \"Swine\"",
+    "options": [
+      "Swone",
+      "Swin",
+      "Swine",
+      "Swan"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 370,
+    "question": "They sent our goods by ________ train.",
+    "options": [
+      "Good",
+      "Goods",
+      "Goody",
+      "None of these"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 371,
+    "question": "Give plural form of - \"Brother\"",
+    "options": [
+      "Brother",
+      "Brotherss",
+      "Brothers",
+      "Bretharen"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 372,
+    "question": "Find out opposite gender of - Gentleman",
+    "options": [
+      "Female",
+      "Woman",
+      "Gentlelady",
+      "Lady"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 373,
+    "question": "Find out opposite gender of - Drake",
+    "options": [
+      "Duck",
+      "Duke",
+      "Duckling",
+      "Droca"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 374,
+    "question": "Find out opposite gender of - Nymph",
+    "options": [
+      "Bride",
+      "Woman",
+      "Bachelor",
+      "Swain"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 375,
+    "question": "Find out opposite gender of - Boar",
+    "options": [
+      "Sow",
+      "Doe",
+      "Buck",
+      "Soer"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 376,
+    "question": "Find out opposite gender of - Gander",
+    "options": [
+      "Bull",
+      "Colt",
+      "Ganderess",
+      "Goose"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 377,
+    "question": "________ is a family where sitar, vocals, and classical violin are practised.",
+    "options": [
+      "Our",
+      "We",
+      "Ours",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 378,
+    "question": "They appreciated ________ at the end of the function.",
+    "options": [
+      "Each other",
+      "One another",
+      "One other",
+      "Each another"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 379,
+    "question": "The couple waved goodbye to ________ as they parted",
+    "options": [
+      "Each other",
+      "One another",
+      "One other",
+      "Each another"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 380,
+    "question": "The flowers danced and sang happily. They said to ________, \"We have hundreds of little gardeners.\"",
+    "options": [
+      "Each another",
+      "one other",
+      "each other",
+      "one another"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 381,
+    "question": "________ and ________ and ________ were declared criminals.",
+    "options": [
+      "I he you",
+      "He you I",
+      "You he I",
+      "I you he"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 382,
+    "question": "The Sun has hidden ________ face behind the cloud.",
+    "options": [
+      "his",
+      "her",
+      "its",
+      "my"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 383,
+    "question": "This car is cheaper than ________ one.",
+    "options": [
+      "This",
+      "These",
+      "Those",
+      "That"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 384,
+    "question": "He is preparing for CCE ________ days.",
+    "options": [
+      "This",
+      "Those",
+      "That",
+      "These"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 385,
+    "question": "________ of them will be rewarded.",
+    "options": [
+      "Each",
+      "Every",
+      "A and B both",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 386,
+    "question": "I am going to Mumbai ________ week - end.",
+    "options": [
+      "That",
+      "This",
+      "These",
+      "Those"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 387,
+    "question": "________ of these two boys is active.",
+    "options": [
+      "Some",
+      "Every",
+      "Either",
+      "None of these"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 388,
+    "question": "No, ________ in my family is married.",
+    "options": [
+      "Nothing",
+      "Nobody",
+      "All",
+      "Some"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 389,
+    "question": "________ have submitted their assignments.",
+    "options": [
+      "Each",
+      "Everybody",
+      "All",
+      "Someone"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 390,
+    "question": "I am hungry. I want ________ to eat.",
+    "options": [
+      "Everyone",
+      "Anyone",
+      "Nothing",
+      "Something"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 391,
+    "question": "They don't know ________ about him.",
+    "options": [
+      "Someone",
+      "Nothing",
+      "Anything",
+      "Everybody"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 392,
+    "question": "________ were rewarded.",
+    "options": [
+      "Everyone",
+      "No one",
+      "One",
+      "All"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 393,
+    "question": "Is this the road ________ lead to the general hospital?",
+    "options": [
+      "who",
+      "whom",
+      "Which",
+      "None of these"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 394,
+    "question": "A man, ________ has poor eyesight can't play cricket well.",
+    "options": [
+      "That",
+      "Who",
+      "A and B both",
+      "None of these"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 395,
+    "question": "God helps those ________ help themselves.",
+    "options": [
+      "Which",
+      "whom",
+      "Who",
+      "None of these"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 396,
+    "question": "There is nothing ________ would interest me.",
+    "options": [
+      "Who",
+      "Which",
+      "What",
+      "That"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 397,
+    "question": "Mr. Raval, ________ is your teacher, will teach you Biology.",
+    "options": [
+      "That",
+      "Who",
+      "What",
+      "Which"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 398,
+    "question": "We went ashore when the boat reached ________ the port.",
+    "options": [
+      "To",
+      "At",
+      "By",
+      "None of the above"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 399,
+    "question": "Baroda Central Library is located ________ Mandvi ________ Vadodara.",
+    "options": [
+      "In, in",
+      "At, in",
+      "In, at",
+      "At, at"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 400,
+    "question": "India Gate is situated ________ New Delhi.",
+    "options": [
+      "At",
+      "To",
+      "In",
+      "By  C 401.  If you have any query, write to us ________ the given address. A) In B) To C) From D) At"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 402,
+    "question": "Sometimes you need to look ________ life from a different perspective.",
+    "options": [
+      "At",
+      "With",
+      "By",
+      "Of"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 403,
+    "question": "Some bright spark thought the building was ________ fire and called the fire brigade.",
+    "options": [
+      "In",
+      "On",
+      "With",
+      "To"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 404,
+    "question": "Teachers usually make corrections ________ red ink.",
+    "options": [
+      "In",
+      "On",
+      "By",
+      "With"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 405,
+    "question": "I can swear ________ my reputation.",
+    "options": [
+      "In",
+      "To",
+      "On",
+      "By"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 406,
+    "question": "Public transit tickets were sold ________ card swiping.",
+    "options": [
+      "By",
+      "To",
+      "With",
+      "On"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 407,
+    "question": "We don't want that awkward man ________ the committee.",
+    "options": [
+      "In",
+      "On",
+      "By",
+      "To"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 408,
+    "question": "Mr. Ashutosh will sit ________ the jury at the trial.",
+    "options": [
+      "In",
+      "To",
+      "With",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 409,
+    "question": "He was born ________ a silver spoon in his mouth.",
+    "options": [
+      "To",
+      "From",
+      "With",
+      "Into"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 410,
+    "question": "Heris is fond ________ classic music.",
+    "options": [
+      "Of",
+      "To",
+      "From",
+      "In"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 411,
+    "question": "Electric cables are buried ________ the streets.",
+    "options": [
+      "To",
+      "By",
+      "Above",
+      "Beneath"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 412,
+    "question": "Madhav hid the letter ________ a pile of papers.",
+    "options": [
+      "Beneath",
+      "Into",
+      "Above",
+      "Behind"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 413,
+    "question": "The ball rolled ________ the frozen surface of the pond.",
+    "options": [
+      "Onto",
+      "Above",
+      "By",
+      "Into"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 414,
+    "question": "Some people came ________ car, others came ________ their foot.",
+    "options": [
+      "By, in",
+      "By, on",
+      "In, on",
+      "In, by"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 415,
+    "question": "There are no places left to sit ________ the train.",
+    "options": [
+      "In",
+      "On",
+      "By",
+      "To"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 416,
+    "question": "Both her parents had been killed ________ a car accident.",
+    "options": [
+      "On",
+      "In",
+      "To",
+      "By"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 417,
+    "question": "________ H.M.T. Watch (Use proper article)",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 418,
+    "question": "________ Utricle. (Use proper article)",
+    "options": [
+      "A",
+      "The",
+      "No article",
+      "An"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 419,
+    "question": "________ Cobbler. (Use proper article)",
+    "options": [
+      "An",
+      "The",
+      "No article",
+      "A"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 420,
+    "question": "When you have to study a subject like ________ Geometry in higher ________ classes then you will understand the importance of hard work.",
+    "options": [
+      "A, the",
+      "An, a",
+      "No article, no article",
+      "No article, the"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 421,
+    "question": "He would first try to find out what was wrong and then he would call ________ doctor.",
+    "options": [
+      "The",
+      "An",
+      "No article",
+      "A"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 422,
+    "question": "You are my ________ responsibility.",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 423,
+    "question": "We have ________ new teacher for clay modelling and pottery.",
+    "options": [
+      "An",
+      "A",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 424,
+    "question": "He saw ________ big crab coming towards him.",
+    "options": [
+      "The",
+      "A",
+      "An",
+      "No article"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 425,
+    "question": "I found ________ empty bottle, floating in the water.",
+    "options": [
+      "A",
+      "The",
+      "No article",
+      "An"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 426,
+    "question": "________ Great Wall of China. (Put proper article)",
+    "options": [
+      "The",
+      "A",
+      "An",
+      "No article"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 427,
+    "question": "One day Meena plucks ________ mango and brings it home.",
+    "options": [
+      "An",
+      "The",
+      "A",
+      "No article"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 428,
+    "question": "The birds lay still until ________ last one had been thrown down.",
+    "options": [
+      "a",
+      "an",
+      "the",
+      "none of these"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 429,
+    "question": "________ winter of 2023 was very cold.",
+    "options": [
+      "A",
+      "No article",
+      "The",
+      "An"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 430,
+    "question": "We should know ________ Geography of Gujarat.",
+    "options": [
+      "A",
+      "No article",
+      "An",
+      "The"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 431,
+    "question": "________ Yellow is my favourite colour.",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 432,
+    "question": "The man in ________ red shirt is my brother.",
+    "options": [
+      "A",
+      "An",
+      "The",
+      "No article"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 433,
+    "question": "Tomorrow will be ________ Sunday.",
+    "options": [
+      "A",
+      "The",
+      "No article",
+      "An"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 434,
+    "question": "We ________ live without water.",
+    "options": [
+      "May",
+      "Might",
+      "Can",
+      "Must"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 435,
+    "question": "You ________ not to drink so much.",
+    "options": [
+      "Can",
+      "Ought",
+      "Need",
+      "Dare"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 436,
+    "question": "You .... drive your car on the left side.",
+    "options": [
+      "May",
+      "Might",
+      "Must",
+      "Dare"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 437,
+    "question": "________ we leave now or do you want to wait?",
+    "options": [
+      "Will",
+      "Might",
+      "Shall",
+      "None"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 438,
+    "question": "When Shweta was three, she ________ already speak very well.",
+    "options": [
+      "Might",
+      "Could",
+      "Can",
+      "Shall"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 439,
+    "question": "________ I make an announcement?",
+    "options": [
+      "Shall",
+      "Should",
+      "Could",
+      "Would"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 440,
+    "question": "Drivers ________ wear the seat belt while driving.",
+    "options": [
+      "will",
+      "ought to",
+      "dare to",
+      "might"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 441,
+    "question": "The class is dismissed. You ________ leave now.",
+    "options": [
+      "may",
+      "can",
+      "need to",
+      "ought to"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 442,
+    "question": "One ________ follow the court orders.",
+    "options": [
+      "could",
+      "might",
+      "can",
+      "must"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 443,
+    "question": "I ________ wake up early to catch the flight tomorrow.",
+    "options": [
+      "must",
+      "can",
+      "could",
+      "ought not to"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 444,
+    "question": "Both Ram and shyam are engineers, ________?",
+    "options": [
+      "isn't he",
+      "isn't she",
+      "are they",
+      "aren't they"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 445,
+    "question": "He knows nobody in the colony, ________?",
+    "options": [
+      "does he",
+      "did he",
+      "doesn't he",
+      "didn't he"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 446,
+    "question": "Jahanfır was a great judge, ________?",
+    "options": [
+      "doesn't he",
+      "didn't he",
+      "wasn't he",
+      "weren't he"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 447,
+    "question": "I am looking after the garden, ________?",
+    "options": [
+      "amn't I",
+      "aren't I",
+      "isn't I",
+      "don't I"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 448,
+    "question": "It is quite hot outside today, ________?",
+    "options": [
+      "is it",
+      "isn't it",
+      "doesn't it",
+      "aren't it"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 449,
+    "question": "We could not enjoy the picnic, ________?",
+    "options": [
+      "could we",
+      "shall we",
+      "can't we",
+      "didn't we"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 450,
+    "question": "Either he or his friends are going to visit museum, ________?",
+    "options": [
+      "isn't he",
+      "are he",
+      "aren't they",
+      "isn't they"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 451,
+    "question": "Don't spit here, ________?",
+    "options": [
+      "won't you",
+      "shall we",
+      "will you",
+      "can you"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 452,
+    "question": "I have a big house, ________?",
+    "options": [
+      "have I",
+      "don't I",
+      "haven't I",
+      "ain't I"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 453,
+    "question": "Don't go there again, ________?",
+    "options": [
+      "will you",
+      "won't you",
+      "shall you",
+      "can't you"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 454,
+    "question": "One can help him, ________?",
+    "options": [
+      "can't he",
+      "can't she",
+      "can't one",
+      "cann't he"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 455,
+    "question": "Give comparative adjective of - 'Many'",
+    "options": [
+      "Much",
+      "Many",
+      "Most",
+      "More"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 456,
+    "question": "Give comparative adjective of – 'Little'",
+    "options": [
+      "Less",
+      "Least",
+      "Leser",
+      "More less"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 457,
+    "question": "Give superlative adjective of - 'fore'",
+    "options": [
+      "Further",
+      "Father",
+      "Furthest",
+      "Former"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 458,
+    "question": "Give comparative adjective of - 'ill'",
+    "options": [
+      "Better",
+      "Good",
+      "Worst",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 459,
+    "question": "Give positive adjective of - 'uppermost'",
+    "options": [
+      "Upper",
+      "Upp",
+      "Up",
+      "Upcoming"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 460,
+    "question": "Platinum is ________ than any metal.",
+    "options": [
+      "precious",
+      "more precious",
+      "most precious",
+      "many precious"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 461,
+    "question": "The Villagers once ________ to the forest a year ago.",
+    "options": [
+      "going",
+      "had gone",
+      "were going",
+      "went"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 462,
+    "question": "When you phoned, I ________ in the garden.",
+    "options": [
+      "worked",
+      "had worked",
+      "was working",
+      "has worked"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 463,
+    "question": "She ________ her finger while she was cooking.",
+    "options": [
+      "burned",
+      "burnt",
+      "had burned",
+      "had burnt"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 464,
+    "question": "The phone ________ while I was having dinner.",
+    "options": [
+      "rung",
+      "rang",
+      "ring",
+      "was ringing"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 465,
+    "question": "It is about time he ________ for the bus-station.",
+    "options": [
+      "had left",
+      "left",
+      "was leaving",
+      "is leaving"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 466,
+    "question": "They ________ coming soon.",
+    "options": [
+      "Will",
+      "Have been",
+      "Are",
+      "Is"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 467,
+    "question": "At noon tomorrow, I ________ on a beach somewhere.",
+    "options": [
+      "will be relaxing",
+      "relax",
+      "will being relax",
+      "relaxed"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 468,
+    "question": "We'll be ________ the news at 10pm.",
+    "options": [
+      "watch",
+      "watching",
+      "to watch",
+      "watched"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 469,
+    "question": "Their parents ________ their house when they return home tomorrow.",
+    "options": [
+      "Will be painted",
+      "Will have paint",
+      "Have painted",
+      "Will be painting"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 470,
+    "question": "The engineers ________ on another project when you come here.",
+    "options": [
+      "Will working",
+      "Will be working",
+      "Will be worked",
+      "Will have worked"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 471,
+    "question": "Why ________ late every day?",
+    "options": [
+      "do you come",
+      "did you come",
+      "have you come",
+      "did you come"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 472,
+    "question": "This pen ________ (cost) me ten rupees.",
+    "options": [
+      "costs",
+      "costing",
+      "has cost",
+      "costed"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 473,
+    "question": "The bell ________ (ring) just now.",
+    "options": [
+      "rings",
+      "ringing",
+      "rung",
+      "has rung"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 474,
+    "question": "At the moment the child ________ (play) in the garden.",
+    "options": [
+      "playing",
+      "plays",
+      "is playing",
+      "has been playing"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 475,
+    "question": "She ________ (pass) the post office on her way to school every day.",
+    "options": [
+      "passes",
+      "has been passing",
+      "is passing",
+      "passed"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 476,
+    "question": "I ________ (tell) you already about it.",
+    "options": [
+      "told",
+      "have told",
+      "tells",
+      "am telling"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 477,
+    "question": "It is time to prepare for the examination.",
+    "options": [
+      "It is time for the examination to prepared.",
+      "It is time to the examination for prepared.",
+      "It was time for the examination to prepare.",
+      "It is time for the examination to be prepared."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 478,
+    "question": "We must help the poor.",
+    "options": [
+      "The poor must be helped by us.",
+      "The poor might helped by we.",
+      "The poor must helped.",
+      "None of these."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 479,
+    "question": "Kindly deposit this amount.",
+    "options": [
+      "You are requested to deposit this amount.",
+      "You are requested to deposited this amount.",
+      "You are requested to be deposit this amount",
+      "You are requested to deposit that amount."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 480,
+    "question": "Don't insult the poor.",
+    "options": [
+      "The poor should be insulted.",
+      "The poor shall not be insulted.",
+      "The poor should not be insulted.",
+      "The poor shall not be insult."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 481,
+    "question": "Who wrote the bible?",
+    "options": [
+      "By whom was written bible?",
+      "By who was written the bible?",
+      "By whom was the bible written?",
+      "Who was written the bible by?"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 482,
+    "question": "Will you buy a car?",
+    "options": [
+      "Will a car be buying by you?",
+      "Will a car bought by you?",
+      "Will a car bought by you?",
+      "Will a car be bought by you?"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 483,
+    "question": "Someone tore the paper.",
+    "options": [
+      "Someone was torn by the paper.",
+      "The paper was torn by someone.",
+      "The paper was torn.",
+      "The paper was been torn by someone."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 484,
+    "question": "The police caught the thief.",
+    "options": [
+      "The thief was caught by police.",
+      "The thief is caught by the police.",
+      "The thief was being caught.",
+      "The thief was caught."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 485,
+    "question": "My brother had had breakfast.",
+    "options": [
+      "Breakfast had been had my brother.",
+      "Breakfast have been had my brother.",
+      "Breakfast had being had my brother.",
+      "Breakfast had been have my brother."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 486,
+    "question": "No one can catch him.",
+    "options": [
+      "He cannot be caught by anyone.",
+      "He could not be caught.",
+      "He can't be caught.",
+      "He can be cought by no one"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 487,
+    "question": "Philip said, \"I was playing football.\" (Change into Indirect Speech)",
+    "options": [
+      "Philip said that he was playing football.",
+      "Philip said that he would be playing football.",
+      "Philip said that he had been playing football.",
+      "Philip said that he plays football."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 488,
+    "question": "The lawyer said, \"The law always believes in the evidence.\" (Change into Indirect Speech)",
+    "options": [
+      "The lawyer said that the law always believed in the evidence.",
+      "The lawyer said that the law should always believe in the evidence.",
+      "The lawyer said that the law always believes in the evidence.",
+      "The lawyer said that the law has always believed in the evidence."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 489,
+    "question": "Tina said, \"I may postpone the trip to the next year.\" (Change into Indirect Speech)",
+    "options": [
+      "Tina said that she may have to postpone the trip to the next year.",
+      "Tina said that she might have to postpone the trip to the next year.",
+      "Tina said that she might postpone the trip to the following year.",
+      "Tina said that she may postpone the trip to the following year."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 490,
+    "question": "Jenny said that Sarah had completed the course. (Change into Indirect Speech)",
+    "options": [
+      "Jenny said, \"Sarah was completing the course.\"",
+      "Jenny said, \"Sarah has completed the course.\"",
+      "Jenny said, \"Sarah completed the course.\"",
+      "Jenny said, \"Sarah is completing the course.\""
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 491,
+    "question": "He said that he had been looking for the file. (Change into Indirect Speech)",
+    "options": [
+      "He said, \"I am looking for the file.\"",
+      "He said, \"I was looking for the file.\"",
+      "He said, \"I have looked for the file.\"",
+      "He said, \"I have been looking for the file.\""
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 492,
+    "question": "\"Call the first witness,\" said the judge.",
+    "options": [
+      "The judge commands to call the first witness.",
+      "The judge pleaded to call the first witness.",
+      "The judge commanded to called the first witness.",
+      "The judge commanded to call the first witness."
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 493,
+    "question": "Vasanth said to Praveen, \"I have eaten three apples.\"",
+    "options": [
+      "Vasanth told Praveen that he ate three apples.",
+      "Vasanth told Praveen that he has eaten three apples.",
+      "Vasanth told Praveen that he had eaten three apples.",
+      "Vasanth told Praveen that he eats three apples."
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 494,
+    "question": "I said to him, \"Don't shout\". Identify the correct reported speech.",
+    "options": [
+      "I said don't shout.",
+      "I asked him not to shout.",
+      "I told him don't shout.",
+      "I told him not to shout."
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 495,
+    "question": "He bade his love goodbye. Change the speech.",
+    "options": [
+      "He said lovingly, \"Goodbye\".",
+      "He said to his love, \"Goodbye\".",
+      "He exclaimed, \"Goodbye, Love\".",
+      "He said, \"Goodbye\""
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 496,
+    "question": "Sahil said to me, \"Where will you go this holiday?\"",
+    "options": [
+      "Sahil asked me where I would go that holiday.",
+      "Sahil asked me where I will go that holiday.",
+      "Sahil asked me where I will be going that holiday.",
+      "Sahil asked me where I would gone that holiday."
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 497,
+    "question": "The lawyer and the assistant ________ together.",
+    "options": [
+      "enters",
+      "has enter",
+      "entered",
+      "had enter"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 498,
+    "question": "Neither the principal nor the teachers ________ convinced.",
+    "options": [
+      "am",
+      "is",
+      "has",
+      "have"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 499,
+    "question": "Several attempts ________ been made.",
+    "options": [
+      "have",
+      "has",
+      "were",
+      "is"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 500,
+    "question": "Shyam ________ invited as the chief guest.",
+    "options": [
+      "is",
+      "are",
+      "were",
+      "have"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 501,
+    "question": "Both the plans ________ wonderful.",
+    "options": [
+      "is",
+      "are",
+      "was",
+      "have"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 502,
+    "question": "Everyone ________ been informed about the incident.",
+    "options": [
+      "have",
+      "are",
+      "were",
+      "has"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 503,
+    "question": "They have given up ________ since long. (drink)",
+    "options": [
+      "Drunk",
+      "Drink",
+      "To drink",
+      "Drinking"
+    ],
+    "correctIndex": 3
+  },
+  {
+    "id": 504,
+    "question": "You must see about ________ your car. (sell)",
+    "options": [
+      "Sell",
+      "Sells",
+      "Selling",
+      "Sold"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 505,
+    "question": "There is no point in ________ with them.",
+    "options": [
+      "Debating",
+      "Debate",
+      "Debated",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 506,
+    "question": "We don't mind his ________ late.",
+    "options": [
+      "Come",
+      "Went",
+      "Coming",
+      "Came"
+    ],
+    "correctIndex": 2
+  },
+  {
+    "id": 507,
+    "question": "He is accustomed to ________ (Smoke)",
+    "options": [
+      "Smoking",
+      "Smoke",
+      "Smoked",
+      "None of these"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 508,
+    "question": "________ just look at the puppies.",
+    "options": [
+      "Oh!",
+      "Aww!",
+      "Hey!",
+      "Ah!"
+    ],
+    "correctIndex": 1
+  },
+  {
+    "id": 509,
+    "question": "________ I have passed the exam.",
+    "options": [
+      "Hurrah!",
+      "Ahh!",
+      "Wow!",
+      "Hey!"
+    ],
+    "correctIndex": 0
+  },
+  {
+    "id": 510,
+    "question": "________ What a beautiful dress.",
+    "options": [
+      "Hey!",
+      "Aww!",
+      "wow!",
+      "Hmm!"
+    ],
+    "correctIndex": 2
   }
 ]
