@@ -537,7 +537,7 @@
 
             testQuestions.forEach((q, index) => {
                 const qNumber = index + 1;
-                const questionText = q.subject === 'Balvikas' ? escapeHTML(q.text) : q.text;
+                const questionText = escapeHTML(q.text);
                 
                 let optionsHTML = '';
                 q.options.forEach((optText, optIndex) => {
