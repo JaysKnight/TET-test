@@ -849,23 +849,34 @@
             if (event.target.closest('.question-card')) event.preventDefault();
         });
         
-       function downloadExamReport() {
+  function downloadExamReport() {
             if (!isSubmitted) return;
             
+            // Check if the library loaded properly
+            if (typeof html2pdf === 'undefined') {
+                alert("The PDF library hasn't loaded yet. Please ensure you are connected to the internet and added the script tag to your <head>.");
+                return;
+            }
+
             const btn = document.getElementById('download-pdf-btn');
             const originalBtnHTML = btn.innerHTML;
-            btn.innerHTML = '⏳ Generating PDF (Please wait)...';
+            btn.innerHTML = '⏳ Generating (Please wait)...';
             btn.style.pointerEvents = 'none';
 
             const finalScore = document.getElementById('final-score').innerText;
             const finalTotal = document.getElementById('final-total').innerText;
             const finalPercentage = document.getElementById('final-percentage').innerText;
 
-            // Create a hidden container for the PDF content
-            const element = document.createElement('div');
-            element.style.padding = '20px';
-            element.style.fontFamily = 'Arial, sans-serif';
-            element.style.color = '#0f172a';
+            // Create a container and attach it off-screen so html2canvas can measure it
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            container.style.width = '800px'; 
+            container.style.backgroundColor = '#ffffff';
+            container.style.padding = '30px';
+            container.style.fontFamily = 'Arial, sans-serif';
+            container.style.color = '#0f172a';
 
             let html = `
                 <div style="text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px;">
@@ -879,7 +890,6 @@
                 const correctAnswerIndex = q.correctIndex;
                 const isCorrect = userAnswerIndex === correctAnswerIndex;
 
-                // Use page-break-inside: avoid to prevent questions splitting across PDF pages
                 html += `
                     <div style="margin-bottom: 20px; page-break-inside: avoid;">
                         <p style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">
@@ -892,9 +902,9 @@
                     let optionStyle = "margin: 4px 0; padding-left: 15px; font-size: 13px;";
                     
                     if (i === correctAnswerIndex) {
-                        optionStyle += " color: #166534; font-weight: bold;"; // Green for correct
+                        optionStyle += " color: #166534; font-weight: bold;"; 
                     } else if (i === userAnswerIndex && !isCorrect) {
-                        optionStyle += " color: #991b1b; text-decoration: line-through;"; // Red for incorrect
+                        optionStyle += " color: #991b1b; text-decoration: line-through;"; 
                     }
 
                     html += `<div style="${optionStyle}">${letter}. ${escapeHTML(opt)}</div>`;
@@ -913,31 +923,36 @@
                     </div>
                     <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 15px 0;">
                 `;
-            });                                                                                element.innerHTML = html;
+            });
+
+            container.innerHTML = html;
+            
+            // Append to body so it renders properly, but remains invisible
+            document.body.appendChild(container);
 
             const dateStr = new Date().toISOString().slice(0, 10);
             
-            // Configure PDF options
             const opt = {
                 margin:       15,
                 filename:     `MCQ_Exam_Report_${dateStr}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Generate and download the PDF
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Restore button state after download starts
+            html2pdf().set(opt).from(container).save().then(() => {
+                // Clean up the temporary container
+                document.body.removeChild(container);
                 btn.innerHTML = originalBtnHTML;
                 btn.style.pointerEvents = 'auto';
             }).catch(err => {
                 console.error("PDF Generation Error:", err);
                 alert("Failed to generate PDF. Please try again.");
+                document.body.removeChild(container);
                 btn.innerHTML = originalBtnHTML;
                 btn.style.pointerEvents = 'auto';
             });
-       }
+        }
         // 10. Bootstrapping the app
        window.onload = async function () {
     generateDatabase();
