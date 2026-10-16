@@ -234,7 +234,6 @@
         html.dark #exam-clock.timer-warning { color: #fbbf24 !important; }
         html.dark #exam-clock.timer-critical { color: #f87171 !important; }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -310,10 +309,10 @@
                     <!-- Subject breakdown injected via JS -->
                 </div>
             </div>
-            <div class="mt-10 flex justify-center">
+           <div class="mt-10 flex justify-center">
                 <button onclick="downloadExamReport()" class="bg-slate-800 hover:bg-black text-white font-bold py-3.5 px-8 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Download Exam Report
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Save as PDF / Print Report
                 </button>
             </div>
         </div>
@@ -851,36 +850,35 @@
         
   function downloadExamReport() {
             if (!isSubmitted) return;
-            
-            // Check if the library loaded properly
-            if (typeof html2pdf === 'undefined') {
-                alert("The PDF library hasn't loaded yet. Please ensure you are connected to the internet and added the script tag to your <head>.");
-                return;
-            }
-
-            const btn = document.getElementById('download-pdf-btn');
-            const originalBtnHTML = btn.innerHTML;
-            btn.innerHTML = '⏳ Generating (Please wait)...';
-            btn.style.pointerEvents = 'none';
 
             const finalScore = document.getElementById('final-score').innerText;
             const finalTotal = document.getElementById('final-total').innerText;
             const finalPercentage = document.getElementById('final-percentage').innerText;
 
-            // Create a container and attach it off-screen so html2canvas can measure it
-            const container = document.createElement('div');
-            container.style.position = 'absolute';
-            container.style.left = '-9999px';
-            container.style.top = '0';
-            container.style.width = '800px'; 
-            container.style.backgroundColor = '#ffffff';
-            container.style.padding = '30px';
-            container.style.fontFamily = 'Arial, sans-serif';
-            container.style.color = '#0f172a';
+            // Safe string escape (avoids errors if escapeHTML is missing)
+            const escapeStr = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
             let html = `
-                <div style="text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px;">
-                    <h1 style="margin: 0; font-size: 24px; color: #1e293b;">Exam Performance Report</h1>
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Exam Report</title>
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #0f172a; max-width: 800px; margin: 0 auto; }
+                    .header { text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px; }
+                    .q-block { margin-bottom: 25px; page-break-inside: avoid; }
+                    .q-text { font-weight: bold; font-size: 15px; margin-bottom: 10px; }
+                    .opt { margin: 6px 0; padding-left: 20px; font-size: 14px; color: #334155; }
+                    .opt-correct { color: #166534; font-weight: bold; }
+                    .opt-wrong { color: #991b1b; text-decoration: line-through; }
+                    .result-box { margin-top: 12px; font-size: 13px; background: #f8fafc; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; }
+                    hr { border: 0; border-top: 1px solid #f1f5f9; margin: 20px 0; }
+                    @media print { body { padding: 0; } }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1 style="margin: 0; font-size: 26px;">Exam Performance Report</h1>
                     <h2 style="margin: 10px 0 0 0; font-size: 18px; color: #2563eb;">Final Score: ${finalScore} / ${finalTotal} (${finalPercentage})</h2>
                 </div>
             `;
@@ -890,68 +888,52 @@
                 const correctAnswerIndex = q.correctIndex;
                 const isCorrect = userAnswerIndex === correctAnswerIndex;
 
-                html += `
-                    <div style="margin-bottom: 20px; page-break-inside: avoid;">
-                        <p style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">
-                            Q${index + 1}. [${q.subject}] ${escapeHTML(q.text)}
-                        </p>
-                `;
+                html += `<div class="q-block">
+                            <div class="q-text">Q${index + 1}. [${escapeStr(q.subject)}] ${escapeStr(q.text)}</div>`;
 
                 q.options.forEach((opt, i) => {
                     const letter = String.fromCharCode(65 + i);
-                    let optionStyle = "margin: 4px 0; padding-left: 15px; font-size: 13px;";
-                    
-                    if (i === correctAnswerIndex) {
-                        optionStyle += " color: #166534; font-weight: bold;"; 
-                    } else if (i === userAnswerIndex && !isCorrect) {
-                        optionStyle += " color: #991b1b; text-decoration: line-through;"; 
-                    }
+                    let optClass = "opt";
+                    if (i === correctAnswerIndex) optClass += " opt-correct";
+                    else if (i === userAnswerIndex && !isCorrect) optClass += " opt-wrong";
 
-                    html += `<div style="${optionStyle}">${letter}. ${escapeHTML(opt)}</div>`;
+                    html += `<div class="${optClass}">${letter}. ${escapeStr(opt)}</div>`;
                 });
 
                 const userAnsLetter = userAnswerIndex !== undefined ? String.fromCharCode(65 + userAnswerIndex) : 'None';
                 const correctAnsLetter = String.fromCharCode(65 + correctAnswerIndex);
-                const resultText = isCorrect ? '<span style="color: #166534;">✅ Correct</span>' : '<span style="color: #991b1b;">❌ Incorrect</span>';
+                const resultText = isCorrect ? '<span style="color: #166534; font-weight: bold;">✅ Correct</span>' : '<span style="color: #991b1b; font-weight: bold;">❌ Incorrect</span>';
 
                 html += `
-                        <div style="margin-top: 10px; font-size: 12px; background: #f8fafc; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
-                            <strong>Result:</strong> ${resultText} &nbsp;|&nbsp; 
-                            <strong>Your Answer:</strong> ${userAnsLetter} &nbsp;|&nbsp; 
-                            <strong>Correct Answer:</strong> ${correctAnsLetter}
+                            <div class="result-box">
+                                <strong>Result:</strong> ${resultText} &nbsp;&nbsp;|&nbsp;&nbsp; 
+                                <strong>Your Answer:</strong> ${userAnsLetter} &nbsp;&nbsp;|&nbsp;&nbsp; 
+                                <strong>Correct Answer:</strong> ${correctAnsLetter}
+                            </div>
                         </div>
-                    </div>
-                    <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 15px 0;">
-                `;
+                        <hr>`;
             });
 
-            container.innerHTML = html;
-            
-            // Append to body so it renders properly, but remains invisible
-            document.body.appendChild(container);
+            html += `</body></html>`;
 
-            const dateStr = new Date().toISOString().slice(0, 10);
+            // Open a new window for the report
+            const printWindow = window.open('', '_blank');
             
-            const opt = {
-                margin:       15,
-                filename:     `MCQ_Exam_Report_${dateStr}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            if (!printWindow) {
+                alert("Popup blocked! Please allow popups for this site to generate the report.");
+                return;
+            }
 
-            html2pdf().set(opt).from(container).save().then(() => {
-                // Clean up the temporary container
-                document.body.removeChild(container);
-                btn.innerHTML = originalBtnHTML;
-                btn.style.pointerEvents = 'auto';
-            }).catch(err => {
-                console.error("PDF Generation Error:", err);
-                alert("Failed to generate PDF. Please try again.");
-                document.body.removeChild(container);
-                btn.innerHTML = originalBtnHTML;
-                btn.style.pointerEvents = 'auto';
-            });
+            // Write the HTML to the new window
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
+            
+            // Wait for it to render, then trigger print/save dialog
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+            }, 300);
         }
         // 10. Bootstrapping the app
        window.onload = async function () {
