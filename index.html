@@ -847,15 +847,14 @@
         elTestContainer.addEventListener('dragstart', event => {
             if (event.target.closest('.question-card')) event.preventDefault();
         });
-        
-  function downloadExamReport() {
+      function downloadExamReport() {
             if (!isSubmitted) return;
 
             const finalScore = document.getElementById('final-score').innerText;
             const finalTotal = document.getElementById('final-total').innerText;
             const finalPercentage = document.getElementById('final-percentage').innerText;
 
-            // Safe string escape (avoids errors if escapeHTML is missing)
+            // Safe string escape
             const escapeStr = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
             let html = `
@@ -864,21 +863,78 @@
             <head>
                 <title>Exam Report</title>
                 <style>
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #0f172a; max-width: 800px; margin: 0 auto; }
-                    .header { text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px; }
-                    .q-block { margin-bottom: 25px; page-break-inside: avoid; }
-                    .q-text { font-weight: bold; font-size: 15px; margin-bottom: 10px; }
-                    .opt { margin: 6px 0; padding-left: 20px; font-size: 14px; color: #334155; }
-                    .opt-correct { color: #166534; font-weight: bold; }
-                    .opt-wrong { color: #991b1b; text-decoration: line-through; }
-                    .result-box { margin-top: 12px; font-size: 13px; background: #f8fafc; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; }
-                    hr { border: 0; border-top: 1px solid #f1f5f9; margin: 20px 0; }
-                    @media print { body { padding: 0; } }
+                    body { 
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                        padding: 40px; 
+                        color: #1e293b; 
+                        max-width: 800px; 
+                        margin: 0 auto; 
+                        position: relative;
+                        background-color: #ffffff;
+                    }
+                    body::before {
+                        content: "";
+                        position: fixed;
+                        top: 0; left: 0; right: 0; bottom: 0;
+                        background-image: url('knight.jpg');
+                        background-size: 550px auto;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        opacity: 0.12; 
+                        z-index: -1;
+                        pointer-events: none;
+                    }
+                    .header { 
+                        text-align: center; 
+                        border-bottom: 2px solid #e2e8f0; 
+                        padding-bottom: 20px; 
+                        margin-bottom: 30px; 
+                    }
+                    .q-block { 
+                        margin-bottom: 20px; 
+                        page-break-inside: avoid; 
+                    }
+                    .q-text { 
+                        font-weight: 700; 
+                        font-size: 15px; 
+                        margin-bottom: 12px; 
+                        line-height: 1.4;
+                    }
+                    .opt { 
+                        margin: 6px 0; 
+                        padding: 6px 14px; 
+                        font-size: 14px; 
+                        color: #334155; 
+                        border-radius: 6px;
+                    }
+                    .opt-correct { 
+                        color: #15803d; 
+                        font-weight: 600; 
+                        background-color: #f0fdf4; 
+                        border-left: 3px solid #22c55e;
+                    }
+                    .opt-wrong { 
+                        color: #b91c1c; 
+                        background-color: #fef2f2; 
+                        border-left: 3px solid #ef4444;
+                        text-decoration: line-through;
+                    }
+                    hr { 
+                        border: 0; 
+                        border-top: 1px solid #f1f5f9; 
+                        margin: 18px 0; 
+                    }
+                    @media print { 
+                        body { padding: 0; } 
+                        body::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        .opt-correct { background-color: #f0fdf4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        .opt-wrong { background-color: #fef2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    }
                 </style>
             </head>
             <body>
                 <div class="header">
-                    <h1 style="margin: 0; font-size: 26px;">Exam Performance Report</h1>
+                    <h1 style="margin: 0; font-size: 26px; color: #0f172a;">Exam Performance Report</h1>
                     <h2 style="margin: 10px 0 0 0; font-size: 18px; color: #2563eb;">Final Score: ${finalScore} / ${finalTotal} (${finalPercentage})</h2>
                 </div>
             `;
@@ -894,47 +950,37 @@
                 q.options.forEach((opt, i) => {
                     const letter = String.fromCharCode(65 + i);
                     let optClass = "opt";
-                    if (i === correctAnswerIndex) optClass += " opt-correct";
-                    else if (i === userAnswerIndex && !isCorrect) optClass += " opt-wrong";
+                    
+                    if (i === correctAnswerIndex) {
+                        optClass += " opt-correct";
+                    } else if (i === userAnswerIndex && !isCorrect) {
+                        optClass += " opt-wrong";
+                    }
 
                     html += `<div class="${optClass}">${letter}. ${escapeStr(opt)}</div>`;
                 });
 
-                const userAnsLetter = userAnswerIndex !== undefined ? String.fromCharCode(65 + userAnswerIndex) : 'None';
-                const correctAnsLetter = String.fromCharCode(65 + correctAnswerIndex);
-                const resultText = isCorrect ? '<span style="color: #166534; font-weight: bold;">✅ Correct</span>' : '<span style="color: #991b1b; font-weight: bold;">❌ Incorrect</span>';
-
-                html += `
-                            <div class="result-box">
-                                <strong>Result:</strong> ${resultText} &nbsp;&nbsp;|&nbsp;&nbsp; 
-                                <strong>Your Answer:</strong> ${userAnsLetter} &nbsp;&nbsp;|&nbsp;&nbsp; 
-                                <strong>Correct Answer:</strong> ${correctAnsLetter}
-                            </div>
-                        </div>
-                        <hr>`;
+                html += `</div><hr>`;
             });
 
             html += `</body></html>`;
 
-            // Open a new window for the report
             const printWindow = window.open('', '_blank');
-            
             if (!printWindow) {
-                alert("Popup blocked! Please allow popups for this site to generate the report.");
+                alert("Popup blocked! Please allow popups to save/download your PDF report.");
                 return;
             }
 
-            // Write the HTML to the new window
             printWindow.document.open();
             printWindow.document.write(html);
             printWindow.document.close();
             
-            // Wait for it to render, then trigger print/save dialog
             setTimeout(() => {
                 printWindow.focus();
                 printWindow.print();
-            }, 300);
-        }
+            }, 500);
+        }  
+
         // 10. Bootstrapping the app
        window.onload = async function () {
     generateDatabase();
