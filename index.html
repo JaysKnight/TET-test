@@ -621,86 +621,30 @@
             });
         }
 
-        function reportQuestion(index) {
+       function reportQuestion(index) {
             if (isSubmitted) return;
             const q = testQuestions[index];
-            // Close any previous report dialog before opening a new one.
-            const existing = document.getElementById('report-modal');
-            if (existing) existing.remove();
-            const modal = document.createElement('div');
-            modal.id = 'report-modal';
-            modal.className = 'fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4';
-            modal.innerHTML = `
-                <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-lg w-full border border-slate-200 max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
-                    <div class="flex items-start justify-between gap-4 mb-5">
-                        <div>
-                            <h2 id="report-modal-title" class="text-xl font-black text-slate-800">Report question error</h2>
-                            <p class="text-sm text-slate-500 mt-1">The report will be prepared as an email to ${ERROR_REPORT_EMAIL}.</p>
-                        </div>
-                        <button type="button" class="question-tool" onclick="closeReportModal()" aria-label="Close report form">✕</button>
-                    </div>
-                    <div class="rounded-xl bg-slate-50 border border-slate-200 p-3 mb-4 text-sm">
-                        <div><strong>Question ID:</strong> ${escapeHTML(q.id)}</div>
-                        <div><strong>Subject:</strong> ${escapeHTML(q.subject)}</div>
-                        <div class="mt-2"><strong>Question:</strong> ${escapeHTML(q.text)}</div>
-                    </div>
-                    <form id="report-error-form" class="space-y-4">
-                        <div>
-                            <label for="report-category" class="block text-sm font-bold text-slate-700 mb-1">Report category</label>
-                            <select id="report-category" name="category" required class="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-slate-800">
-                                <option value="typo">Typo / spelling mistake</option>
-                                <option value="incorrect answer key">Incorrect answer key</option>
-                                <option value="incorrect options">Incorrect options</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="report-explanation" class="block text-sm font-bold text-slate-700 mb-1">Explanation (optional)</label>
-                            <textarea id="report-explanation" name="explanation" rows="4" maxlength="2000" placeholder="Describe the error or suggest a correction..." class="w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-slate-800"></textarea>
-                        </div>
-                        <p class="text-xs text-slate-500">Your email app will open with the report filled in. You must press Send in that app to deliver it.</p>
-                        <div class="flex flex-col-reverse sm:flex-row gap-3 justify-end">
-                            <button type="button" onclick="closeReportModal()" class="px-5 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200">Cancel</button>
-                            <button type="submit" class="px-5 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700">Prepare email</button>
-                        </div>
-                    </form>
-                </div>`;
-            document.body.appendChild(modal);
-            document.getElementById('report-error-form').addEventListener('submit', function (event) {
-                event.preventDefault();
-                const category = document.getElementById('report-category').value;
-                const explanation = document.getElementById('report-explanation').value.trim();
-                const report = {
-                    questionId: q.id,
-                    subject: q.subject,
-                    question: q.text,
-                    options: q.options,
-                    currentCorrectAnswer: q.options[q.correctIndex] ?? '',
-                    correctIndex: q.correctIndex,
-                    category,
-                    explanation,
-                    reportedAt: new Date().toISOString()
-                };
-                errorReports.push(report);
-                saveLocalJSON(ERROR_REPORTS_KEY, errorReports);
-                const body = [
-                    'Question error report',
-                    '',
-                    `Question ID: ${report.questionId}`,
-                    `Subject: ${report.subject}`,
-                    `Question: ${report.question}`,
-                    `Options: ${report.options.map((option, i) => `${String.fromCharCode(65 + i)}. ${option}`).join('\n')}`,
-                    `Current answer key: ${report.currentCorrectAnswer} (option index ${report.correctIndex})`,
-                    `Report category: ${report.category}`,
-                    `Explanation: ${report.explanation || '(not provided)'}`,
-                    `Reported at: ${report.reportedAt}`
-                ].join('\n');
-                const mailto = `mailto:${ERROR_REPORT_EMAIL}?subject=${encodeURIComponent(`MCQ Error Report: ${report.questionId}`)}&body=${encodeURIComponent(body)}`;
-            closeReportModal();
-            // Launch the user's configured email app with all report details prefilled.
-            window.location.href = mailto;
-            });
+            
+            // Construct the email body with CRLF (\r\n) for broad email client compatibility
+            const body = [
+                'Question error report',
+                '',
+                `Question ID: ${q.id}`,
+                `Subject: ${q.subject}`,
+                `Question: ${q.text}`,
+                `Options:\r\n${q.options.map((option, i) => `${String.fromCharCode(65 + i)}.${option}`).join('\r\n')}`,
+                `Current answer key: ${q.options[q.correctIndex] ?? ''} (option index ${q.correctIndex})`,
+                '',
+                'Please describe the error below:',
+                ''
+            ].join('\r\n');
+            
+            const mailto = `mailto:${ERROR_REPORT_EMAIL}?subject=${encodeURIComponent(`MCQ Error Report: ${q.id}`)}&body=${encodeURIComponent(body)}`;
+            
+            // Instantly launch the user's configured email app
+            window.location.assign(mailto);
         }
+    
 
         function closeReportModal() {
             const modal = document.getElementById('report-modal');
