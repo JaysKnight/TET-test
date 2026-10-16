@@ -980,6 +980,22 @@
                 printWindow.print();
             }, 500);
         }  
+        function shuffleQuestionOptions() {
+            testQuestions.forEach(q => {
+                // 1. Save the actual text of the correct answer before shuffling
+                const correctAnswerText = q.options[q.correctIndex];
+
+                // 2. Shuffle the options array randomly
+                for (let i = q.options.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    // Swap elements
+                    [q.options[i], q.options[j]] = [q.options[j], q.options[i]];
+                }
+
+                // 3. Find where the correct answer moved to, and update the index
+                q.correctIndex = q.options.indexOf(correctAnswerText);
+            });
+        }
 
         // 10. Bootstrapping the app
        window.onload = async function () {
@@ -1047,7 +1063,7 @@
                 });
             });
         }
-
+        shuffleQuestionOptions();
         generateTest();
         renderTestUI();
         startExamTimer();
