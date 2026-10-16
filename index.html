@@ -645,7 +645,7 @@
                 ''
             ].join('\r\n');
             
-            const mailto = `mailto:${ERROR_REPORT_EMAIL}?subject=${encodeURIComponent(`MCQ Error Report: ${q.id}`)}&body=${encodeURIComponent(body)}`;
+            const mailto = `mailto:Support <${ERROR_REPORT_EMAIL}>?subject=${encodeURIComponent(`MCQ Error Report: ${q.id}`)}&body=${encodeURIComponent(body)}`;
             
             // Instantly launch the user's configured email app
             window.location.assign(mailto);
