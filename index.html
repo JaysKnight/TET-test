@@ -848,56 +848,95 @@
             if (event.target.closest('.question-card')) event.preventDefault();
         });
         
-        function downloadExamReport() {
+       function downloadExamReport() {
             if (!isSubmitted) return;
+            
+            const btn = document.getElementById('download-pdf-btn');
+            const originalBtnHTML = btn.innerHTML;
+            btn.innerHTML = '⏳ Generating PDF (Please wait)...';
+            btn.style.pointerEvents = 'none';
 
             const finalScore = document.getElementById('final-score').innerText;
             const finalTotal = document.getElementById('final-total').innerText;
             const finalPercentage = document.getElementById('final-percentage').innerText;
 
-            let reportContent = "=========================================\n";
-            reportContent += "          EXAM PERFORMANCE REPORT        \n";
-            reportContent += "=========================================\n\n";
-            reportContent += `Final Score: ${finalScore} / ${finalTotal}\n`;
-            reportContent += `Accuracy: ${finalPercentage}\n\n`;
-            reportContent += "-----------------------------------------\n\n";
+            // Create a hidden container for the PDF content
+            const element = document.createElement('div');
+            element.style.padding = '20px';
+            element.style.fontFamily = 'Arial, sans-serif';
+            element.style.color = '#0f172a';
+
+            let html = `
+                <div style="text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px;">
+                    <h1 style="margin: 0; font-size: 24px; color: #1e293b;">Exam Performance Report</h1>
+                    <h2 style="margin: 10px 0 0 0; font-size: 18px; color: #2563eb;">Final Score: ${finalScore} / ${finalTotal} (${finalPercentage})</h2>
+                </div>
+            `;
 
             testQuestions.forEach((q, index) => {
                 const userAnswerIndex = userAnswers[index];
                 const correctAnswerIndex = q.correctIndex;
                 const isCorrect = userAnswerIndex === correctAnswerIndex;
 
-                reportContent += `Q${index + 1}. [${q.subject}] ${q.text}\n\n`;
-                
+                // Use page-break-inside: avoid to prevent questions splitting across PDF pages
+                html += `
+                    <div style="margin-bottom: 20px; page-break-inside: avoid;">
+                        <p style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">
+                            Q${index + 1}. [${q.subject}] ${escapeHTML(q.text)}
+                        </p>
+                `;
+
                 q.options.forEach((opt, i) => {
                     const letter = String.fromCharCode(65 + i);
-                    reportContent += `   ${letter}. ${opt}\n`;
+                    let optionStyle = "margin: 4px 0; padding-left: 15px; font-size: 13px;";
+                    
+                    if (i === correctAnswerIndex) {
+                        optionStyle += " color: #166534; font-weight: bold;"; // Green for correct
+                    } else if (i === userAnswerIndex && !isCorrect) {
+                        optionStyle += " color: #991b1b; text-decoration: line-through;"; // Red for incorrect
+                    }
+
+                    html += `<div style="${optionStyle}">${letter}. ${escapeHTML(opt)}</div>`;
                 });
 
-                const userAnsText = userAnswerIndex !== undefined 
-                    ? `${String.fromCharCode(65 + userAnswerIndex)}. ${q.options[userAnswerIndex]}` 
-                    : 'Not Answered';
-                const correctAnsText = `${String.fromCharCode(65 + correctAnswerIndex)}. ${q.options[correctAnswerIndex]}`;
+                const userAnsLetter = userAnswerIndex !== undefined ? String.fromCharCode(65 + userAnswerIndex) : 'None';
+                const correctAnsLetter = String.fromCharCode(65 + correctAnswerIndex);
+                const resultText = isCorrect ? '<span style="color: #166534;">✅ Correct</span>' : '<span style="color: #991b1b;">❌ Incorrect</span>';
 
-                reportContent += `\nYour Answer: ${userAnsText}\n`;
-                reportContent += `Correct Answer: ${correctAnsText}\n`;
-                reportContent += `Result: ${isCorrect ? '✅ Correct' : '❌ Incorrect'}\n`;
-                reportContent += "\n-----------------------------------------\n\n";
-            });
+                html += `
+                        <div style="margin-top: 10px; font-size: 12px; background: #f8fafc; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                            <strong>Result:</strong> ${resultText} &nbsp;|&nbsp; 
+                            <strong>Your Answer:</strong> ${userAnsLetter} &nbsp;|&nbsp; 
+                            <strong>Correct Answer:</strong> ${correctAnsLetter}
+                        </div>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 15px 0;">
+                `;
+            });                                                                                element.innerHTML = html;
 
-            // Create and trigger the download
-            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
             const dateStr = new Date().toISOString().slice(0, 10);
-            link.download = `Exam_Report_${dateStr}.txt`;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
-        }
+            
+            // Configure PDF options
+            const opt = {
+                margin:       15,
+                filename:     `MCQ_Exam_Report_${dateStr}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
 
+            // Generate and download the PDF
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore button state after download starts
+                btn.innerHTML = originalBtnHTML;
+                btn.style.pointerEvents = 'auto';
+            }).catch(err => {
+                console.error("PDF Generation Error:", err);
+                alert("Failed to generate PDF. Please try again.");
+                btn.innerHTML = originalBtnHTML;
+                btn.style.pointerEvents = 'auto';
+            })
+       }
         // 10. Bootstrapping the app
        window.onload = async function () {
     generateDatabase();
