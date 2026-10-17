@@ -524,7 +524,10 @@
                 selectedQuestions.push(...weightedSelectQuestions(subjectQs, QUESTIONS_TO_SELECT_PER_SUBJECT));
             });
 
-            testQuestions = shuffleArray(selectedQuestions);
+            testQuestions = shuffleArray(selectedQuestions).map(q => ({
+    ...q,
+    options: [...q.options]
+}));
             if (testQuestions.length !== SUBJECTS.length * QUESTIONS_TO_SELECT_PER_SUBJECT) {
                 throw new Error('The test did not generate the expected 150 questions.');
             }
@@ -981,20 +984,26 @@
             }, 500);
         }  
         function shuffleQuestionOptions() {
-            testQuestions.forEach(q => {
-                // 1. Save the actual text of the correct answer before shuffling
-                const correctAnswerText = q.options[q.correctIndex];
+    testQuestions.forEach(q => {
+        // 1. Save the actual text of the correct answer before shuffling
+        const options = q.options.map((text, originalIndex) => ({
+            text,
+            originalIndex
+        }));
+        
+        // 2. Shuffle the options array randomly
+        for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            // Swap elements
+            [options[i], options[j]] = [options[j], options[i]];
+        }
 
-                // 2. Shuffle the options array randomly
-                for (let i = q.options.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    // Swap elements
-                    [q.options[i], q.options[j]] = [q.options[j], q.options[i]];
-                }
-
-                // 3. Find where the correct answer moved to, and update the index
-                q.correctIndex = q.options.indexOf(correctAnswerText);
-            });
+        // 3. Find where the correct answer moved to, and update the index
+        q.options = options.map(option => option.text);
+        q.correctIndex = options.findIndex(
+            option => option.originalIndex === q.correctIndex
+        );
+    });
         }
 
         // 10. Bootstrapping the app
@@ -1063,8 +1072,9 @@
                 });
             });
         }
-        shuffleQuestionOptions();
+        
         generateTest();
+        shuffleQuestionOptions();
         renderTestUI();
         startExamTimer();
     } catch (error) {
