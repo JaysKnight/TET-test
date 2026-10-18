@@ -377,12 +377,6 @@ Use width="640", height="360", viewBox="0 0 640 360".
       const newQuestions = validateQuestions(parsed, extractionProvider + ' output');
       renderPreview(newQuestions);
       setStatus('Extraction completed with ' + extractionProvider + '. Review the questions and diagrams below.');
-      let parsed;
-      try { parsed = JSON.parse(aiResponseText); }
-      catch (_) { fail('Gemini returned invalid JSON. Try again or use a clearer document. No data was committed.'); }
-      const newQuestions = validateQuestions(parsed, 'Gemini output');
-      renderPreview(newQuestions);
-
       const previewText = newQuestions.slice(0, 5).map((q, i) => `${i + 1}. ${q.question}`).join('\n');
       const confirmText = `${extractionProvider} extracted ${newQuestions.length} valid question(s) for ${targetFile}.\n\nPreview:\n${previewText}${newQuestions.length > 5 ? '\n…' : ''}\n\nHave you checked the answer keys and want to continue to GitHub?`;
       if (!window.confirm(confirmText)) {
