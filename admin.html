@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>Admin MCQ Uploader</title>
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] } };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 p-4 sm:p-8 font-sans text-slate-800">
@@ -23,6 +27,10 @@
       <div id="model-select-wrap" class="mt-2 hidden">
         <label class="block text-sm font-medium" for="model-select">Detected models (choose one)</label>
         <select id="model-select" class="w-full p-3 border rounded-xl bg-slate-50"></select>
+      </div>
+      <div class="mt-2">
+        <label class="inline-flex items-center"><input id="math-aware" type="checkbox" class="mr-2"> <span class="text-sm">Enable math-aware extraction (convert math to LaTeX)</span></label>
+        <p class="text-xs text-slate-500 mt-1">When enabled, the model will be instructed to convert any mathematical expressions to LaTeX wrapped in $...$ so they render correctly in previews and downstream uses.</p>
       </div>
       <label class="block text-sm font-medium" for="github-token">GitHub personal access token</label>
       <input type="password" id="github-token" autocomplete="off" spellcheck="false" placeholder="GitHub PAT (repo contents write access required)" class="w-full p-3 border rounded-xl bg-slate-50">
@@ -68,6 +76,7 @@
       const modelSelectWrap = $('model-select-wrap');
       const modelSelect = $('model-select');
       const geminiKeyInput = $('gemini-key');
+      const mathAwareCheckbox = $('math-aware');
 
       const MAX_FILE_BYTES = 14 * 1024 * 1024;
       const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'application/pdf']);
@@ -142,26 +151,41 @@
         return new Error(`${service} request failed (${response.status}${response.statusText ? ' ' + response.statusText : ''}).${detail ? '\n' + detail : ''}`);
       }
 
+      function escapeHtmlAllowMath(text) {
+        if (text == null) return '';
+        const escaped = String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+        return escaped;
+      }
+
       function renderPreview(questions) {
         previewList.replaceChildren();
-        questions.slice(0, 10).forEach((q) => {
+        questions.slice(0, 1000).forEach((q) => {
           const li = document.createElement('li');
           const title = document.createElement('p');
           title.className = 'font-semibold';
-          title.textContent = q.question;
+          title.innerHTML = escapeHtmlAllowMath(q.question).replace(/\n/g, '<br>');
           li.appendChild(title);
           const options = document.createElement('ul');
           options.className = 'list-disc pl-5 mt-1 text-slate-600';
           q.options.forEach((option, i) => {
             const item = document.createElement('li');
-            item.textContent = `${String.fromCharCode(65 + i)}. ${option}${i === q.correctIndex ? ' (answer key)' : ''}`;
+            item.innerHTML = escapeHtmlAllowMath(`${String.fromCharCode(65 + i)}. ${option}`);
+            if (i === q.correctIndex) item.innerHTML += ' <strong>(answer key)</strong>';
             options.appendChild(item);
           });
           li.appendChild(options);
           previewList.appendChild(li);
         });
-        previewSummary.textContent = `Found ${questions.length} valid question(s). Preview shows up to 10. Verify the wording and answer keys before committing.`;
+        previewSummary.textContent = `Found ${questions.length} valid question(s). Preview shows up to 10.`;
         previewWrap.classList.remove('hidden');
+        if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+          MathJax.typesetPromise([previewWrap]).catch(err => console.error('MathJax typeset error', err));
+        }
       }
 
       // Discover available models for the given API key
@@ -191,14 +215,17 @@
         return models[0] || null;
       }
 
-      async function callGeminiExtract(base64Data, fileType, apiKey) {
+      function latexLooksBalanced(s) {
+        if (typeof s !== 'string') return true;
+        const open = (s.match(/\{/g) || []).length;
+        const close = (s.match(/\}/g) || []).length;
+        return open === close;
+      }
+
+      async function callGeminiExtract(base64Data, fileType, apiKey, mathAware) {
         setStatus('Discovering available Gemini models for your key...');
         let models;
-        try {
-          models = await listModels(apiKey);
-        } catch (err) {
-          throw new Error('Could not list models: ' + err.message);
-        }
+        try { models = await listModels(apiKey); } catch (err) { throw new Error('Could not list models: ' + err.message); }
         if (!models || !models.length) throw new Error('No models were returned for this key. Check the key and project access.');
 
         modelSelect.replaceChildren();
@@ -212,25 +239,19 @@
         const modelToUse = modelSelect.value;
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelToUse)}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
-        const prompt = `Extract ONLY the multiple-choice questions that are clearly present in this document. Return valid JSON only, as an array of objects. Each object must follow this exact shape:\n{\"question\":\"...\",\"options\":[\"...\",\"...\",\"...\",\"...\"],\"correctIndex\":0}\nRules:\n- Preserve original wording as closely as possible.\n- Keep exactly 4 options for each question.\n- If a question is not a MCQ, skip it.\n- Do not include explanations, markdown, or extra text outside the JSON array.\n- If no questions are found, return []`;
+        const basePrompt = `Extract ONLY the multiple-choice questions that are clearly present in this document. RETURN VALID JSON ONLY as a single array of objects with this exact shape:\n[{\n  "question": "...",\n  "options": ["optA","optB","optC","optD"],\n  "correctIndex": 0\n}]\nIMPORTANT rules:\n- Preserve original wording as closely as possible.\n- Keep exactly 4 options for each question.\n- If a question is not a MCQ, skip it.\n- Return only the JSON array and nothing else. If no MCQs are present, return []`;
+
+        const mathPromptAddition = `\nADDITIONAL MATH RULES (apply only if math-aware):\n1) Whenever any mathematical expression appears, CONVERT it to LaTeX and WRAP the LaTeX inline with $...$ (for example: $\\frac{1}{2}$, $x^{2}$, $\\sqrt{x+1}$, $\\sum_{i=1}^{n} a_i$).\n2) Use standard LaTeX macros (\\frac, \\sqrt, ^{}, _{}, Greek letters like \\alpha).\n3) Preserve the original wording; only replace math with LaTeX wrapped in $...$.`;
+
+        const prompt = mathAware ? (basePrompt + mathPromptAddition) : basePrompt;
 
         const body = {
-          contents: [{
-            parts: [
-              { text: prompt },
-              { inline_data: { mime_type: fileType, data: base64Data } }
-            ]
-          }],
+          contents: [{ parts: [ { text: prompt }, { inline_data: { mime_type: fileType, data: base64Data } } ] }],
           generationConfig: { temperature: 0.0 }
         };
 
-        const res = await fetch(url, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-        });
-
-        if (res.status === 404) {
-          throw new Error(`Model ${modelToUse} is not available for generateContent (404). Try selecting a different model from the list.`);
-        }
+        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (res.status === 404) { throw new Error(`Model ${modelToUse} is not available for generateContent (404). Try selecting a different model from the list.`); }
         if (!res.ok) throw await responseError(res, 'Gemini generateContent');
 
         const data = await res.json();
@@ -244,9 +265,20 @@
         try { parsed = JSON.parse(text); }
         catch (e) {
           const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-          try { parsed = JSON.parse(cleaned); }
-          catch (err) { throw new Error('Gemini returned invalid JSON output.'); }
+          try { parsed = JSON.parse(cleaned); } catch (err) { throw new Error('Gemini returned invalid JSON output.'); }
         }
+
+        // Basic LaTeX sanity if math-aware
+        if (mathAware) {
+          for (const q of parsed) {
+            if (!latexLooksBalanced(q.question) || (q.options && q.options.some(opt => !latexLooksBalanced(opt)))) {
+              const proceed = window.confirm('Some extracted questions contain unbalanced LaTeX braces. This commonly indicates malformed LaTeX. Proceed and commit anyway? Click Cancel to inspect the preview and edit before committing.');
+              if (!proceed) throw new Error('User cancelled due to LaTeX sanity check.');
+              break;
+            }
+          }
+        }
+
         return parsed;
       }
 
@@ -260,29 +292,21 @@
         const repo = $('github-repo').value.trim();
         const file = $('file-upload').files[0];
         const targetFile = $('subject-file').value;
+        const mathAware = mathAwareCheckbox.checked;
 
-        if (!geminiKey || !githubToken || !owner || !repo || !file) {
-          setStatus('Please fill in all credential/repository fields and select a file.', 'error'); return;
-        }
-        if (!/^[A-Za-z0-9-]+$/.test(owner) || !/^[A-Za-z0-9._-]+$/.test(repo)) {
-          setStatus('GitHub owner or repository name contains invalid characters.', 'error'); return;
-        }
-        if (!ALLOWED_TYPES.has(file.type)) {
-          setStatus('Unsupported file type. Select a PNG, JPEG, WebP, or PDF file.', 'error'); return;
-        }
-        if (file.size === 0 || file.size > MAX_FILE_BYTES) {
-          setStatus('The file must be non-empty and no larger than 14 MB for inline Gemini requests.', 'error'); return;
-        }
+        if (!geminiKey || !githubToken || !owner || !repo || !file) { setStatus('Please fill in all credential/repository fields and select a file.', 'error'); return; }
+        if (!/^[A-Za-z0-9-]+$/.test(owner) || !/^[A-Za-z0-9._-]+$/.test(repo)) { setStatus('GitHub owner or repository name contains invalid characters.', 'error'); return; }
+        if (!ALLOWED_TYPES.has(file.type)) { setStatus('Unsupported file type. Select a PNG, JPEG, WebP, or PDF file.', 'error'); return; }
+        if (file.size === 0 || file.size > MAX_FILE_BYTES) { setStatus('The file must be non-empty and no larger than 14 MB for inline Gemini requests.', 'error'); return; }
 
-        btn.disabled = true;
-        btn.textContent = 'Processing…';
+        btn.disabled = true; btn.textContent = 'Processing…';
 
         try {
           setStatus('Step 1/4: Reading file…');
           const base64Data = await readFileAsBase64(file);
 
           setStatus('Step 2/4: Extracting MCQs with Gemini…');
-          const geminiParsed = await callGeminiExtract(base64Data, file.type, geminiKey);
+          const geminiParsed = await callGeminiExtract(base64Data, file.type, geminiKey, mathAware);
           const newQuestions = validateQuestions(geminiParsed, 'Gemini output');
           renderPreview(newQuestions);
 
@@ -292,47 +316,30 @@
 
           setStatus('Step 3/4: Fetching and validating existing GitHub JSON…');
           const githubFileUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeURIComponent(targetFile)}`;
-          const githubHeaders = {
-            'Authorization': `Bearer ${githubToken}`,
-            'Accept': 'application/vnd.github+json',
-            'X-GitHub-Api-Version': '2022-11-28',
-            'Content-Type': 'application/json'
-          };
+          const githubHeaders = { 'Authorization': `Bearer ${githubToken}`, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' };
 
           const fetchRes = await fetch(githubFileUrl, { headers: githubHeaders });
-          let existingQuestions = [];
-          let fileSha = null;
+          let existingQuestions = []; let fileSha = null;
 
           if (fetchRes.ok) {
             const fileData = await fetchRes.json();
-            if (fileData.type !== 'file' || typeof fileData.content !== 'string') {
-              fail('GitHub did not return a normal file with inline content. No data was committed.');
-            }
-            let decodedContent;
-            try { decodedContent = decodeGitHubContent(fileData.content); } catch (_) { fail('Could not decode the existing GitHub JSON file. No data was committed.'); }
-            let existingParsed;
-            try { existingParsed = JSON.parse(decodedContent); } catch (_) { fail('The existing GitHub file is not valid JSON. It was left unchanged.'); }
+            if (fileData.type !== 'file' || typeof fileData.content !== 'string') { fail('GitHub did not return a normal file with inline content. No data was committed.'); }
+            let decodedContent; try { decodedContent = decodeGitHubContent(fileData.content); } catch (_) { fail('Could not decode the existing GitHub JSON file. No data was committed.'); }
+            let existingParsed; try { existingParsed = JSON.parse(decodedContent); } catch (_) { fail('The existing GitHub file is not valid JSON. It was left unchanged.'); }
             if (!Array.isArray(existingParsed)) fail('The existing GitHub JSON must be an array. It was left unchanged.');
-            existingQuestions = existingParsed;
-            fileSha = fileData.sha;
-          } else if (fetchRes.status !== 404) {
-            throw await responseError(fetchRes, 'GitHub read');
-          }
+            existingQuestions = existingParsed; fileSha = fileData.sha;
+          } else if (fetchRes.status !== 404) { throw await responseError(fetchRes, 'GitHub read'); }
 
           const existingIds = existingQuestions.map(q => q && q.id).filter(id => Number.isSafeInteger(id) && id >= 0);
           let lastId = existingIds.length ? Math.max(...existingIds) : 0;
           if (!Number.isSafeInteger(lastId + newQuestions.length)) fail('Question IDs would exceed the safe integer range.');
 
           const seen = new Set(existingQuestions.filter(q => q && typeof q.question === 'string').map(q => normalizeText(q.question)));
-          const uniqueQuestions = [];
-          let duplicates = 0;
-
+          const uniqueQuestions = []; let duplicates = 0;
           for (const q of newQuestions) {
             const key = normalizeText(q.question);
             if (seen.has(key)) { duplicates++; continue; }
-            seen.add(key);
-            lastId++;
-            uniqueQuestions.push({ id: lastId, question: q.question, options: q.options, correctIndex: q.correctIndex });
+            seen.add(key); lastId++; uniqueQuestions.push({ id: lastId, question: q.question, options: q.options, correctIndex: q.correctIndex });
           }
 
           if (uniqueQuestions.length === 0) { setStatus(`No new questions to add. All ${duplicates} extracted question(s) already exist in ${targetFile}.`, 'success'); return; }
@@ -353,8 +360,7 @@
           console.error(error);
           setStatus(`Error: ${error?.message || 'Unexpected error.'}`, 'error');
         } finally {
-          btn.disabled = false;
-          btn.textContent = 'Extract, Review & Commit';
+          btn.disabled = false; btn.textContent = 'Extract, Review & Commit';
         }
       }
 
