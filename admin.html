@@ -75,6 +75,30 @@
   function normalizeText(value) {
     return String(value ?? '').normalize('NFKC').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
   }
+  function sanitizeDiagramSvg(svgText) {
+    if (typeof svgText !== 'string' || svgText.length > 200000) {
+      fail('Diagram SVG is missing or too large.');
+    }
+    const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+    const root = doc.documentElement;
+    if (!root || root.localName !== 'svg' || root.nodeName.toLowerCase() === 'parsererror') {
+      fail('Gemini returned invalid SVG.');
+    }
+    const allowedTags = new Set(['svg', 'g', 'line', 'path', 'rect', 'circle', 'ellipse', 'polygon', 'polyline', 'text', 'tspan']);
+    const allowedAttributes = new Set(['xmlns', 'width', 'height', 'viewBox', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'points', 'fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'font-size', 'font-family', 'font-weight', 'text-anchor', 'dominant-baseline', 'transform', 'opacity']);
+    for (const element of [root, ...root.querySelectorAll('*')]) {
+      if (!allowedTags.has(element.localName)) fail('Gemini returned an unsupported SVG element.');
+      for (const attr of [...element.attributes]) {
+        if (!allowedAttributes.has(attr.name) || /^on/i.test(attr.name)) element.removeAttribute(attr.name);
+      }
+    }
+    if (!root.hasAttribute('viewBox')) root.setAttribute('viewBox', '0 0 640 360');
+    if (!root.hasAttribute('xmlns')) root.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    if (!root.hasAttribute('width')) root.setAttribute('width', '640');
+    if (!root.hasAttribute('height')) root.setAttribute('height', '360');
+    return new XMLSerializer().serializeToString(root);
+  }
+
   function validateQuestions(value, label) {
     if (!Array.isArray(value)) fail(label + ' must be a JSON array. No data was committed.');
     if (value.length === 0) fail(label + ' contains no questions. No data was committed.');
@@ -88,7 +112,9 @@
       if (!Number.isInteger(q.correctIndex) || q.correctIndex < 0 || q.correctIndex > 3) {
         fail(where + ' must have correctIndex as an integer from 0 to 3. Check the answer key in the source document.');
       }
-      return { ...q, question: q.question.trim(), options: q.options.map(o => o.trim()) };
+      if (q.diagramSvg != null && typeof q.diagramSvg !== 'string') fail(where + ' has an invalid diagram.');
+      const diagramSvg = q.diagramSvg?.trim() ? sanitizeDiagramSvg(q.diagramSvg) : null;
+      return { ...q, question: q.question.trim(), options: q.options.map(o => o.trim()), diagramSvg };
     });
   }
   function readFileAsBase64(file) {
@@ -128,14 +154,40 @@
     } catch (_) { /* response may not be JSON */ }
     return new Error(`${service} request failed (${response.status}${response.statusText ? ' ' + response.statusText : ''}).${detail ? '\n' + detail : ''}`);
   }
+  async function uploadSvgToGitHub(owner, repo, path, svg, headers) {
+    const encodedPath = path.split('/').map(segment => encodeURIComponent(segment)).join('/');
+    const url = 'https://api.github.com/repos/' + encodeURIComponent(owner) + '/' + encodeURIComponent(repo) + '/contents/' + encodedPath;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        message: 'Add MCQ diagram ' + path.split('/').pop(),
+        content: encodeUtf8Base64(svg)
+      })
+    });
+    if (!response.ok) throw await responseError(response, 'GitHub diagram upload');
+  }
+
   function renderPreview(questions) {
     previewList.replaceChildren();
-    questions.slice(0, 10).forEach((q) => {
+    questions.forEach((q, index) => {
+      if (index >= 10 && !q.diagramSvg) return;
       const li = document.createElement('li');
       const title = document.createElement('p');
       title.className = 'font-semibold';
       title.textContent = q.question;
       li.appendChild(title);
+      if (q.diagramSvg) {
+        const image = document.createElement('img');
+        image.alt = 'Generated diagram preview';
+        image.src = 'data:image/svg+xml;base64,' + encodeUtf8Base64(q.diagramSvg);
+        image.style.maxWidth = '100%';
+        image.style.maxHeight = '260px';
+        image.style.margin = '12px 0';
+        image.style.border = '1px solid #cbd5e1';
+        image.style.background = 'white';
+        li.appendChild(image);
+      }
       const options = document.createElement('ul');
       options.className = 'list-disc pl-5 mt-1 text-slate-600';
       q.options.forEach((option, i) => {
@@ -146,7 +198,7 @@
       li.appendChild(options);
       previewList.appendChild(li);
     });
-    previewSummary.textContent = `Found ${questions.length} valid question(s). Preview shows up to 10. Verify the wording and answer keys before committing.`;
+    previewSummary.textContent = `Found ${questions.length} valid question(s). Preview shows the first 10 plus later questions with diagrams. Verify wording, diagrams, and answer keys before committing.`;
     previewWrap.classList.remove('hidden');
   }
   async function processAndCommit() {
@@ -184,7 +236,25 @@
       const mediaInput = isPdf
         ? { type: 'document', mime_type: file.type, data: base64Data }
         : { type: 'image', mime_type: file.type, data: base64Data };
-     const extractionPrompt = 'Extract only multiple-choice questions actually present in the supplied document. For any mathematical formulas, fractions, roots, exponents, or geometric symbols (such as angles $\\angle ABC$, triangles $\\triangle ABC$, degrees $45^\\circ$, parallel $\\parallel$, perpendicular $\\perp$, congruency $\\cong$, similarity $\\sim$, line segments $\\overline{AB}$, or squares $\\square ABCD$), you MUST convert them into inline LaTeX code wrapped in $ signs. Return a JSON array only. Each item must have this exact shape: {"question":"question text","options":["option A","option B","option C","option D"],"correctIndex":0}. correctIndex is zero-based (0=A, 1=B, 2=C, 3=D). Preserve the original language and script for standard text. Do not invent missing text or include markdown fences.';
+     const extractionPrompt = `
+Extract only MCQs present in the supplied document. Preserve the original language.
+For formulas, use inline LaTeX wrapped in $ signs.
+
+Return a JSON array only. Each item must have:
+{
+  "question": "question text",
+  "options": ["A", "B", "C", "D"],
+  "correctIndex": 0,
+  "diagramSvg": null
+}
+
+For a question that depends on a visible geometric figure in the supplied document,
+return diagramSvg as one complete SVG string that faithfully redraws that figure.
+Use simple SVG primitives only. If the source does not show enough information to
+recreate the figure accurately, return null. Do not invent measurements or geometry.
+Do not use scripts, external links, images, stylesheets, or markdown fences.
+Use width="640", height="360", viewBox="0 0 640 360".
+`;;
       const geminiRes = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
@@ -278,7 +348,7 @@
         if (seen.has(key)) { duplicates++; continue; }
         seen.add(key);
         lastId++;
-        uniqueQuestions.push({ id: lastId, question: q.question, options: q.options, correctIndex: q.correctIndex });
+        uniqueQuestions.push({ id: lastId, question: q.question, options: q.options, correctIndex: q.correctIndex, diagramSvg: q.diagramSvg || null });
       }
       if (uniqueQuestions.length === 0) {
         setStatus(`No new questions to add. All ${duplicates} extracted question(s) already exist in ${targetFile}.`, 'success'); return;
@@ -287,9 +357,20 @@
         setStatus('Commit cancelled. Nothing was changed on GitHub.'); return;
       }
 
+      const subjectSlug = targetFile.replace(/\.json$/i, '').replace(/[^A-Za-z0-9_-]/g, '');
+      setStatus('Step 4/4: Uploading diagrams and committing questions to GitHub…');
+      for (const question of uniqueQuestions) {
+        const svg = question.diagramSvg;
+        delete question.diagramSvg;
+        if (!svg) continue;
+        const imagePath = 'assets/diagrams/' + subjectSlug + '-' + question.id + '-' + Date.now() + '.svg';
+        await uploadSvgToGitHub(owner, repo, imagePath, svg, githubHeaders);
+        question.image = imagePath;
+      }
+
       const mergedQuestions = [...existingQuestions, ...uniqueQuestions];
       const newContentBase64 = encodeUtf8Base64(JSON.stringify(mergedQuestions, null, 2) + '\n');
-      setStatus('Step 4/4: Committing validated questions to GitHub…');
+      setStatus('Saving the updated question JSON to GitHub…');
       const commitBody = {
         message: `Add ${uniqueQuestions.length} MCQs to ${targetFile} via Admin Portal`,
         content: newContentBase64
