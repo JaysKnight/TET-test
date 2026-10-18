@@ -254,7 +254,7 @@ Use simple SVG primitives only. If the source does not show enough information t
 recreate the figure accurately, return null. Do not invent measurements or geometry.
 Do not use scripts, external links, images, stylesheets, or markdown fences.
 Use width="640", height="360", viewBox="0 0 640 360".
-`;;
+`;
       const geminiRes = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
