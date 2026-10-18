@@ -20,6 +20,10 @@
       <h2 class="text-sm font-bold text-slate-500 uppercase">1. Credentials</h2>
       <label class="block text-sm font-medium" for="gemini-key">Gemini API key</label>
       <input type="password" id="gemini-key" autocomplete="off" spellcheck="false" placeholder="Gemini API Key" class="w-full p-3 border rounded-xl bg-slate-50">
+      <div id="model-select-wrap" class="mt-2 hidden">
+        <label class="block text-sm font-medium" for="model-select">Detected models (choose one)</label>
+        <select id="model-select" class="w-full p-3 border rounded-xl bg-slate-50"></select>
+      </div>
       <label class="block text-sm font-medium" for="github-token">GitHub personal access token</label>
       <input type="password" id="github-token" autocomplete="off" spellcheck="false" placeholder="GitHub PAT (repo contents write access required)" class="w-full p-3 border rounded-xl bg-slate-50">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -61,8 +65,11 @@
       const previewWrap = $('preview-wrap');
       const previewSummary = $('preview-summary');
       const previewList = $('preview-list');
+      const modelSelectWrap = $('model-select-wrap');
+      const modelSelect = $('model-select');
+      const geminiKeyInput = $('gemini-key');
+
       const MAX_FILE_BYTES = 14 * 1024 * 1024;
-      const GEMINI_MODEL = 'gemini-1.5-flash';
       const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'application/pdf']);
 
       function setStatus(message, kind = 'info') {
@@ -157,75 +164,90 @@
         previewWrap.classList.remove('hidden');
       }
 
-      async function callGeminiExtract(base64Data, fileType) {
-        const geminiKey = $('gemini-key').value.trim();
-        if (!geminiKey) fail('Gemini API key is missing.');
+      // Discover available models for the given API key
+      async function listModels(apiKey) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`;
+        const res = await fetch(url);
+        if (!res.ok) throw await responseError(res, 'Gemini ListModels');
+        const data = await res.json();
+        const models = (Array.isArray(data?.models) ? data.models : []).map(m => {
+          if (m?.name && typeof m.name === 'string') {
+            const name = m.name;
+            return name.startsWith('models/') ? name.slice('models/'.length) : name;
+          }
+          return null;
+        }).filter(Boolean);
+        return models;
+      }
 
-        const prompt = `Extract ONLY the multiple-choice questions that are clearly present in this document. Return valid JSON only, as an array of objects.
-Each object must follow this exact shape:
-{"question":"...","options":["...","...","...","..."],"correctIndex":0}
-Rules:
-- Preserve the original question wording as closely as possible.
-- Keep exactly 4 options for each question.
-- If a question is not a MCQ, skip it.
-- If the correct answer is not clearly visible, use the best available answer key and keep it explicit.
-- Do not include explanations, markdown fences, or prose outside the JSON array.
-- If no questions are found, return [].`;
+      function choosePreferredModel(models) {
+        const preferredOrder = ['gemini-3.8-flash','gemini-3.8','gemini-3.1','gemini-2.1','gemini-2.0','gemini-1.5-flash','gemini-1.5','gemini-1.0'];
+        for (const pref of preferredOrder) {
+          const found = models.find(m => m.toLowerCase().includes(pref));
+          if (found) return found;
+        }
+        const gem = models.find(m => m.toLowerCase().includes('gemini'));
+        if (gem) return gem;
+        return models[0] || null;
+      }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey}`;
+      async function callGeminiExtract(base64Data, fileType, apiKey) {
+        setStatus('Discovering available Gemini models for your key...');
+        let models;
+        try {
+          models = await listModels(apiKey);
+        } catch (err) {
+          throw new Error('Could not list models: ' + err.message);
+        }
+        if (!models || !models.length) throw new Error('No models were returned for this key. Check the key and project access.');
+
+        modelSelect.replaceChildren();
+        models.forEach(m => modelSelect.appendChild(new Option(m, m)));
+        modelSelectWrap.classList.remove('hidden');
+
+        const selected = choosePreferredModel(models);
+        if (selected) modelSelect.value = selected;
+        setStatus(`Using model: ${modelSelect.value}. If you prefer another model, select it from the dropdown.`);
+
+        const modelToUse = modelSelect.value;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelToUse)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+        const prompt = `Extract ONLY the multiple-choice questions that are clearly present in this document. Return valid JSON only, as an array of objects. Each object must follow this exact shape:\n{\"question\":\"...\",\"options\":[\"...\",\"...\",\"...\",\"...\"],\"correctIndex\":0}\nRules:\n- Preserve original wording as closely as possible.\n- Keep exactly 4 options for each question.\n- If a question is not a MCQ, skip it.\n- Do not include explanations, markdown, or extra text outside the JSON array.\n- If no questions are found, return []`;
+
         const body = {
           contents: [{
             parts: [
               { text: prompt },
-              {
-                inline_data: {
-                  mime_type: fileType,
-                  data: base64Data
-                }
-              }
+              { inline_data: { mime_type: fileType, data: base64Data } }
             ]
           }],
-          generationConfig: {
-            temperature: 0.1,
-            responseMimeType: 'application/json'
-          }
+          generationConfig: { temperature: 0.0 }
         };
 
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+        const res = await fetch(url, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
         });
 
-        if (!response.ok) {
-          throw await responseError(response, 'Gemini API');
+        if (res.status === 404) {
+          throw new Error(`Model ${modelToUse} is not available for generateContent (404). Try selecting a different model from the list.`);
         }
+        if (!res.ok) throw await responseError(res, 'Gemini generateContent');
 
-        const data = await response.json();
-        const textParts = data?.candidates?.[0]?.content?.parts || [];
-        const text = textParts
-          .filter(part => typeof part?.text === 'string')
-          .map(part => part.text)
-          .join('')
-          .trim();
+        const data = await res.json();
+        const text = (Array.isArray(data?.candidates) && data.candidates[0])
+          ? (Array.isArray(data.candidates[0].content?.parts) ? data.candidates[0].content.parts.map(p => p.text || '').join('') : (data.candidates[0].content?.text || ''))
+          : (data?.output_text || '');
 
-        if (!text) {
-          fail('Gemini returned no usable text output. Please try a clearer PDF/image or a different file.');
-        }
+        if (!text) throw new Error('Gemini returned no usable text output.');
 
         let parsed;
-        try {
-          parsed = JSON.parse(text);
-        } catch (_) {
+        try { parsed = JSON.parse(text); }
+        catch (e) {
           const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-          try {
-            parsed = JSON.parse(cleaned);
-          } catch (err) {
-            fail('Gemini returned invalid JSON. Please reload the file and try again.');
-          }
+          try { parsed = JSON.parse(cleaned); }
+          catch (err) { throw new Error('Gemini returned invalid JSON output.'); }
         }
-
-        return validateQuestions(parsed, 'Gemini output');
+        return parsed;
       }
 
       async function processAndCommit() {
@@ -260,15 +282,13 @@ Rules:
           const base64Data = await readFileAsBase64(file);
 
           setStatus('Step 2/4: Extracting MCQs with Gemini…');
-          const extracted = await callGeminiExtract(base64Data, file.type);
-          renderPreview(extracted);
+          const geminiParsed = await callGeminiExtract(base64Data, file.type, geminiKey);
+          const newQuestions = validateQuestions(geminiParsed, 'Gemini output');
+          renderPreview(newQuestions);
 
-          const previewText = extracted.slice(0, 5).map((q, i) => `${i + 1}. ${q.question}`).join('\n');
-          const confirmText = `Gemini extracted ${extracted.length} valid question(s) for ${targetFile}.\n\nPreview:\n${previewText}${extracted.length > 5 ? '\n…' : ''}\n\nHave you reviewed the wording and answer keys before committing?`;
-          if (!window.confirm(confirmText)) {
-            setStatus('Commit cancelled. Nothing was changed on GitHub.');
-            return;
-          }
+          const previewText = newQuestions.slice(0, 5).map((q, i) => `${i + 1}. ${q.question}`).join('\n');
+          const confirmText = `Gemini extracted ${newQuestions.length} valid question(s) for ${targetFile}.\n\nPreview:\n${previewText}${newQuestions.length > 5 ? '\n…' : ''}\n\nHave you reviewed the wording and answer keys before committing?`;
+          if (!window.confirm(confirmText)) { setStatus('Commit cancelled. Nothing was changed on GitHub.'); return; }
 
           setStatus('Step 3/4: Fetching and validating existing GitHub JSON…');
           const githubFileUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeURIComponent(targetFile)}`;
@@ -289,17 +309,9 @@ Rules:
               fail('GitHub did not return a normal file with inline content. No data was committed.');
             }
             let decodedContent;
-            try {
-              decodedContent = decodeGitHubContent(fileData.content);
-            } catch (_) {
-              fail('Could not decode the existing GitHub JSON file. No data was committed.');
-            }
+            try { decodedContent = decodeGitHubContent(fileData.content); } catch (_) { fail('Could not decode the existing GitHub JSON file. No data was committed.'); }
             let existingParsed;
-            try {
-              existingParsed = JSON.parse(decodedContent);
-            } catch (_) {
-              fail('The existing GitHub file is not valid JSON. It was left unchanged.');
-            }
+            try { existingParsed = JSON.parse(decodedContent); } catch (_) { fail('The existing GitHub file is not valid JSON. It was left unchanged.'); }
             if (!Array.isArray(existingParsed)) fail('The existing GitHub JSON must be an array. It was left unchanged.');
             existingQuestions = existingParsed;
             fileSha = fileData.sha;
@@ -309,49 +321,31 @@ Rules:
 
           const existingIds = existingQuestions.map(q => q && q.id).filter(id => Number.isSafeInteger(id) && id >= 0);
           let lastId = existingIds.length ? Math.max(...existingIds) : 0;
-          if (!Number.isSafeInteger(lastId + extracted.length)) fail('Question IDs would exceed the safe integer range.');
+          if (!Number.isSafeInteger(lastId + newQuestions.length)) fail('Question IDs would exceed the safe integer range.');
 
           const seen = new Set(existingQuestions.filter(q => q && typeof q.question === 'string').map(q => normalizeText(q.question)));
           const uniqueQuestions = [];
           let duplicates = 0;
 
-          for (const q of extracted) {
+          for (const q of newQuestions) {
             const key = normalizeText(q.question);
-            if (seen.has(key)) {
-              duplicates++;
-              continue;
-            }
+            if (seen.has(key)) { duplicates++; continue; }
             seen.add(key);
             lastId++;
             uniqueQuestions.push({ id: lastId, question: q.question, options: q.options, correctIndex: q.correctIndex });
           }
 
-          if (uniqueQuestions.length === 0) {
-            setStatus(`No new questions to add. All ${duplicates} extracted question(s) already exist in ${targetFile}.`, 'success');
-            return;
-          }
-
-          if (duplicates && !window.confirm(`${duplicates} duplicate question(s) will be skipped. Add the remaining ${uniqueQuestions.length} new question(s)?`)) {
-            setStatus('Commit cancelled. Nothing was changed on GitHub.');
-            return;
-          }
+          if (uniqueQuestions.length === 0) { setStatus(`No new questions to add. All ${duplicates} extracted question(s) already exist in ${targetFile}.`, 'success'); return; }
+          if (duplicates && !window.confirm(`${duplicates} duplicate question(s) will be skipped. Add the remaining ${uniqueQuestions.length} new question(s)?`)) { setStatus('Commit cancelled. Nothing was changed on GitHub.'); return; }
 
           const mergedQuestions = [...existingQuestions, ...uniqueQuestions];
           const newContentBase64 = encodeUtf8Base64(JSON.stringify(mergedQuestions, null, 2) + '\n');
 
           setStatus('Step 4/4: Committing validated questions to GitHub…');
-          const commitBody = {
-            message: `Add ${uniqueQuestions.length} MCQs to ${targetFile} via Admin Portal`,
-            content: newContentBase64
-          };
+          const commitBody = { message: `Add ${uniqueQuestions.length} MCQs to ${targetFile} via Admin Portal`, content: newContentBase64 };
           if (fileSha) commitBody.sha = fileSha;
 
-          const commitRes = await fetch(githubFileUrl, {
-            method: 'PUT',
-            headers: githubHeaders,
-            body: JSON.stringify(commitBody)
-          });
-
+          const commitRes = await fetch(githubFileUrl, { method: 'PUT', headers: githubHeaders, body: JSON.stringify(commitBody) });
           if (!commitRes.ok) throw await responseError(commitRes, 'GitHub commit');
 
           setStatus(`Success! Added ${uniqueQuestions.length} question(s) to ${targetFile}.${duplicates ? ` Skipped ${duplicates} duplicate(s).` : ''}\nGitHub accepted the commit.`, 'success');
