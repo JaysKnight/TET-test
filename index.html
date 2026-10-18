@@ -552,11 +552,11 @@
             testQuestions.forEach((q, index) => {
                 const qNumber = index + 1;
                 const questionText = escapeHTML(q.text);
-                    const imageBlock = q.image 
-      ? `<div class="my-4 flex justify-center w-full">
-           <img src="${q.image}" alt="Question Diagram" class="max-h-64 max-w-full rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
-         </div>` 
-      : '';
+                    const imagePath = typeof q.image === 'string' && q.image.startsWith('assets/images/') && !q.image.split('/').includes('..') ? q.image : '';
+                const imageSource = imagePath ? escapeHTML(imagePath) : '';
+                const imageBlock = imageSource
+                    ? '<div class="question-diagram-wrap my-4 flex justify-center w-full"><img src="' + imageSource + '" alt="Question diagram" loading="lazy" class="question-diagram-image max-h-96 max-w-full rounded-lg border border-slate-200 bg-white p-1 shadow-sm"></div>'
+                    : '';
                 let optionsHTML = '';
                 q.options.forEach((optText, optIndex) => {
                     const letter = String.fromCharCode(65 + optIndex); // A, B, C, D
@@ -607,9 +607,23 @@
             });
 
             elTestContainer.innerHTML = htmlContent;
+            elTestContainer.querySelectorAll('img.question-diagram-image').forEach(img => {
+                img.addEventListener('error', () => {
+                    const wrapper = img.closest('.question-diagram-wrap');
+                    if (!wrapper) return;
+                    const warning = document.createElement('p');
+                    warning.className = 'text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3';
+                    warning.textContent = 'Question diagram could not be loaded.';
+                    wrapper.replaceChildren(warning);
+                }, { once: true });
+            });
             updateBookmarkCount();
             applyBookmarkFilter();
-            if (window.MathJax) { MathJax.typesetPromise(); }
+            if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                MathJax.typesetPromise([elTestContainer]).catch(error => {
+                    console.error('MathJax could not typeset the test content:', error);
+                });
+            }
         }
 
         function toggleBookmark(index) {
@@ -1078,7 +1092,8 @@
                     subjectClass: source.subjectClass,
                     text: item.question,
                     options: item.options,
-                    correctIndex: item.correctIndex
+                    correctIndex: item.correctIndex,
+                    image: typeof item.image === 'string' && item.image.startsWith('assets/images/') && !item.image.split('/').includes('..') ? item.image : null
                 });
             });
         }
