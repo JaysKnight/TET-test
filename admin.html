@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin MCQ Uploader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-8 font-sans text-slate-800">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-md border border-slate-200">
+        <h1 class="text-2xl font-black mb-6">Upload MCQs to GitHub</h1>
+        
+        <div class="space-y-4 mb-8">
+            <h2 class="text-sm font-bold text-slate-500 uppercase">1. Credentials (Do not share)</h2>
+            <input type="password" id="gemini-key" placeholder="Gemini API Key" class="w-full p-3 border rounded-xl bg-slate-50">
+            <input type="password" id="github-token" placeholder="GitHub Personal Access Token (PAT)" class="w-full p-3 border rounded-xl bg-slate-50">
+            
+            <div class="flex gap-4">
+                <input type="text" id="github-owner" placeholder="GitHub Username (e.g., jaysknight)" class="w-1/2 p-3 border rounded-xl bg-slate-50">
+                <input type="text" id="github-repo" placeholder="Repository Name (e.g., tet-exam)" class="w-1/2 p-3 border rounded-xl bg-slate-50">
+            </div>
+        </div>
+
+        <div class="space-y-4 mb-8">
+            <h2 class="text-sm font-bold text-slate-500 uppercase">2. Document Details</h2>
+            <select id="subject-file" class="w-full p-3 border rounded-xl bg-slate-50">
+                <option value="Gujarati.json">Gujarati.json</option>
+                <option value="English.json">English.json</option>
+                <option value="Maths.json">Maths.json</option>
+                <option value="GK.json">GK.json</option>
+                <option value="Balvikas.json">Balvikas.json</option>
+            </select>
+            <input type="file" id="file-upload" accept="image/png, image/jpeg, application/pdf" class="w-full p-3 border rounded-xl bg-slate-50">
+        </div>
+
+        <button onclick="processAndCommit()" id="action-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all">
+            Extract & Commit to GitHub
+        </button>
+        
+        <div id="status" class="mt-4 text-sm font-bold text-center text-slate-600"></div>
+    </div>
+
+    <script>
+        async function processAndCommit() {
+            const geminiKey = document.getElementById('gemini-key').value;
+            const githubToken = document.getElementById('github-token').value;
+            const owner = document.getElementById('github-owner').value;
+            const repo = document.getElementById('github-repo').value;
+            const file = document.getElementById('file-upload').files[0];
+            const targetFile = document.getElementById('subject-file').value;
+            const statusEl = document.getElementById('status');
+            const btn = document.getElementById('action-btn');
+
+            if (!geminiKey || !githubToken || !owner || !repo || !file) {
+                return alert("Please fill in all fields and select a file.");
+            }
+
+            try {
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+                
+                // STEP 1: Convert file to Base64 for Gemini
+                statusEl.textContent = "Step 1/3: Reading image/PDF...";
+                const base64Data = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+
+                // STEP 2: Send to Gemini API for extraction
+                statusEl.textContent = "Step 2/3: AI is extracting MCQs...";
+                const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+                const geminiRes = await fetch(geminiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: "Extract MCQs from this document. Return ONLY a raw JSON array: [{\"id\": 999, \"question\": \"Text?\", \"options\": [\"A\", \"B\", \"C\", \"D\"], \"correctIndex\": 0}]. No markdown code blocks." },
+                                { inlineData: { mimeType: file.type, data: base64Data } }
+                            ]
+                        }]
+                    })
+                });
+                
+                if (!geminiRes.ok) throw new Error("AI Processing failed. Check Gemini key.");
+                const geminiData = await geminiRes.json();
+                let aiResponseText = geminiData.candidates[0].content.parts[0].text;
+                aiResponseText = aiResponseText.replace(/```json\n?|```/g, '').trim();
+                const newQuestions = JSON.parse(aiResponseText);
+
+                // STEP 3: Fetch existing JSON from GitHub
+                statusEl.textContent = "Step 3/4: Fetching existing database from GitHub...";
+                const githubFileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${targetFile}`;
+                const githubHeaders = {
+                    'Authorization': `Bearer ${githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                };
+
+                let existingQuestions = [];
+                let fileSha = null;
+
+                const fetchRes = await fetch(githubFileUrl, { headers: githubHeaders });
+                if (fetchRes.ok) {
+                    const fileData = await fetchRes.json();
+                    fileSha = fileData.sha; // Needed to update existing files
+                    
+                    // Decode base64 content from GitHub (handles special characters)
+                    const decodedContent = decodeURIComponent(escape(atob(fileData.content)));
+                    existingQuestions = JSON.parse(decodedContent);
+                }
+
+                // STEP 4: Merge and Commit back to GitHub
+                statusEl.textContent = "Step 4/4: Committing new questions to GitHub...";
+                
+                // Auto-increment IDs based on the last existing question
+                let lastId = existingQuestions.length > 0 ? Math.max(...existingQuestions.map(q => q.id)) : 0;
+                newQuestions.forEach(q => {
+                    lastId++;
+                    q.id = lastId;
+                });
+
+                const mergedQuestions = [...existingQuestions, ...newQuestions];
+                
+                // Encode updated JSON to base64 safely
+                const newContentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(mergedQuestions, null, 2))));
+
+                const commitRes = await fetch(githubFileUrl, {
+                    method: 'PUT',
+                    headers: githubHeaders,
+                    body: JSON.stringify({
+                        message: `Add ${newQuestions.length} new questions to ${targetFile} via Admin Portal`,
+                        content: newContentBase64,
+                        sha: fileSha // Required if updating an existing file
+                    })
+                });
+
+                if (!commitRes.ok) throw new Error("Failed to commit to GitHub. Check PAT permissions.");
+
+                statusEl.textContent = `Success! Added ${newQuestions.length} questions to ${targetFile}. Changes will reflect on the site in ~1 minute.`;
+                statusEl.classList.replace('text-slate-600', 'text-green-600');
+                
+            } catch (error) {
+                console.error(error);
+                statusEl.textContent = `Error: ${error.message}`;
+                statusEl.classList.replace('text-slate-600', 'text-red-600');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50');
+            }
+        }
+    </script>
+</body>
+</html>
