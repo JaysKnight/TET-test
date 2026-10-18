@@ -183,7 +183,8 @@
       const mediaInput = isPdf
         ? { type: 'document', mime_type: file.type, data: base64Data }
         : { type: 'image', mime_type: file.type, data: base64Data };
-      const extractionPrompt = 'Extract only multiple-choice questions actually present in the supplied document. Do not invent missing text, options, or answers. Return a JSON array only. Each item must have this exact shape: {"question":"question text","options":["option A","option B","option C","option D"],"correctIndex":0}. correctIndex is zero-based (0=A, 1=B, 2=C, 3=D). If the correct answer cannot be determined confidently from the document, do not include that question. Preserve the original language and script. Do not include markdown fences or commentary.';
+      const extractionPrompt = 'Extract only multiple-choice questions actually present in the supplied document. For any mathematical formulas, fractions, equations, roots, or exponents, you MUST convert them into inline LaTeX code wrapped in $ signs (for example, $\\frac{2}{3}$ or $x^{21}$). Return a JSON array only. Each item must have this exact shape: {"question":"question text","options":["option A","option B","option C","option D"],"correctIndex":0}. correctIndex is zero-based (0=A, 1=B, 2=C, 3=D). Preserve the original language and script for standard text. Do not invent missing text or include markdown fences.';
+
       const geminiRes = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
