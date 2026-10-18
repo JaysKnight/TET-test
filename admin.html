@@ -19,8 +19,11 @@
 
     <section class="space-y-4 mb-8">
       <h2 class="text-sm font-bold text-slate-500 uppercase">1. Credentials</h2>
-      <label class="block text-sm font-medium" for="gemini-key">Gemini API key</label>
-      <input type="password" id="gemini-key" autocomplete="off" spellcheck="false" placeholder="Gemini API Key" class="w-full p-3 border rounded-xl bg-slate-50">
+      <label class="block text-sm font-medium" for="gemini-key">Gemini API key (primary)</label>
+      <input type="password" id="gemini-key" autocomplete="off" spellcheck="false" placeholder="Gemini API Key (optional if using OpenAI)" class="w-full p-3 border rounded-xl bg-slate-50">
+      <label class="block text-sm font-medium" for="openai-key">OpenAI API key (fallback)</label>
+      <input type="password" id="openai-key" autocomplete="off" spellcheck="false" placeholder="OpenAI API Key (used if Gemini quota/rate limit is reached)" class="w-full p-3 border rounded-xl bg-slate-50">
+      <p class="text-xs text-slate-500">Gemini is tried first. If its quota or rate limit is reached, the same document is sent to OpenAI. You can also leave Gemini blank to use OpenAI directly.</p>
       <label class="block text-sm font-medium" for="github-token">GitHub personal access token</label>
       <input type="password" id="github-token" autocomplete="off" spellcheck="false" placeholder="GitHub PAT (repo contents write access required)" class="w-full p-3 border rounded-xl bg-slate-50">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -64,6 +67,7 @@
   const previewList = $('preview-list');
   const MAX_FILE_BYTES = 14 * 1024 * 1024;
   const GEMINI_MODEL = 'gemini-3.8-flash';
+  const OPENAI_MODEL = 'gpt-4.1';
   const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'application/pdf']);
 
   function setStatus(message, kind = 'info') {
@@ -154,6 +158,46 @@
     } catch (_) { /* response may not be JSON */ }
     return new Error(`${service} request failed (${response.status}${response.statusText ? ' ' + response.statusText : ''}).${detail ? '\n' + detail : ''}`);
   }
+  async function extractWithOpenAI(apiKey, base64Data, file, prompt) {
+    const isPdf = file.type === 'application/pdf';
+    const content = [{ type: 'input_text', text: prompt }];
+    if (isPdf) {
+      content.push({
+        type: 'input_file',
+        filename: file.name || 'document.pdf',
+        file_data: 'data:application/pdf;base64,' + base64Data,
+        detail: 'high'
+      });
+    } else {
+      content.push({
+        type: 'input_image',
+        image_url: 'data:' + file.type + ';base64,' + base64Data,
+        detail: 'high'
+      });
+    }
+    const response = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        input: [{ role: 'user', content }],
+        store: false
+      })
+    });
+    if (!response.ok) throw await responseError(response, 'OpenAI Responses API');
+    const data = await response.json();
+    const output = typeof data.output_text === 'string' ? data.output_text.trim() : '';
+    if (!output) throw new Error('OpenAI returned no usable text output. Check the API response and try again.');
+    return output;
+  }
+
+  function isGeminiQuotaOrRateLimit(status, message) {
+    return status === 429 || /quota|rate.?limit|resource_exhausted|too many requests|capacity.*exceeded/i.test(message || '');
+  }
+
   async function uploadSvgToGitHub(owner, repo, path, svg, headers) {
     const encodedPath = path.split('/').map(segment => encodeURIComponent(segment)).join('/');
     const url = 'https://api.github.com/repos/' + encodeURIComponent(owner) + '/' + encodeURIComponent(repo) + '/contents/' + encodedPath;
@@ -205,14 +249,15 @@
     if (btn.disabled) return;
     previewWrap.classList.add('hidden');
     const geminiKey = $('gemini-key').value.trim();
+    const openAIKey = $('openai-key').value.trim();
     const githubToken = $('github-token').value.trim();
     const owner = $('github-owner').value.trim();
     const repo = $('github-repo').value.trim();
     const file = $('file-upload').files[0];
     const targetFile = $('subject-file').value;
 
-    if (!geminiKey || !githubToken || !owner || !repo || !file) {
-      setStatus('Please fill in all credential/repository fields and select a file.', 'error'); return;
+    if ((!geminiKey && !openAIKey) || !githubToken || !owner || !repo || !file) {
+      setStatus('Enter at least one AI API key, your GitHub token, repository details, and a document.', 'error'); return;
     }
     if (!/^[A-Za-z0-9-]+$/.test(owner) || !/^[A-Za-z0-9._-]+$/.test(repo)) {
       setStatus('GitHub owner or repository name contains invalid characters.', 'error'); return;
@@ -230,13 +275,7 @@
       setStatus('Step 1/4: Reading file…');
       const base64Data = await readFileAsBase64(file);
 
-      setStatus('Step 2/4: Extracting MCQs with Gemini…');
-      const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/interactions';
-      const isPdf = file.type === 'application/pdf';
-      const mediaInput = isPdf
-        ? { type: 'document', mime_type: file.type, data: base64Data }
-        : { type: 'image', mime_type: file.type, data: base64Data };
-     const extractionPrompt = `
+      const extractionPrompt = `
 Extract only MCQs present in the supplied document. Preserve the original language.
 For formulas, use inline LaTeX wrapped in $ signs.
 
@@ -255,43 +294,89 @@ recreate the figure accurately, return null. Do not invent measurements or geome
 Do not use scripts, external links, images, stylesheets, or markdown fences.
 Use width="640", height="360", viewBox="0 0 640 360".
 `;
-      const geminiRes = await fetch(geminiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
-        body: JSON.stringify({
-          model: GEMINI_MODEL,
-          input: [
-            { type: 'text', text: extractionPrompt },
-            mediaInput
-          ],
-          generation_config: { thinking_level: 'low' },
-          store: false
-        })
-      });
-      if (!geminiRes.ok) throw await responseError(geminiRes, 'Gemini Interactions API');
-      const geminiData = await geminiRes.json();
-      // Interactions API responses expose model output as output[] content blocks.
-      // Handle output_text as well when supplied by an API response variant.
-      let aiResponseText = typeof geminiData?.output_text === 'string' ? geminiData.output_text.trim() : '';
-      if (!aiResponseText && Array.isArray(geminiData?.output)) {
-        aiResponseText = geminiData.output
-          .filter(step => step?.type === 'model_output' || Array.isArray(step?.content))
-          .flatMap(step => Array.isArray(step?.content) ? step.content : [])
-          .filter(block => block?.type === 'text' && typeof block?.text === 'string')
-          .map(block => block.text)
-          .join('')
-          .trim();
+      let aiResponseText = '';
+      let extractionProvider = '';
+      let geminiLimitMessage = '';
+
+      if (geminiKey) {
+        setStatus('Step 2/4: Extracting MCQs with Gemini…');
+        try {
+          const geminiRes = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
+            body: JSON.stringify({
+              model: GEMINI_MODEL,
+              input: [
+                { type: 'text', text: extractionPrompt },
+                isPdf
+                  ? { type: 'document', mime_type: file.type, data: base64Data }
+                  : { type: 'image', mime_type: file.type, data: base64Data }
+              ],
+              generation_config: { thinking_level: 'low' },
+              store: false
+            })
+          });
+          if (!geminiRes.ok) {
+            const status = geminiRes.status;
+            const err = await responseError(geminiRes, 'Gemini Interactions API');
+            if (isGeminiQuotaOrRateLimit(status, err.message)) {
+              geminiLimitMessage = err.message;
+            } else {
+              throw err;
+            }
+          } else {
+            const geminiData = await geminiRes.json();
+            aiResponseText = typeof geminiData?.output_text === 'string' ? geminiData.output_text.trim() : '';
+            if (!aiResponseText && Array.isArray(geminiData?.output)) {
+              aiResponseText = geminiData.output
+                .filter(step => step?.type === 'model_output' || Array.isArray(step?.content))
+                .flatMap(step => Array.isArray(step?.content) ? step.content : [])
+                .filter(block => block?.type === 'text' && typeof block?.text === 'string')
+                .map(block => block.text).join('').trim();
+            }
+            if (!aiResponseText && Array.isArray(geminiData?.steps)) {
+              aiResponseText = geminiData.steps
+                .filter(step => step?.type === 'model_output' && Array.isArray(step?.content))
+                .flatMap(step => step.content)
+                .filter(block => block?.type === 'text' && typeof block?.text === 'string')
+                .map(block => block.text).join('').trim();
+            }
+            if (aiResponseText) extractionProvider = 'Gemini';
+            else throw new Error('Gemini returned no usable text output. Check the API response and try again.');
+          }
+        } catch (error) {
+          if (isGeminiQuotaOrRateLimit(error?.status, error?.message)) {
+            geminiLimitMessage = error.message;
+          } else {
+            throw error;
+          }
+        }
       }
-      if (!aiResponseText && Array.isArray(geminiData?.steps)) {
-        aiResponseText = geminiData.steps
-          .filter(step => step?.type === 'model_output' && Array.isArray(step?.content))
-          .flatMap(step => step.content)
-          .filter(block => block?.type === 'text' && typeof block?.text === 'string')
-          .map(block => block.text)
-          .join('')
-          .trim();
+
+      if (!aiResponseText) {
+        if (!openAIKey) {
+          fail('Gemini quota/rate limit was reached, but no OpenAI API key was entered. Add an OpenAI key and retry. Details: ' + (geminiLimitMessage || 'Gemini was not selected.'));
+        }
+        setStatus(geminiKey
+          ? 'Gemini quota/rate limit reached. Switching to OpenAI…'
+          : 'Step 2/4: Extracting MCQs directly with OpenAI…');
+        try {
+          aiResponseText = await extractWithOpenAI(openAIKey, base64Data, file, extractionPrompt);
+          extractionProvider = 'OpenAI';
+        } catch (openAIError) {
+          if (geminiLimitMessage) {
+            throw new Error('Gemini quota/rate limit was reached, and OpenAI fallback also failed. Gemini: ' + geminiLimitMessage + ' OpenAI: ' + (openAIError?.message || 'Unknown error.'));
+          }
+          throw openAIError;
+        }
       }
-      if (!aiResponseText) fail('Gemini returned no usable text output. Check the API response and try again. No data was committed.');
+
+      let parsed;
+      try { parsed = JSON.parse(aiResponseText); }
+      catch (_) { fail(extractionProvider + ' returned invalid JSON. Try again or use a clearer document. No data was committed.'); }
+      const newQuestions = validateQuestions(parsed, extractionProvider + ' output');
+      renderPreview(newQuestions);
+      setStatus('Extraction completed with ' + extractionProvider + '. Review the questions and diagrams below.');
       let parsed;
       try { parsed = JSON.parse(aiResponseText); }
       catch (_) { fail('Gemini returned invalid JSON. Try again or use a clearer document. No data was committed.'); }
@@ -299,7 +384,7 @@ Use width="640", height="360", viewBox="0 0 640 360".
       renderPreview(newQuestions);
 
       const previewText = newQuestions.slice(0, 5).map((q, i) => `${i + 1}. ${q.question}`).join('\n');
-      const confirmText = `Gemini extracted ${newQuestions.length} valid question(s) for ${targetFile}.\n\nPreview:\n${previewText}${newQuestions.length > 5 ? '\n…' : ''}\n\nHave you checked the answer keys and want to continue to GitHub?`;
+      const confirmText = `${extractionProvider} extracted ${newQuestions.length} valid question(s) for ${targetFile}.\n\nPreview:\n${previewText}${newQuestions.length > 5 ? '\n…' : ''}\n\nHave you checked the answer keys and want to continue to GitHub?`;
       if (!window.confirm(confirmText)) {
         setStatus('Commit cancelled. Nothing was changed on GitHub.'); return;
       }
