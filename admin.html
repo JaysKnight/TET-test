@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin MCQ Uploader — Math OCR & Crop</title>
+  <title>Admin MCQ Uploader — Math OCR, Shapes & Crop</title>
   <script>window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(', '\\)']] }, options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] } };</script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script>
@@ -13,12 +13,13 @@
     #crop-rect { position:absolute; border:2px dashed #2563eb; pointer-events:none; }
     .canvas-wrap { position: relative; display:inline-block; }
     .small { font-size: 0.85rem }
+    .question-image { max-width: 220px; border: 1px solid #dbeafe; border-radius: 8px; background:#fff; margin: 8px 0; }
   </style>
 </head>
 <body class="bg-slate-50 p-6 font-sans text-slate-800">
   <main class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow">
-    <h1 class="text-2xl font-bold mb-2">Admin MCQ Uploader — Math OCR, Crop & Commit</h1>
-    <p class="text-sm text-slate-600 mb-4">This page provides: PDF page rendering, crop tool for equation regions, Mathpix (optional) or Gemini fallback to recognize LaTeX, MathJax preview, and commit to GitHub as MCQs JSON.</p>
+    <h1 class="text-2xl font-bold mb-2">Admin MCQ Uploader — Math OCR, Shapes & Commit</h1>
+    <p class="text-sm text-slate-600 mb-4">PDF/image upload, crop tool, Mathpix (optional) or Gemini fallback for LaTeX, MathJax preview, and a simple built-in shape generator. Use the generator for basic shapes (square, rectangle, circle, triangle). For irregular shapes crop and choose to store the image separately in images/ when committing.</p>
 
     <section class="mb-4">
       <h2 class="font-semibold">Credentials & Options</h2>
@@ -47,15 +48,39 @@
       <div class="mt-3">
         <div id="canvas-container" class="canvas-wrap"></div>
       </div>
-      <div class="mt-2 small text-slate-600">Instructions: Click and drag on the canvas to draw a crop rectangle. Release to set the crop. Then click 'Recognize Crop' to get LaTeX.</div>
+      <div class="mt-2 small text-slate-600">Instructions: Click and drag on the canvas to draw a crop rectangle. Release to set the crop. Use the generator below to create simple shapes, or crop irregular shapes.</div>
+    </section>
+
+    <section class="mb-4">
+      <h2 class="font-semibold">Shape Generator (simple shapes)</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
+        <select id="shape-type" class="p-2 border rounded">
+          <option value="square">Square</option>
+          <option value="rectangle">Rectangle</option>
+          <option value="circle">Circle</option>
+          <option value="triangle">Triangle</option>
+        </select>
+        <input id="shape-width" type="number" value="200" min="20" class="p-2 border rounded" placeholder="width (px)" />
+        <input id="shape-height" type="number" value="200" min="20" class="p-2 border rounded" placeholder="height (px)" />
+      </div>
+      <div class="flex gap-2 mb-3">
+        <button id="generate-shape" class="px-3 py-2 bg-indigo-600 text-white rounded">Generate Shape</button>
+        <button id="insert-shape-generated" class="px-3 py-2 bg-indigo-700 text-white rounded">Attach Generated Shape to Current Question</button>
+        <label class="inline-flex items-center ml-4"><input id="store-generated-separate" type="checkbox" class="mr-2">Store generated shape as separate image file on commit</label>
+      </div>
+      <div id="generated-shape-wrap" class="hidden">
+        <div class="small text-slate-600">Generated shape preview:</div>
+        <img id="generated-shape" class="question-image" alt="Generated shape preview" />
+      </div>
     </section>
 
     <section class="mb-4">
       <h2 class="font-semibold">Crop & Recognize</h2>
       <div class="flex gap-2">
+        <button id="capture-shape" class="px-3 py-2 bg-orange-600 text-white rounded">Capture Crop Image</button>
         <button id="recognize-crop" class="px-3 py-2 bg-green-600 text-white rounded">Recognize Crop</button>
         <button id="clear-crop" class="px-3 py-2 bg-gray-200 rounded">Clear Crop</button>
-        <label class="inline-flex items-center ml-4"><input id="use-mathpix" type="checkbox" class="mr-2">Use Mathpix if available</label>
+        <label class="inline-flex items-center ml-4"><input id="store-crop-separate" type="checkbox" class="mr-2">Store crop as separate image file on commit</label>
       </div>
       <div id="recognize-status" class="mt-2 small text-slate-600"></div>
       <div class="mt-3">
@@ -111,7 +136,6 @@
 <script>
 (async () => {
   'use strict';
-  // PDF.js setup
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.worker.min.js';
 
   const $ = id => document.getElementById(id);
@@ -121,6 +145,7 @@
   const pageInfo = $('page-info');
   const prevPage = $('prev-page');
   const nextPage = $('next-page');
+  const captureShapeBtn = $('capture-shape');
   const recognizeCropBtn = $('recognize-crop');
   const clearCropBtn = $('clear-crop');
   const recognizeStatus = $('recognize-status');
@@ -135,13 +160,21 @@
   const geminiKeyInput = $('gemini-key'); const githubTokenInput = $('github-token');
   const ownerInput = $('github-owner'); const repoInput = $('github-repo');
 
+  // shape generator elements
+  const generateShapeBtn = $('generate-shape'); const generatedWrap = $('generated-shape-wrap'); const generatedImg = $('generated-shape');
+  const insertGeneratedShapeBtn = $('insert-shape-generated'); const shapeType = $('shape-type');
+  const shapeW = $('shape-width'); const shapeH = $('shape-height'); const storeGeneratedSeparate = $('store-generated-separate');
+  const storeCropSeparate = $('store-crop-separate');
+
   let pdfDoc = null, currentPage = 1, totalPages = 0, currentScale = 1.2;
   let canvas, ctx;
-  let crop = null; // {x,y,w,h} in canvas pixel coords
+  let crop = null; // {x,y,w,h}
+  let currentQuestionImage = null; // data URL
+  let currentQuestionImageSeparate = false; // whether to store as separate image file
+  let generatedShapeDataUrl = null;
   let previewQuestions = [];
 
   function setStatus(msg, kind='info') { statusEl.textContent = msg; statusEl.className = kind==='error' ? 'text-red-700 small' : 'text-slate-600 small'; }
-
   function clearCanvas() { if (canvas) { ctx.clearRect(0,0,canvas.width,canvas.height); canvas.remove(); canvas=null; } canvasContainer.innerHTML = ''; }
 
   function createCanvas(width, height) {
@@ -156,7 +189,7 @@
     if (!pdfDoc) return;
     const page = await pdfDoc.getPage(pageNum);
     const viewport = page.getViewport({ scale: currentScale });
-    createCanvas(viewport.width, viewport.height);
+    createCanvas(viewport.width,viewport.height);
     const renderContext = { canvasContext: ctx, viewport };
     await page.render(renderContext).promise;
     pageInfo.textContent = `${pageNum} / ${totalPages}`;
@@ -181,43 +214,113 @@
       return { x, y };
     }
 
-    canvas.onmousedown = (e) => { start = mousePos(e); rectEl.style.left = start.x + 'px'; rectEl.style.top = start.y + 'px'; rectEl.style.width = '0px'; rectEl.style.height = '0px'; rectEl.style.display = 'block'; };
-    canvas.onmousemove = (e) => { if (!start) return; const p = mousePos(e); const r = toRect(start,p); rectEl.style.left = r.x + 'px'; rectEl.style.top = r.y + 'px'; rectEl.style.width = r.w + 'px'; rectEl.style.height = r.h + 'px'; };
-    window.addEventListener('mouseup', (e) => { if (!start) return; const p = mousePos(e); crop = toRect(start,p); start = null; });
+    canvas.onmousedown = (e) => {
+      start = mousePos(e);
+      rectEl.style.left = start.x + 'px'; rectEl.style.top = start.y + 'px';
+      rectEl.style.width = '0px'; rectEl.style.height = '0px'; rectEl.style.display = 'block';
+    };
+
+    canvas.onmousemove = (e) => {
+      if (!start) return;
+      const p = mousePos(e); const r = toRect(start,p);
+      rectEl.style.left = r.x + 'px'; rectEl.style.top = r.y + 'px';
+      rectEl.style.width = r.w + 'px'; rectEl.style.height = r.h + 'px';
+    };
+
+    window.addEventListener('mouseup', (e) => {
+      if (!start) return;
+      const p = mousePos(e); crop = toRect(start,p); start = null;
+      if (crop.w < 5 || crop.h < 5) {
+        crop = null;
+        rectEl.style.display = 'none';
+      }
+    }, { once: true });
   }
-
-  openPdf.addEventListener('click', async () => {
-    const f = fileUpload.files[0]; if (!f) { setStatus('Select a PDF or image first', 'error'); return; }
-    if (f.type === 'application/pdf') {
-      const arrayBuf = await f.arrayBuffer();
-      pdfDoc = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
-      totalPages = pdfDoc.numPages; currentPage = 1; await renderPage(currentPage);
-    } else if (f.type.startsWith('image/')) {
-      // load image to canvas
-      const img = new Image(); img.src = URL.createObjectURL(f);
-      await new Promise(r=>img.onload=r);
-      createCanvas(img.width, img.height); ctx.drawImage(img,0,0);
-      totalPages = 1; currentPage = 1; pageInfo.textContent = '1 / 1'; attachCropHandlers();
-    } else { setStatus('Unsupported file type', 'error'); }
-  });
-
-  prevPage.addEventListener('click', async ()=>{ if (!pdfDoc) return; if (currentPage>1) { currentPage--; await renderPage(currentPage); } });
-  nextPage.addEventListener('click', async ()=>{ if (!pdfDoc) return; if (currentPage<totalPages) { currentPage++; await renderPage(currentPage); } });
-
-  clearCropBtn.addEventListener('click', ()=>{ crop = null; const rect = document.getElementById('crop-rect'); if (rect) rect.style.display='none'; recognizedLatex.value=''; recognizedLatex.dispatchEvent(new Event('input')); recognizestatus('Crop cleared'); });
-  function recognizestatus(msg){ recognizeStatus.textContent = msg; }
 
   function dataUrlFromCrop() {
-    if (!canvas || !crop || crop.w<5 || crop.h<5) return null;
+    if (!canvas || !crop || crop.w < 5 || crop.h < 5) return null;
     const tmp = document.createElement('canvas'); tmp.width = crop.w; tmp.height = crop.h; const tctx = tmp.getContext('2d');
-    tctx.drawImage(canvas, crop.x, crop.y, crop.w, crop.h, 0,0,crop.w,crop.h);
+    tctx.drawImage(canvas, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
     return tmp.toDataURL('image/png');
   }
+
+  function updateShapePreview(dataUrl, el) {
+    if (!dataUrl) { el.classList.add('hidden'); el.previousElementSibling && (el.previousElementSibling.textContent=''); return; }
+    el.src = dataUrl; el.classList.remove('hidden');
+  }
+
+  // Shape generator
+  function drawShapeOnCanvas(type, w, h, fill='#fff', stroke='#111'){
+    const tmp = document.createElement('canvas'); tmp.width = w; tmp.height = h; const t = tmp.getContext('2d');
+    t.fillStyle = fill; t.fillRect(0,0,w,h);
+    t.strokeStyle = stroke; t.lineWidth = Math.max(2, Math.min(w,h)/50);
+    t.translate(w/2, h/2);
+    if (type==='square' || type==='rectangle'){
+      const rw = type==='square' ? Math.min(w,h)*0.8 : Math.min(w*0.9,w);
+      const rh = type==='square' ? Math.min(w,h)*0.8 : Math.min(h*0.9,h);
+      t.beginPath(); t.rect(-rw/2, -rh/2, rw, rh); t.fillStyle = '#ffffff'; t.fill(); t.stroke();
+    } else if (type==='circle'){
+      const r = Math.min(w,h)*0.4; t.beginPath(); t.arc(0,0,r,0,Math.PI*2); t.fillStyle='#ffffff'; t.fill(); t.stroke();
+    } else if (type==='triangle'){
+      const s = Math.min(w,h)*0.9; t.beginPath(); t.moveTo(0,-s/2); t.lineTo(s/2,s/3); t.lineTo(-s/2,s/3); t.closePath(); t.fillStyle='#ffffff'; t.fill(); t.stroke();
+    }
+    // return data url
+    return tmp.toDataURL('image/png');
+  }
+
+  generateShapeBtn.addEventListener('click', ()=>{
+    const type = shapeType.value; const w = Math.max(20, Number(shapeW.value)||200); const h = Math.max(20, Number(shapeH.value)||200);
+    try{
+      generatedShapeDataUrl = drawShapeOnCanvas(type,w,h,'#ffffff','#111111');
+      generatedImg.src = generatedShapeDataUrl; generatedWrap.classList.remove('hidden'); setStatus('Generated shape');
+    }catch(e){ setStatus('Could not generate shape: '+e.message,'error'); }
+  });
+
+  insertGeneratedShapeBtn.addEventListener('click', ()=>{
+    if (!generatedShapeDataUrl) { setStatus('No generated shape available','error'); return; }
+    currentQuestionImage = generatedShapeDataUrl; currentQuestionImageSeparate = storeGeneratedSeparate.checked;
+    setStatus('Generated shape attached to current question (store separately: '+currentQuestionImageSeparate+')');
+  });
+
+  captureShapeBtn.addEventListener('click', () => {
+    const dataUrl = dataUrlFromCrop();
+    if (!dataUrl) { setStatus('No crop selected for the shape image.', 'error'); return; }
+    currentQuestionImage = dataUrl;
+    currentQuestionImageSeparate = storeCropSeparate.checked;
+    // show small preview
+    let tmp = document.getElementById('temp-crop-preview'); if (!tmp){ tmp = document.createElement('img'); tmp.id='temp-crop-preview'; tmp.className='question-image'; document.querySelector('#preview-wrap').appendChild(tmp); }
+    tmp.src = currentQuestionImage;
+    previewWrap.classList.remove('hidden'); setStatus('Crop image captured. Attached to current question (store separately: '+currentQuestionImageSeparate+').');
+  });
+
+  recognizeCropBtn.addEventListener('click', async () => {
+    try {
+      const dataUrl = dataUrlFromCrop(); if (!dataUrl) { recognizeStatus.textContent='No crop selected'; return; }
+      if (useMathpix.checked && mathpixAppId.value.trim() && mathpixAppKey.value.trim()) {
+        try {
+          const latex = await callMathpix(dataUrl);
+          recognizedLatex.value = latex || '';
+          recognizeStatus.textContent='Mathpix returned result';
+          return;
+        } catch (e) {
+          console.warn(e);
+          recognizeStatus.textContent='Mathpix failed: '+e.message;
+        }
+      }
+      try {
+        const latex2 = await callGeminiForCrop(dataUrl);
+        recognizedLatex.value = latex2 || '';
+        recognizeStatus.textContent='Gemini returned result';
+      } catch (e) {
+        recognizeStatus.textContent='Gemini failed: '+e.message;
+      }
+    } catch (err) { recognizeStatus.textContent = 'Error: '+err.message; }
+  });
 
   async function callMathpix(dataUrl) {
     const app_id = mathpixAppId.value.trim(); const app_key = mathpixAppKey.value.trim();
     if (!app_id || !app_key) throw new Error('Mathpix credentials missing');
-    recognizestatus('Calling Mathpix...');
+    recognizeStatus.textContent='Calling Mathpix...';
     const body = { src: dataUrl, formats: ['latex_simplified','text'], data_options:{ include_asciimath: false } };
     const res = await fetch('https://api.mathpix.com/v3/text', { method:'POST', headers: { 'app_id': app_id, 'app_key': app_key, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
     if (!res.ok) throw new Error('Mathpix error: ' + (await res.text()));
@@ -225,10 +328,8 @@
   }
 
   async function callGeminiForCrop(dataUrl) {
-    recognizestatus('Calling Gemini for LaTeX extraction...');
+    recognizeStatus.textContent='Calling Gemini for LaTeX extraction...';
     const key = geminiKeyInput.value.trim(); if (!key) throw new Error('Missing Gemini key');
-    // send single image inline to generateContent with a tight prompt: return LaTeX only
-    // Use model discovery? For simplicity reuse earlier approach: try preferred model list via ListModels
     const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`;
     const listRes = await fetch(listUrl); if (!listRes.ok) throw new Error('Could not list Gemini models');
     const listData = await listRes.json(); const models = (Array.isArray(listData.models)?listData.models:[]).map(m=>m.name?.startsWith('models/')?m.name.slice(7):m.name).filter(Boolean);
@@ -236,88 +337,141 @@
     if (!preferred) throw new Error('No usable Gemini model found');
     const modelName = preferred;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(key)}`;
-
-    const prompt = `You are a Latex extraction tool. Given a small image containing a single mathematical expression or equation, return only the LaTeX source for that expression as plain text. Do not add any surrounding text, JSON, or markup. Use standard LaTeX macros (\\frac, \\sqrt, ^{}, _{}, \\sum, \\int, Greek letters). If you cannot extract clear math, return an empty string.`;
-
+    const prompt = `You are a Latex extraction tool. Given a small image containing a single mathematical expression or equation, return only the LaTeX source for that expression as plain text. Do not add any surrounding text, JSON, or markup.`;
     const base64 = dataUrl.split(',')[1];
     const body = { contents:[{ parts:[{ text: prompt }, { inline_data: { mime_type: 'image/png', data: base64 } }]}], generationConfig:{ temperature: 0.0 } };
     const res = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
     if (!res.ok) { const t = await res.text(); throw new Error('Gemini error: ' + t); }
     const data = await res.json();
-    // parse candidate text
     let text = '';
     if (Array.isArray(data?.candidates) && data.candidates[0]) {
       const parts = data.candidates[0].content?.parts; if (Array.isArray(parts)) text = parts.map(p=>p.text||'').join('');
     }
     text = text || data.output_text || '';
-    // clean fences
     text = text.replace(/^```latex\s*/i,'').replace(/```$/,'').trim();
     return text;
   }
 
-  recognizeCropBtn.addEventListener('click', async () => {
-    try {
-      const dataUrl = dataUrlFromCrop(); if (!dataUrl) { recognizestatus('No crop selected'); return; }
-      // decide Mathpix vs Gemini
-      if (useMathpix.checked && mathpixAppId.value.trim() && mathpixAppKey.value.trim()) {
-        try { const latex = await callMathpix(dataUrl); recognizedLatex.value = latex || ''; recognizestatus('Mathpix returned result'); return; } catch (e) { console.warn(e); recognizestatus('Mathpix failed: ' + e.message); }
-      }
-      // fallback Gemini
-      try { const latex2 = await callGeminiForCrop(dataUrl); recognizedLatex.value = latex2 || ''; recognizestatus('Gemini returned result'); } catch (e){ recognizestatus('Gemini failed: ' + e.message); }
-    } catch (err) { recognizestatus('Error: ' + err.message); }
-  });
-
   insertLatexBtn.addEventListener('click', ()=>{
-    // insert recognized latex into question at cursor
-    const v = recognizedLatex.value.trim(); if (!v) return; const selStart = questionText.selectionStart || questionText.value.length; const text = questionText.value; questionText.value = text.slice(0,selStart) + ' $' + v + '$ ' + text.slice(selStart); questionText.focus();
+    const v = recognizedLatex.value.trim(); if (!v) return;
+    const selStart = questionText.selectionStart || questionText.value.length;
+    const text = questionText.value;
+    questionText.value = text.slice(0, selStart) + ' $' + v + '$ ' + text.slice(selStart);
+    questionText.focus();
   });
 
   addToPreview.addEventListener('click', ()=>{
-    const q = questionText.value.trim(); const options = [optA.value.trim(), optB.value.trim(), optC.value.trim(), optD.value.trim()]; const idx = Number(correctIndex.value);
+    const q = questionText.value.trim();
+    const options = [optA.value.trim(), optB.value.trim(), optC.value.trim(), optD.value.trim()];
+    const idx = Number(correctIndex.value);
     if (!q || options.some(o=>!o)) { setStatus('Question and all four options are required', 'error'); return; }
-    const item = { question: q, options, correctIndex: idx };
+    const item = { question: q, options, correctIndex: idx, image: currentQuestionImage || null, storeImageSeparately: currentQuestionImageSeparate || false };
     previewQuestions.push(item); renderPreviewList(); setStatus('Added to preview');
+    // reset current image for next question
+    currentQuestionImage = null; currentQuestionImageSeparate = false; generatedShapeDataUrl = null; generatedImg.src=''; generatedWrap.classList.add('hidden');
   });
 
-  function renderPreviewList(){ previewList.replaceChildren(); previewQuestions.forEach((q, i)=>{
-    const li = document.createElement('li'); const p = document.createElement('div'); p.className='font-semibold'; p.innerHTML = escapeHtmlAllowMath(q.question).replace(/\n/g,'<br>'); li.appendChild(p);
-    const ul = document.createElement('ul'); ul.className='list-disc pl-5 text-slate-600'; q.options.forEach((opt,j)=>{ const li2=document.createElement('li'); li2.innerHTML = escapeHtmlAllowMath(String.fromCharCode(65+j)+'. '+opt); if (j===q.correctIndex) li2.innerHTML += ' <strong>(answer key)</strong>'; ul.appendChild(li2); }); li.appendChild(ul);
-    // add remove button
-    const rm = document.createElement('button'); rm.textContent='Remove'; rm.className='mt-2 px-2 py-1 text-sm bg-red-500 text-white rounded'; rm.addEventListener('click', ()=>{ previewQuestions.splice(i,1); renderPreviewList(); }); li.appendChild(rm);
-    previewList.appendChild(li);
-  }); previewWrap.classList.toggle('hidden', previewQuestions.length===0); if (window.MathJax && typeof window.MathJax.typesetPromise==='function') MathJax.typesetPromise([previewWrap]).catch(()=>{});
+  function escapeHtmlAllowMath(text){
+    if (text == null) return '';
+    return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
-  function escapeHtmlAllowMath(text){ if (text==null) return ''; return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function renderPreviewList(){
+    previewList.replaceChildren();
+    previewQuestions.forEach((q, i)=>{
+      const li = document.createElement('li');
+      const p = document.createElement('div'); p.className='font-semibold'; p.innerHTML = escapeHtmlAllowMath(q.question).replace(/\n/g,'<br>'); li.appendChild(p);
+      if (q.image) {
+        const img = document.createElement('img'); img.className='question-image';
+        if (q.image.startsWith('data:')) img.src = q.image; else img.src = `https://raw.githubusercontent.com/${ownerInput.value.trim()}/${repoInput.value.trim()}/main/${q.image}`;
+        li.appendChild(img);
+      }
+      const ul = document.createElement('ul'); ul.className='list-disc pl-5 text-slate-600';
+      q.options.forEach((opt,j)=>{ const li2=document.createElement('li'); li2.innerHTML = escapeHtmlAllowMath(String.fromCharCode(65+j)+'. '+opt); if (j===q.correctIndex) li2.innerHTML += ' <strong>(answer key)</strong>'; ul.appendChild(li2); });
+      li.appendChild(ul);
+      const rm = document.createElement('button'); rm.textContent='Remove'; rm.className='mt-2 px-2 py-1 text-sm bg-red-500 text-white rounded'; rm.addEventListener('click', ()=>{ previewQuestions.splice(i,1); renderPreviewList(); });
+      li.appendChild(rm);
+      previewList.appendChild(li);
+    });
+    previewWrap.classList.toggle('hidden', previewQuestions.length === 0);
+    if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') { MathJax.typesetPromise([previewWrap]).catch(()=>{}); }
+  }
+
+  // upload image to repo images/ folder and return path (images/filename.png)
+  async function uploadImageToRepo(owner, repo, token, dataUrl, filename){
+    const content = dataUrl.split(',')[1];
+    const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/images/${encodeURIComponent(filename)}`;
+    const headers = { 'Authorization':'Bearer '+token, 'Accept':'application/vnd.github+json' };
+    const body = { message: `Add image ${filename}`, content };
+    const res = await fetch(url, { method:'PUT', headers: {...headers, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) { const t = await res.text(); throw new Error('Image upload failed: '+t); }
+    return `images/${filename}`;
+  }
 
   commitBtn.addEventListener('click', async ()=>{
     const token = githubTokenInput.value.trim(); const owner = ownerInput.value.trim(); const repo = repoInput.value.trim(); const file = targetFile.value || 'Maths.json';
     if (!token || !owner || !repo) { setStatus('GitHub credentials/owner/repo required', 'error'); return; }
     if (previewQuestions.length===0) { setStatus('No questions to commit', 'error'); return; }
-    commitBtn.disabled = true; setStatus('Fetching existing file...');
+    commitBtn.disabled = true; setStatus('Preparing commit...');
     try {
+      // First, fetch existing JSON file
       const url = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeURIComponent(file)}`;
       const headers = { 'Authorization':'Bearer '+token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' };
       const res = await fetch(url, { headers });
       let existing = [], sha=null;
       if (res.ok){ const data = await res.json(); if (data.type!=='file' || typeof data.content!=='string') throw new Error('Remote path not a file'); const decoded = decodeURIComponent(escape(atob(data.content.replace(/\s/g,'')))); existing = JSON.parse(decoded); sha = data.sha; }
-      else if (res.status===404) existing = [];
+      else if (res.status===404){ existing = []; }
       else { throw new Error('GitHub read failed: '+res.status); }
 
-      // dedupe by normalized question
-      const normalize = s=>String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim(); const seen = new Set(existing.filter(q=>q&&q.question).map(q=>normalize(q.question)));
-      let nextId = existing.length ? Math.max(...existing.map(q=>q.id||0)) : 0; const toAdd=[]; let skipped=0;
-      for (const q of previewQuestions){ if (seen.has(normalize(q.question))) { skipped++; continue; } nextId++; toAdd.push({ id: nextId, question: q.question, options: q.options, correctIndex: q.correctIndex }); }
+      // Upload images that need separate storage
+      const uploadedImages = {};
+      for (let i=0;i<previewQuestions.length;i++){
+        const q = previewQuestions[i];
+        if (q.image && q.image.startsWith('data:') && q.storeImageSeparately){
+          const ext = q.image.split(';')[0].split('/')[1] || 'png';
+          const filename = `mcq_image_${Date.now()}_${i}.${ext}`;
+          setStatus('Uploading image '+filename);
+          const path = await uploadImageToRepo(owner, repo, token, q.image, filename);
+          uploadedImages[i]=path; // relative path
+          q.image = path; // replace data URL with path for JSON
+          delete q.storeImageSeparately;
+        }
+      }
+
+      // Merge and dedupe
+      const normalize = s => String(s||'').normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim();
+      const seen = new Set(existing.filter(q=>q&&q.question).map(q=>normalize(q.question)));
+      let nextId = existing.length ? Math.max(...existing.map(q=>q.id||0)) : 0;
+      const toAdd=[]; let skipped=0;
+      for (const q of previewQuestions) {
+        if (seen.has(normalize(q.question))) { skipped++; continue; }
+        nextId++;
+        toAdd.push({ id: nextId, question: q.question, options: q.options, correctIndex: q.correctIndex, image: q.image || null });
+      }
       if (toAdd.length===0){ setStatus('No new questions to add (duplicates skipped)', 'info'); commitBtn.disabled=false; return; }
-      const merged = [...existing, ...toAdd]; const content = btoa(unescape(encodeURIComponent(JSON.stringify(merged,null,2)+'\n')));
+      const merged = [...existing, ...toAdd];
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(merged,null,2)+'\n')));
       const body = { message: `Add ${toAdd.length} MCQs via Admin Portal`, content };
       if (sha) body.sha = sha;
       const putRes = await fetch(url, { method:'PUT', headers: {...headers, 'Content-Type':'application/json' }, body: JSON.stringify(body) });
       if (!putRes.ok) { const t=await putRes.text(); throw new Error('Commit failed: '+t); }
-      setStatus(`Success! Added ${toAdd.length} question(s). Skipped ${skipped} duplicate(s).`, 'info'); previewQuestions=[]; renderPreviewList();
-    } catch (err){ setStatus('Error: '+err.message,'error'); }
+      setStatus(`Success! Added ${toAdd.length} question(s). Skipped ${skipped} duplicate(s).`, 'info');
+      previewQuestions=[]; renderPreviewList();
+    } catch (err) { setStatus('Error: '+err.message,'error'); }
     finally { commitBtn.disabled=false; }
   });
+
+  // File / PDF loading handlers
+  openPdf.addEventListener('click', async () => {
+    const f = fileUpload.files[0]; if (!f) { setStatus('Select a PDF or image first', 'error'); return; }
+    if (f.type === 'application/pdf') {
+      const arrayBuf = await f.arrayBuffer(); pdfDoc = await pdfjsLib.getDocument({ data: arrayBuf }).promise; totalPages = pdfDoc.numPages; currentPage = 1; await renderPage(currentPage);
+    } else if (f.type.startsWith('image/')) {
+      const img = new Image(); img.src = URL.createObjectURL(f); await new Promise(r => img.onload = r); createCanvas(img.width,img.height); ctx.drawImage(img,0,0); totalPages = 1; currentPage = 1; pageInfo.textContent = '1 / 1'; attachCropHandlers();
+    } else { setStatus('Unsupported file type', 'error'); }
+  });
+  prevPage.addEventListener('click', async ()=>{ if (!pdfDoc) return; if (currentPage>1) { currentPage--; await renderPage(currentPage); } });
+  nextPage.addEventListener('click', async ()=>{ if (!pdfDoc) return; if (currentPage<totalPages) { currentPage++; await renderPage(currentPage); } });
 
 })();
 </script>
