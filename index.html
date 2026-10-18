@@ -554,7 +554,7 @@
                 const questionText = escapeHTML(q.text);
                     const imageBlock = q.image 
       ? `<div class="my-4 flex justify-center w-full">
-           <img src="${q.image}" alt="Question Diagram" class="max-h-64 max-w-full rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
+           <img src="${escapeHTML(q.image)}" alt="Question Diagram" loading="lazy" class="max-h-64 max-w-full rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
          </div>` 
       : '';
                 let optionsHTML = '';
@@ -1078,7 +1078,8 @@
                     subjectClass: source.subjectClass,
                     text: item.question,
                     options: item.options,
-                    correctIndex: item.correctIndex
+                    correctIndex: item.correctIndex,
+                    image: typeof item.image === 'string' ? item.image : null
                 });
             });
         }
