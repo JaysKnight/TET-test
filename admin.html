@@ -81,7 +81,7 @@
   }
   function parseJsonArrayFromModel(text) {
     let source = String(text || '').trim();
-    source = source.replace(/^```(?:json)?\\s*/i, '').replace(/\\s*```$/, '').trim();
+    source = source.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
     try { const direct = JSON.parse(source); if (Array.isArray(direct)) return direct; } catch (_) {}
     const first = source.indexOf('[');
     const last = source.lastIndexOf(']');
