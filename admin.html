@@ -96,20 +96,28 @@
     if (!Array.isArray(parsed)) throw new Error('Output is not a JSON array.');
     return parsed;
   }
+  function normalizeExtractedText(value) {
+    return String(value || '')
+      // Gujarati dependent vowel signs and combining marks belong to the previous character.
+      .replace(/\\s+([\\u0A81-\\u0A83\\u0ABC\\u0ABE-\\u0ACD\\u0AE2-\\u0AE3])/g, '$1')
+      .replace(/[\\u200B-\\u200D\\uFEFF]/g, '')
+      .replace(/[ \\t]+/g, ' ')
+      .trim();
+  }
   function validateQuestions(value, label) {
     if (!Array.isArray(value)) fail(label + ' must be a JSON array. No data was committed.');
     if (value.length === 0) fail(label + ' contains no questions. No data was committed.');
     return value.map((q, index) => {
       const where = label + ' question ' + (index + 1);
       if (!q || typeof q !== 'object' || Array.isArray(q)) fail(where + ' is not an object.');
-      if (typeof q.question !== 'string' || !q.question.trim()) fail(where + ' has no valid question text.');
-      if (!Array.isArray(q.options) || q.options.length !== 4 || q.options.some(o => typeof o !== 'string' || !o.trim())) {
+      if (typeof q.question !== 'string' || !normalizeExtractedText(q.question)) fail(where + ' has no valid question text.');
+      if (!Array.isArray(q.options) || q.options.length !== 4 || q.options.some(o => typeof o !== 'string' || !normalizeExtractedText(o))) {
         fail(where + ' must have exactly four non-empty text options.');
       }
       if (!Number.isInteger(q.correctIndex) || q.correctIndex < 0 || q.correctIndex > 3) {
         fail(where + ' must have correctIndex as an integer from 0 to 3. Check the answer key in the source document.');
       }
-      return { ...q, question: q.question.trim(), options: q.options.map(o => o.trim()) };
+      return { ...q, question: normalizeExtractedText(q.question), options: q.options.map(o => normalizeExtractedText(o)) };
     });
   }
   function readFileAsBase64(file) {
@@ -358,7 +366,7 @@
       setStatus('Step 1/4: Checking document…');
       const isPdf = file.type === 'application/pdf';
       const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/interactions';
-      const extractionPrompt = 'Extract only multiple-choice questions actually present in the supplied page(s). Do not generate, redraw, describe, or return diagrams/images; extract question wording and any labels or symbols that are part of the printed text. Preserve the original language and script. Transcribe mathematical equations, fractions, roots, powers, operators, and symbols accurately; represent maths in inline LaTeX wrapped in $ signs. Preserve all four answer options in their original order. Do not guess unreadable text or answer keys. Return a JSON array only, each item exactly shaped as {"question":"question text","options":["option A","option B","option C","option D"],"correctIndex":0}. correctIndex is zero-based (0=A, 1=B, 2=C, 3=D). No markdown fences or extra fields.';
+      const extractionPrompt = 'Extract only multiple-choice questions actually present in the supplied page(s). Do not generate, redraw, describe, or return diagrams/images; extract question wording and any labels or symbols that are part of the printed text. Preserve the original language and script, especially Gujarati. Gujarati accuracy rules: keep each Gujarati word intact; never insert spaces inside a word or between a consonant and its vowel sign/matra; attach signs such as ા િ ી ુ ૂ ે ૈ ો ૌ to the preceding consonant; do not output a matra as a separate word (for example, correct સેકન્ડ ે to સેકન્ડે when the page clearly shows that word). Rejoin OCR-split word fragments only when the intended word is unambiguous. If text is genuinely unreadable, mark only that part as [અસ્પષ્ટ] instead of inventing it. Transcribe mathematical equations, fractions, roots, powers, operators, and symbols accurately; represent maths in inline LaTeX wrapped in $ signs. Preserve all four answer options in their original order. Do not guess answer keys. Return a JSON array only, each item exactly shaped as {"question":"question text","options":["option A","option B","option C","option D"],"correctIndex":0}. correctIndex is zero-based (0=A, 1=B, 2=C, 3=D). No markdown fences or extra fields.';
       async function extractWithGemini(mediaItems, statusMessage) {
         const requestModel = async (model) => {
           let lastError;
