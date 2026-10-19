@@ -69,6 +69,11 @@
   const GEMINI_MODEL = 'gemini-3.8-flash';
   const OPENAI_MODEL = 'gpt-4.1';
   const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'application/pdf']);
+  const PDFJS_MODULE_URL = 'https://mozilla.github.io/pdf.js/build/pdf.mjs';
+  const PDFJS_WORKER_URL = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
+  const MAX_CROP_EDGE_PX = 1600;
+  const MAX_CROP_PNG_BYTES = 2 * 1024 * 1024;
+  let pdfJsLoadPromise = null;
 
   function setStatus(message, kind = 'info') {
     statusEl.textContent = message;
@@ -79,30 +84,33 @@
   function normalizeText(value) {
     return String(value ?? '').normalize('NFKC').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
   }
-  function sanitizeDiagramSvg(svgText) {
-    if (typeof svgText !== 'string' || svgText.length > 200000) {
-      fail('Diagram SVG is missing or too large.');
-    }
-    const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
-    const root = doc.documentElement;
-    if (!root || root.localName !== 'svg' || root.nodeName.toLowerCase() === 'parsererror') {
-      fail('Gemini returned invalid SVG.');
-    }
-    const allowedTags = new Set(['svg', 'g', 'line', 'path', 'rect', 'circle', 'ellipse', 'polygon', 'polyline', 'text', 'tspan']);
-    const allowedAttributes = new Set(['xmlns', 'width', 'height', 'viewBox', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'points', 'fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'font-size', 'font-family', 'font-weight', 'text-anchor', 'dominant-baseline', 'transform', 'opacity']);
-    for (const element of [root, ...root.querySelectorAll('*')]) {
-      if (!allowedTags.has(element.localName)) fail('Gemini returned an unsupported SVG element.');
-      for (const attr of [...element.attributes]) {
-        if (!allowedAttributes.has(attr.name) || /^on/i.test(attr.name)) element.removeAttribute(attr.name);
-      }
-    }
-    if (!root.hasAttribute('viewBox')) root.setAttribute('viewBox', '0 0 640 360');
-    if (!root.hasAttribute('xmlns')) root.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    if (!root.hasAttribute('width')) root.setAttribute('width', '640');
-    if (!root.hasAttribute('height')) root.setAttribute('height', '360');
-    return new XMLSerializer().serializeToString(root);
+  function slugifyQuestion(value) {
+    const slug = String(value ?? '').normalize('NFKC').toLocaleLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '').slice(0, 72);
+    return slug || 'question';
   }
-
+  function imageNeedsSourceCrop(imagePath) {
+    return typeof imagePath !== 'string' || !imagePath.trim() || imagePath.startsWith('assets/diagrams/');
+  }
+  function validateDiagramCrop(crop, where) {
+    if (crop == null) return null;
+    if (!crop || typeof crop !== 'object' || Array.isArray(crop)) fail(where + ' has an invalid source crop.');
+    const page = Number(crop.page);
+    const x = Number(crop.x);
+    const y = Number(crop.y);
+    const width = Number(crop.width);
+    const height = Number(crop.height);
+    if (!Number.isInteger(page) || page < 1 || ![x, y, width, height].every(Number.isFinite)) {
+      fail(where + ' has invalid crop coordinates.');
+    }
+    if (x < 0 || y < 0 || x >= 1 || y >= 1 || width <= 0 || height <= 0 || x + width > 1.03 || y + height > 1.03) {
+      fail(where + ' crop must be a positive box within the source page.');
+    }
+    const clippedWidth = Math.min(width, 1 - x);
+    const clippedHeight = Math.min(height, 1 - y);
+    if (clippedWidth <= 0 || clippedHeight <= 0) fail(where + ' crop is outside the source page.');
+    return { page, x, y, width: clippedWidth, height: clippedHeight };
+  }
   function validateQuestions(value, label) {
     if (!Array.isArray(value)) fail(label + ' must be a JSON array. No data was committed.');
     if (value.length === 0) fail(label + ' contains no questions. No data was committed.');
@@ -116,9 +124,13 @@
       if (!Number.isInteger(q.correctIndex) || q.correctIndex < 0 || q.correctIndex > 3) {
         fail(where + ' must have correctIndex as an integer from 0 to 3. Check the answer key in the source document.');
       }
-      if (q.diagramSvg != null && typeof q.diagramSvg !== 'string') fail(where + ' has an invalid diagram.');
-      const diagramSvg = q.diagramSvg?.trim() ? sanitizeDiagramSvg(q.diagramSvg) : null;
-      return { ...q, question: q.question.trim(), options: q.options.map(o => o.trim()), diagramSvg };
+      if (q.diagramRequired != null && typeof q.diagramRequired !== 'boolean') fail(where + ' has an invalid diagramRequired flag.');
+      const diagramCrop = validateDiagramCrop(q.diagramCrop, where);
+      const diagramRequired = q.diagramRequired === true || Boolean(diagramCrop);
+      if (diagramRequired && !diagramCrop) {
+        fail(where + ' needs a diagram, but the model did not return a usable crop box. Use a clearer PDF page and try again; no data was committed.');
+      }
+      return { question: q.question.trim(), options: q.options.map(o => o.trim()), correctIndex: q.correctIndex, diagramRequired, diagramCrop };
     });
   }
   function readFileAsBase64(file) {
@@ -150,6 +162,122 @@
     }
     return btoa(binary);
   }
+  async function loadPdfJs() {
+    if (!pdfJsLoadPromise) {
+      pdfJsLoadPromise = import(PDFJS_MODULE_URL).then(pdfjs => {
+        pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+        return pdfjs;
+      });
+    }
+    return pdfJsLoadPromise;
+  }
+  function encodeCanvasPng(canvas) {
+    const scales = [1, 0.78, 0.58, 0.4];
+    for (const scale of scales) {
+      let output = canvas;
+      if (scale < 1) {
+        output = document.createElement('canvas');
+        output.width = Math.max(1, Math.round(canvas.width * scale));
+        output.height = Math.max(1, Math.round(canvas.height * scale));
+        const context = output.getContext('2d', { alpha: false });
+        context.fillStyle = '#fff';
+        context.fillRect(0, 0, output.width, output.height);
+        context.drawImage(canvas, 0, 0, output.width, output.height);
+      }
+      const dataUrl = output.toDataURL('image/png');
+      const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+      if (base64.length * 0.75 <= MAX_CROP_PNG_BYTES) return { dataUrl, base64 };
+    }
+    fail('A cropped diagram is too large to upload safely. Use a smaller or more tightly cropped source page.');
+  }
+  function cropSourceCanvas(source, box) {
+    const sx = Math.max(0, Math.floor(box.x * source.width));
+    const sy = Math.max(0, Math.floor(box.y * source.height));
+    const sw = Math.min(source.width - sx, Math.ceil(box.width * source.width));
+    const sh = Math.min(source.height - sy, Math.ceil(box.height * source.height));
+    if (sw < 2 || sh < 2) fail('A diagram crop is too small. Review the PDF scan and try again.');
+    const scale = Math.min(1, MAX_CROP_EDGE_PX / Math.max(sw, sh));
+    const output = document.createElement('canvas');
+    output.width = Math.max(1, Math.round(sw * scale));
+    output.height = Math.max(1, Math.round(sh * scale));
+    const context = output.getContext('2d', { alpha: false });
+    if (!context) fail('Could not create a canvas for the diagram crop.');
+    context.fillStyle = '#fff';
+    context.fillRect(0, 0, output.width, output.height);
+    context.drawImage(source, sx, sy, sw, sh, 0, 0, output.width, output.height);
+    return encodeCanvasPng(output);
+  }
+  async function createSourceCropper(file) {
+    let pdfDocument = null;
+    let bitmap = null;
+    let imageCanvas = null;
+    const pageCanvasCache = new Map();
+    if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '')) {
+      const pdfjs = await loadPdfJs();
+      pdfDocument = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+    } else {
+      bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, 4200 / Math.max(bitmap.width, bitmap.height));
+      imageCanvas = document.createElement('canvas');
+      imageCanvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      imageCanvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      const context = imageCanvas.getContext('2d', { alpha: false });
+      if (!context) fail('Could not read the source image for cropping.');
+      context.fillStyle = '#fff';
+      context.fillRect(0, 0, imageCanvas.width, imageCanvas.height);
+      context.drawImage(bitmap, 0, 0, imageCanvas.width, imageCanvas.height);
+    }
+    async function getPageCanvas(pageNumber) {
+      if (!pdfDocument) return imageCanvas;
+      if (pageNumber > pdfDocument.numPages) fail('The model selected PDF page ' + pageNumber + ', but the document has only ' + pdfDocument.numPages + ' page(s).');
+      if (!pageCanvasCache.has(pageNumber)) {
+        const pagePromise = (async () => {
+          const page = await pdfDocument.getPage(pageNumber);
+          const oneScale = page.getViewport({ scale: 1 });
+          const scale = Math.min(2.2, 4200 / Math.max(oneScale.width, oneScale.height));
+          const viewport = page.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.ceil(viewport.width);
+          canvas.height = Math.ceil(viewport.height);
+          const context = canvas.getContext('2d', { alpha: false });
+          if (!context) fail('Could not render PDF page ' + pageNumber + '.');
+          context.fillStyle = '#fff';
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          await page.render({ canvasContext: context, viewport, background: 'rgb(255,255,255)' }).promise;
+          return canvas;
+        })();
+        pageCanvasCache.set(pageNumber, pagePromise);
+      }
+      return pageCanvasCache.get(pageNumber);
+    }
+    return {
+      crop: async function(box) {
+        if (!pdfDocument && box.page !== 1) fail('An uploaded image has only page 1, but the model selected page ' + box.page + '.');
+        const source = await getPageCanvas(box.page);
+        return cropSourceCanvas(source, box);
+      },
+      dispose: async function() {
+        pageCanvasCache.clear();
+        if (bitmap && typeof bitmap.close === 'function') bitmap.close();
+        if (imageCanvas) { imageCanvas.width = 0; imageCanvas.height = 0; }
+        if (pdfDocument) { try { await pdfDocument.destroy(); } catch (_) {} }
+      }
+    };
+  }
+  async function uploadPngToGitHub(owner, repo, path, base64, headers) {
+    const encodedPath = path.split('/').map(segment => encodeURIComponent(segment)).join('/');
+    const url = 'https://api.github.com/repos/' + encodeURIComponent(owner) + '/' + encodeURIComponent(repo) + '/contents/' + encodedPath;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        message: 'Add MCQ diagram ' + path.split('/').pop(),
+        content: base64
+      })
+    });
+    if (!response.ok) throw await responseError(response, 'GitHub diagram upload');
+  }
+
   async function responseError(response, service) {
     let detail = '';
     try {
@@ -159,7 +287,7 @@
     return new Error(`${service} request failed (${response.status}${response.statusText ? ' ' + response.statusText : ''}).${detail ? '\n' + detail : ''}`);
   }
   async function extractWithOpenAI(apiKey, base64Data, file, prompt) {
-    const isPdf = file.type === 'application/pdf';
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
     const content = [{ type: 'input_text', text: prompt }];
     if (isPdf) {
       content.push({
@@ -197,33 +325,19 @@
     return status === 429 || /quota|rate.?limit|resource_exhausted|too many requests|capacity.*exceeded/i.test(message || '');
   }
 
-  async function uploadSvgToGitHub(owner, repo, path, svg, headers) {
-    const encodedPath = path.split('/').map(segment => encodeURIComponent(segment)).join('/');
-    const url = 'https://api.github.com/repos/' + encodeURIComponent(owner) + '/' + encodeURIComponent(repo) + '/contents/' + encodedPath;
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify({
-        message: 'Add MCQ diagram ' + path.split('/').pop(),
-        content: encodeUtf8Base64(svg)
-      })
-    });
-    if (!response.ok) throw await responseError(response, 'GitHub diagram upload');
-  }
-
   function renderPreview(questions) {
     previewList.replaceChildren();
     questions.forEach((q, index) => {
-      if (index >= 10 && !q.diagramSvg) return;
+      if (index >= 10 && !q.diagramPreviewDataUrl) return;
       const li = document.createElement('li');
       const title = document.createElement('p');
       title.className = 'font-semibold';
       title.textContent = q.question;
       li.appendChild(title);
-      if (q.diagramSvg) {
+      if (q.diagramPreviewDataUrl) {
         const image = document.createElement('img');
-        image.alt = 'Generated diagram preview';
-        image.src = 'data:image/svg+xml;base64,' + encodeUtf8Base64(q.diagramSvg);
+        image.alt = 'Crop from original source';
+        image.src = q.diagramPreviewDataUrl;
         image.style.maxWidth = '100%';
         image.style.maxHeight = '260px';
         image.style.margin = '12px 0';
@@ -235,13 +349,14 @@
       options.className = 'list-disc pl-5 mt-1 text-slate-600';
       q.options.forEach((option, i) => {
         const item = document.createElement('li');
-        item.textContent = `${String.fromCharCode(65 + i)}. ${option}${i === q.correctIndex ? ' (answer key)' : ''}`;
+        item.textContent = String.fromCharCode(65 + i) + '. ' + option + (i === q.correctIndex ? ' (answer key)' : '');
         options.appendChild(item);
       });
       li.appendChild(options);
       previewList.appendChild(li);
     });
-    previewSummary.textContent = `Found ${questions.length} valid question(s). Preview shows the first 10 plus later questions with diagrams. Verify wording, diagrams, and answer keys before committing.`;
+    const cropCount = questions.filter(q => Boolean(q.diagramPreviewDataUrl)).length;
+    previewSummary.textContent = 'Found ' + questions.length + ' valid question(s) and cropped ' + cropCount + ' source figure(s). Preview shows the first 10 questions plus every figure crop. Check the crops and answer keys before committing.';
     previewWrap.classList.remove('hidden');
   }
   async function processAndCommit() {
@@ -261,7 +376,8 @@
     if (!/^[A-Za-z0-9-]+$/.test(owner) || !/^[A-Za-z0-9._-]+$/.test(repo)) {
       setStatus('GitHub owner or repository name contains invalid characters.', 'error'); return;
     }
-    if (!ALLOWED_TYPES.has(file.type)) {
+    const fileType = file.type || (/\.pdf$/i.test(file.name || '') ? 'application/pdf' : '');
+    if (!ALLOWED_TYPES.has(fileType)) {
       setStatus('Unsupported file type. Select a PNG, JPEG, WebP, or PDF file.', 'error'); return;
     }
     if (file.size === 0 || file.size > MAX_FILE_BYTES) {
@@ -272,27 +388,18 @@
     btn.textContent = 'Processing…';
     try {
       setStatus('Step 1/4: Reading file…');
+      const isPdf = fileType === 'application/pdf';
       const base64Data = await readFileAsBase64(file);
 
-      const extractionPrompt = `
-Extract only MCQs present in the supplied document. Preserve the original language.
-For formulas, use inline LaTeX wrapped in $ signs.
-
-Return a JSON array only. Each item must have:
-{
-  "question": "question text",
-  "options": ["A", "B", "C", "D"],
-  "correctIndex": 0,
-  "diagramSvg": null
-}
-
-For a question that depends on a visible geometric figure in the supplied document,
-return diagramSvg as one complete SVG string that faithfully redraws that figure.
-Use simple SVG primitives only. If the source does not show enough information to
-recreate the figure accurately, return null. Do not invent measurements or geometry.
-Do not use scripts, external links, images, stylesheets, or markdown fences.
-Use width="640", height="360", viewBox="0 0 640 360".
-`;
+      const extractionPrompt = [
+        'Extract only MCQs present in the supplied document. Preserve the original language and exact mathematical meaning.',
+        'For formulas in question text and options, use MathJax-compatible LaTeX: use \\(...\\) inline and \\[...\\] for display formulas. Use standard TeX for fractions, powers, roots, equations, inequalities, angles, triangles, parallel/perpendicular lines, congruence, sets, matrices, and Greek letters. Do not omit signs or change values.',
+        'Return only a valid JSON array. Each item must have question (string), options (exactly four strings), correctIndex (integer 0 to 3), diagramRequired (boolean), and diagramCrop (null or an object with page, x, y, width, height).',
+        'If a question uses a visible figure, diagram, graph, number line, table, or plotted geometry, set diagramRequired to true and return the tightest crop box that contains the complete relevant original figure, all its labels, and no answer text. Do not redraw, recreate, approximate, or output SVG. The browser will crop the original PDF/image so the figure is preserved exactly.',
+        'Crop coordinates must be numeric fractions from 0 to 1 relative to the full upright source page: x and y are the top-left; width and height are the box size. page is a 1-based PDF page number; for a single image use page 1. Keep x + width and y + height within 1.0. If multiple connected parts form one figure, use one box containing all of them.',
+        'If the question has no source figure, use diagramRequired=false and diagramCrop=null. If a figure is required but you cannot locate it confidently, use diagramRequired=true and diagramCrop=null; the uploader will stop rather than invent or silently omit it.',
+        'Do not wrap the answer in markdown fences. Do not add commentary or any fields other than the requested question data and crop metadata.'
+      ].join('\\n');
       let aiResponseText = '';
       let extractionProvider = '';
       let geminiLimitMessage = '';
@@ -308,8 +415,8 @@ Use width="640", height="360", viewBox="0 0 640 360".
               input: [
                 { type: 'text', text: extractionPrompt },
                 isPdf
-                  ? { type: 'document', mime_type: file.type, data: base64Data }
-                  : { type: 'image', mime_type: file.type, data: base64Data }
+                  ? { type: 'document', mime_type: fileType, data: base64Data }
+                  : { type: 'image', mime_type: fileType, data: base64Data }
               ],
               generation_config: { thinking_level: 'low' },
               store: false
@@ -374,10 +481,28 @@ Use width="640", height="360", viewBox="0 0 640 360".
       try { parsed = JSON.parse(aiResponseText); }
       catch (_) { fail(extractionProvider + ' returned invalid JSON. Try again or use a clearer document. No data was committed.'); }
       const newQuestions = validateQuestions(parsed, extractionProvider + ' output');
+      const diagramCount = newQuestions.filter(q => Boolean(q.diagramCrop)).length;
+      if (diagramCount) {
+        setStatus('Rendering ' + diagramCount + ' source figure crop(s)…');
+        const cropper = await createSourceCropper(file);
+        try {
+          let cropped = 0;
+          for (const question of newQuestions) {
+            if (!question.diagramCrop) continue;
+            cropped++;
+            setStatus('Cropping figure ' + cropped + ' of ' + diagramCount + ' from the original source…');
+            const png = await cropper.crop(question.diagramCrop);
+            question.diagramPngBase64 = png.base64;
+            question.diagramPreviewDataUrl = png.dataUrl;
+          }
+        } finally {
+          await cropper.dispose();
+        }
+      }
       renderPreview(newQuestions);
-      setStatus('Extraction completed with ' + extractionProvider + '. Review the questions and diagrams below.');
-      const previewText = newQuestions.slice(0, 5).map((q, i) => `${i + 1}. ${q.question}`).join('\n');
-      const confirmText = `${extractionProvider} extracted ${newQuestions.length} valid question(s) for ${targetFile}.\n\nPreview:\n${previewText}${newQuestions.length > 5 ? '\n…' : ''}\n\nHave you checked the answer keys and want to continue to GitHub?`;
+      setStatus('Extraction completed with ' + extractionProvider + '. Review the question text, original-source crops, and answer keys below.');
+      const previewText = newQuestions.slice(0, 5).map((q, i) => (i + 1) + '. ' + q.question).join('\\n');
+      const confirmText = extractionProvider + ' extracted ' + newQuestions.length + ' question(s) and ' + diagramCount + ' source figure crop(s) for ' + targetFile + '.\\n\\nPreview:\\n' + previewText + (newQuestions.length > 5 ? '\\n…' : '') + '\\n\\nReview the crops and answer keys. Continue to GitHub?';
       if (!window.confirm(confirmText)) {
         setStatus('Commit cancelled. Nothing was changed on GitHub.'); return;
       }
@@ -418,39 +543,60 @@ Use width="640", height="360", viewBox="0 0 640 360".
       let lastId = existingIds.length ? Math.max(...existingIds) : 0;
       if (!Number.isSafeInteger(lastId + newQuestions.length)) fail('Question IDs would exceed the safe integer range.');
 
-      const seen = new Set(existingQuestions.filter(q => q && typeof q.question === 'string').map(q => normalizeText(q.question)));
+      const seen = new Map();
+      for (const existing of existingQuestions) {
+        if (!existing || typeof existing.question !== 'string') continue;
+        const key = normalizeText(existing.question);
+        const current = seen.get(key);
+        if (!current || (!imageNeedsSourceCrop(current.image) && imageNeedsSourceCrop(existing.image))) seen.set(key, existing);
+      }
       const uniqueQuestions = [];
       let duplicates = 0;
+      let attachedExistingImages = 0;
       for (const q of newQuestions) {
         const key = normalizeText(q.question);
-        if (seen.has(key)) { duplicates++; continue; }
-        seen.add(key);
+        if (seen.has(key)) {
+          duplicates++;
+          const matched = seen.get(key);
+          if (q.diagramPngBase64 && imageNeedsSourceCrop(matched.image) && !matched.pendingDiagramPngBase64) {
+            matched.pendingDiagramPngBase64 = q.diagramPngBase64;
+            if (existingQuestions.includes(matched)) attachedExistingImages++;
+          }
+          continue;
+        }
         lastId++;
-        uniqueQuestions.push({ id: lastId, question: q.question, options: q.options, correctIndex: q.correctIndex, diagramSvg: q.diagramSvg || null });
+        const added = { id: lastId, question: q.question, options: q.options, correctIndex: q.correctIndex };
+        if (q.diagramPngBase64) added.pendingDiagramPngBase64 = q.diagramPngBase64;
+        uniqueQuestions.push(added);
+        seen.set(key, added);
       }
-      if (uniqueQuestions.length === 0) {
-        setStatus(`No new questions to add. All ${duplicates} extracted question(s) already exist in ${targetFile}.`, 'success'); return;
+      if (uniqueQuestions.length === 0 && attachedExistingImages === 0) {
+        setStatus('No new questions or missing diagram images to add. All ' + duplicates + ' extracted question(s) already exist with their available image.', 'success');
+        return;
       }
-      if (duplicates && !window.confirm(`${duplicates} duplicate question(s) will be skipped. Add the remaining ${uniqueQuestions.length} new question(s)?`)) {
+      if (duplicates && !window.confirm('This upload contains ' + duplicates + ' duplicate question(s). ' + uniqueQuestions.length + ' new question(s) will be added and ' + attachedExistingImages + ' missing image(s) will be attached to existing questions. Continue?')) {
         setStatus('Commit cancelled. Nothing was changed on GitHub.'); return;
       }
 
-      const subjectSlug = targetFile.replace(/\.json$/i, '').replace(/[^A-Za-z0-9_-]/g, '');
-      setStatus('Step 4/4: Uploading diagrams and committing questions to GitHub…');
-      for (const question of uniqueQuestions) {
-        const svg = question.diagramSvg;
-        delete question.diagramSvg;
-        if (!svg) continue;
-        const imagePath = 'assets/diagrams/' + subjectSlug + '-' + question.id + '-' + Date.now() + '.svg';
-        await uploadSvgToGitHub(owner, repo, imagePath, svg, githubHeaders);
-        question.image = imagePath;
+      const subjectSlug = targetFile.replace(/\.json$/i, '').replace(/[^A-Za-z0-9_-]/g, '').toLocaleLowerCase();
+      const imageTargets = [...existingQuestions, ...uniqueQuestions].filter(q => typeof q.pendingDiagramPngBase64 === 'string');
+      let uploadedDiagramCount = 0;
+      const uploadStamp = Date.now();
+      setStatus('Step 4/4: Saving ' + imageTargets.length + ' cropped PNG image(s) and questions to GitHub…');
+      for (const target of imageTargets) {
+        const base64 = target.pendingDiagramPngBase64;
+        delete target.pendingDiagramPngBase64;
+        const filename = slugifyQuestion(target.question) + '-' + target.id + '-' + uploadStamp + '-' + (uploadedDiagramCount + 1) + '.png';
+        const imagePath = 'assets/images/' + subjectSlug + '/' + filename;
+        await uploadPngToGitHub(owner, repo, imagePath, base64, githubHeaders);
+        target.image = imagePath;
+        uploadedDiagramCount++;
       }
-
       const mergedQuestions = [...existingQuestions, ...uniqueQuestions];
       const newContentBase64 = encodeUtf8Base64(JSON.stringify(mergedQuestions, null, 2) + '\n');
       setStatus('Saving the updated question JSON to GitHub…');
       const commitBody = {
-        message: `Add ${uniqueQuestions.length} MCQs to ${targetFile} via Admin Portal`,
+        message: 'Add ' + uniqueQuestions.length + ' MCQs and ' + uploadedDiagramCount + ' PNG diagram(s) to ' + targetFile + ' via Admin Portal',
         content: newContentBase64
       };
       if (fileSha) commitBody.sha = fileSha;
@@ -458,7 +604,7 @@ Use width="640", height="360", viewBox="0 0 640 360".
         method: 'PUT', headers: githubHeaders, body: JSON.stringify(commitBody)
       });
       if (!commitRes.ok) throw await responseError(commitRes, 'GitHub commit');
-      setStatus(`Success! Added ${uniqueQuestions.length} question(s) to ${targetFile}.${duplicates ? ` Skipped ${duplicates} duplicate(s).` : ''}\nGitHub accepted the commit. GitHub Pages may take a short time to update.`, 'success');
+      setStatus('Success! Added ' + uniqueQuestions.length + ' new question(s) and uploaded ' + uploadedDiagramCount + ' PNG diagram(s) to ' + targetFile + '.' + (attachedExistingImages ? ' Attached ' + attachedExistingImages + ' image(s) to existing questions.' : '') + (duplicates > attachedExistingImages ? ' Skipped ' + (duplicates - attachedExistingImages) + ' duplicate(s) that already had an image or no crop was found.' : '') + '\nGitHub accepted the commits. GitHub Pages may take a short time to update.', 'success');
     } catch (error) {
       console.error(error);
       setStatus(`Error: ${error?.message || 'Unexpected error.'}`, 'error');
