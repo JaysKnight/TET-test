@@ -196,7 +196,7 @@ const extractionPrompt = 'Extract only multiple-choice questions actually presen
             { type: 'text', text: extractionPrompt },
             mediaInput
           ],
-          generation_config: { thinking_level: 'low' },
+          generation_config: { thinking_level: 'minimal', thinking_summaries: 'none' },
           store: false
         })
       });
