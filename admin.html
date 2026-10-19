@@ -79,6 +79,17 @@
   function normalizeText(value) {
     return String(value ?? '').normalize('NFKC').toLocaleLowerCase().replace(/\s+/g, ' ').trim();
   }
+  function parseJsonArrayFromModel(text) {
+    let source = String(text || '').trim();
+    source = source.replace(/^```(?:json)?\\s*/i, '').replace(/\\s*```$/, '').trim();
+    try { const direct = JSON.parse(source); if (Array.isArray(direct)) return direct; } catch (_) {}
+    const first = source.indexOf('[');
+    const last = source.lastIndexOf(']');
+    if (first < 0 || last <= first) throw new Error('No complete JSON array found.');
+    const parsed = JSON.parse(source.slice(first, last + 1));
+    if (!Array.isArray(parsed)) throw new Error('Output is not a JSON array.');
+    return parsed;
+  }
   function validateQuestions(value, label) {
     if (!Array.isArray(value)) fail(label + ' must be a JSON array. No data was committed.');
     if (value.length === 0) fail(label + ' contains no questions. No data was committed.');
@@ -286,8 +297,8 @@
         }
         if (!outputText) fail('Gemini returned no usable text output. No data was committed.');
         let parsed;
-        try { parsed = JSON.parse(outputText); }
-        catch (_) { fail('Gemini returned invalid JSON. Try a clearer document. No data was committed.'); }
+        try { parsed = parseJsonArrayFromModel(outputText); }
+        catch (error) { fail('Gemini output was not a complete JSON array: ' + (error && error.message ? error.message : 'parse error') + '. No data was committed. Try again or use a smaller batch.'); }
         return validateQuestions(parsed, 'Gemini output');
       }
 
