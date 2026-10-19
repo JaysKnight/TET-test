@@ -68,6 +68,8 @@
   const PDF_BATCH_PAGES = 4;
   const PDF_JS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
   const GEMINI_MODEL = 'gemini-3.8-flash';
+  const GEMINI_FALLBACK_MODEL = 'gemini-3.5-flash-lite';
+  const GEMINI_MAX_RETRIES = 2;
   const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'application/pdf']);
 
   function setStatus(message, kind = 'info') {
@@ -268,18 +270,47 @@
       const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/interactions';
       const extractionPrompt = 'Extract only multiple-choice questions actually present in the supplied page(s). Do not generate, redraw, describe, or return diagrams/images; extract question wording and any labels or symbols that are part of the printed text. Preserve the original language and script. Transcribe mathematical equations, fractions, roots, powers, operators, and symbols accurately; represent maths in inline LaTeX wrapped in $ signs. Preserve all four answer options in their original order. Do not guess unreadable text or answer keys. Return a JSON array only, each item exactly shaped as {"question":"question text","options":["option A","option B","option C","option D"],"correctIndex":0}. correctIndex is zero-based (0=A, 1=B, 2=C, 3=D). No markdown fences or extra fields.';
       async function extractWithGemini(mediaItems, statusMessage) {
-        setStatus(statusMessage);
-        const response = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
-          body: JSON.stringify({
-            model: GEMINI_MODEL,
-            input: [{ type: 'text', text: extractionPrompt }, ...mediaItems],
-            generation_config: { thinking_level: 'low' },
-            store: false
-          })
-        });
-        if (!response.ok) throw await responseError(response, 'Gemini Interactions API');
+        const requestModel = async (model) => {
+          let lastError;
+          for (let attempt = 0; attempt <= GEMINI_MAX_RETRIES; attempt++) {
+            try {
+              setStatus(statusMessage + ' (' + model + ', attempt ' + (attempt + 1) + ')…');
+              const response = await fetch(geminiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
+                body: JSON.stringify({
+                  model,
+                  input: [{ type: 'text', text: extractionPrompt }, ...mediaItems],
+                  generation_config: { thinking_level: 'low' },
+                  store: false
+                })
+              });
+              if (response.ok) return response;
+              const error = await responseError(response, 'Gemini Interactions API');
+              error.status = response.status;
+              lastError = error;
+              if (![429, 500, 502, 503, 504].includes(response.status) || attempt === GEMINI_MAX_RETRIES) throw error;
+            } catch (error) {
+              lastError = error;
+              const status = Number(error && error.status);
+              const retryable = !status || [429, 500, 502, 503, 504].includes(status);
+              if (!retryable || attempt === GEMINI_MAX_RETRIES) throw error;
+            }
+            const waitMs = 700 * (attempt + 1);
+            setStatus('Gemini is busy. Retrying in ' + (waitMs / 1000).toFixed(1) + ' seconds…');
+            await new Promise(resolve => setTimeout(resolve, waitMs));
+          }
+          throw lastError || new Error('Gemini request failed.');
+        };
+        let response;
+        try {
+          response = await requestModel(GEMINI_MODEL);
+        } catch (error) {
+          const status = Number(error && error.status);
+          if (![429, 500, 502, 503, 504].includes(status)) throw error;
+          setStatus('Primary Gemini model is busy. Trying fallback model ' + GEMINI_FALLBACK_MODEL + '…');
+          response = await requestModel(GEMINI_FALLBACK_MODEL);
+        }
         const data = await response.json();
         let outputText = typeof data?.output_text === 'string' ? data.output_text.trim() : '';
         if (!outputText && Array.isArray(data?.output)) {
