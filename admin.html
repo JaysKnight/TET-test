@@ -41,7 +41,7 @@
       </select>
       <label class="block text-sm font-medium" for="file-upload">Image or PDF</label>
       <input type="file" id="file-upload" accept="image/png,image/jpeg,image/webp,application/pdf" class="w-full p-3 border rounded-xl bg-slate-50">
-      <p class="text-xs text-slate-500">Accepted: PNG, JPEG, WebP, PDF. Maximum file size: 14 MB for inline Gemini requests.</p>
+      <p class="text-xs text-slate-500">Accepted: PNG, JPEG, WebP, PDF. PDFs up to 50 MB are accepted. Small PDFs are sent directly; large PDFs are compressed into page images and processed in batches. Images are compressed only when needed.</p>
     </section>
 
     <button type="button" id="action-btn" class="w-full bg-blue-600 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all">Extract, Review &amp; Commit</button>
@@ -62,7 +62,11 @@
   const previewWrap = $('preview-wrap');
   const previewSummary = $('preview-summary');
   const previewList = $('preview-list');
-  const MAX_FILE_BYTES = 14 * 1024 * 1024;
+  const MAX_FILE_BYTES = 50 * 1024 * 1024;
+  const MAX_INLINE_PDF_BYTES = 14 * 1024 * 1024;
+  const MAX_INLINE_IMAGE_BYTES = 20 * 1024 * 1024;
+  const PDF_BATCH_PAGES = 4;
+  const PDF_JS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
   const GEMINI_MODEL = 'gemini-3.8-flash';
   const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'application/pdf']);
 
@@ -104,6 +108,78 @@
       };
       reader.readAsDataURL(file);
     });
+  }
+  function loadPdfJs() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (window.__tetPdfJsPromise) return window.__tetPdfJsPromise;
+    window.__tetPdfJsPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = PDF_JS_URL;
+      script.async = true;
+      script.onload = () => {
+        if (!window.pdfjsLib) return reject(new Error('PDF reader library did not load.'));
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        resolve(window.pdfjsLib);
+      };
+      script.onerror = () => reject(new Error('Could not load PDF reader. Check your internet connection and try again.'));
+      document.head.appendChild(script);
+    });
+    return window.__tetPdfJsPromise;
+  }
+  function canvasToJpegBase64(canvas, quality = 0.88) {
+    const url = canvas.toDataURL('image/jpeg', quality);
+    return url.slice(url.indexOf(',') + 1);
+  }
+  async function compressImage(file) {
+    if (file.size <= MAX_INLINE_IMAGE_BYTES) return { mime_type: file.type, data: await readFileAsBase64(file) };
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.src = objectUrl;
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = () => reject(new Error('Could not decode this image for compression.'));
+      });
+      const scale = Math.min(1, 2400 / Math.max(img.naturalWidth, img.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const ctx = canvas.getContext('2d', { alpha: false });
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      return { mime_type: 'image/jpeg', data: canvasToJpegBase64(canvas, 0.86) };
+    } finally { URL.revokeObjectURL(objectUrl); }
+  }
+  async function renderPdfBatches(file, onProgress) {
+    const pdfjs = await loadPdfJs();
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const pdf = await pdfjs.getDocument({ data: bytes, isEvalSupported: false }).promise;
+    const batches = [];
+    try {
+      for (let start = 1; start <= pdf.numPages; start += PDF_BATCH_PAGES) {
+        const batch = [];
+        const end = Math.min(pdf.numPages, start + PDF_BATCH_PAGES - 1);
+        for (let pageNo = start; pageNo <= end; pageNo++) {
+          const page = await pdf.getPage(pageNo);
+          const base = page.getViewport({ scale: 1 });
+          const viewport = page.getViewport({ scale: Math.min(1.8, 2000 / Math.max(base.width, base.height)) });
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.ceil(viewport.width));
+          canvas.height = Math.max(1, Math.ceil(viewport.height));
+          const ctx = canvas.getContext('2d', { alpha: false });
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          await page.render({ canvasContext: ctx, viewport, background: '#ffffff' }).promise;
+          batch.push({ pageNo, mime_type: 'image/jpeg', data: canvasToJpegBase64(canvas, 0.88) });
+          canvas.width = 1; canvas.height = 1;
+          page.cleanup();
+          if (onProgress) onProgress(pageNo, pdf.numPages);
+        }
+        batches.push(batch);
+      }
+      return { pageCount: pdf.numPages, batches };
+    } finally { await pdf.destroy(); }
   }
   function decodeGitHubContent(content) {
     const clean = String(content || '').replace(/\s/g, '');
