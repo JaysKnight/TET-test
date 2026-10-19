@@ -264,7 +264,7 @@
           body: JSON.stringify({
             model: GEMINI_MODEL,
             input: [{ type: 'text', text: extractionPrompt }, ...mediaItems],
-            generation_config: { thinking_level: 'minimal', thinking_summaries: 'none' },
+            generation_config: { thinking_level: 'low' },
             store: false
           })
         });
