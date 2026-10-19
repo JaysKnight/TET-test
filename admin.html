@@ -251,60 +251,76 @@
     btn.disabled = true;
     btn.textContent = 'Processing…';
     try {
-      setStatus('Step 1/4: Reading file…');
-      const base64Data = await readFileAsBase64(file);
-
-      setStatus('Step 2/4: Extracting MCQs with Gemini…');
-      const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/interactions';
+      setStatus('Step 1/4: Checking document…');
       const isPdf = file.type === 'application/pdf';
-      const mediaInput = isPdf
-        ? { type: 'document', mime_type: file.type, data: base64Data }
-        : { type: 'image', mime_type: file.type, data: base64Data };
-
-const extractionPrompt = 'Extract only multiple-choice questions actually present in the supplied document. For any mathematical formulas, fractions, roots, exponents, or geometric symbols (such as angles $\\angle ABC$, triangles $\\triangle ABC$, degrees $45^\\circ$, parallel $\\parallel$, perpendicular $\\perp$, congruency $\\cong$, similarity $\\sim$, line segments $\\overline{AB}$, $\\frac{2}{3}$, $x^{21}$, or squares $\\square ABCD$), you MUST convert them into inline LaTeX code wrapped in $ signs. Return a JSON array only. Each item must have this exact shape: {"question":"question text","options":["option A","option B","option C","option D"],"correctIndex":0}. correctIndex is zero-based (0=A, 1=B, 2=C, 3=D). Preserve the original language and script for standard text. Do not invent missing text or include markdown fences.';
-
-      const geminiRes = await fetch(geminiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
-        body: JSON.stringify({
-          model: GEMINI_MODEL,
-          input: [
-            { type: 'text', text: extractionPrompt },
-            mediaInput
-          ],
-          generation_config: { thinking_level: 'minimal', thinking_summaries: 'none' },
-          store: false
-        })
-      });
-      if (!geminiRes.ok) throw await responseError(geminiRes, 'Gemini Interactions API');
-      const geminiData = await geminiRes.json();
-      // Interactions API responses expose model output as output[] content blocks.
-      // Handle output_text as well when supplied by an API response variant.
-      let aiResponseText = typeof geminiData?.output_text === 'string' ? geminiData.output_text.trim() : '';
-      if (!aiResponseText && Array.isArray(geminiData?.output)) {
-        aiResponseText = geminiData.output
-          .filter(step => step?.type === 'model_output' || Array.isArray(step?.content))
-          .flatMap(step => Array.isArray(step?.content) ? step.content : [])
-          .filter(block => block?.type === 'text' && typeof block?.text === 'string')
-          .map(block => block.text)
-          .join('')
-          .trim();
+      const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/interactions';
+      const extractionPrompt = 'Extract only multiple-choice questions actually present in the supplied page(s). Do not generate, redraw, describe, or return diagrams/images; extract question wording and any labels or symbols that are part of the printed text. Preserve the original language and script. Transcribe mathematical equations, fractions, roots, powers, operators, and symbols accurately; represent maths in inline LaTeX wrapped in $ signs. Preserve all four answer options in their original order. Do not guess unreadable text or answer keys. Return a JSON array only, each item exactly shaped as {"question":"question text","options":["option A","option B","option C","option D"],"correctIndex":0}. correctIndex is zero-based (0=A, 1=B, 2=C, 3=D). No markdown fences or extra fields.';
+      async function extractWithGemini(mediaItems, statusMessage) {
+        setStatus(statusMessage);
+        const response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
+          body: JSON.stringify({
+            model: GEMINI_MODEL,
+            input: [{ type: 'text', text: extractionPrompt }, ...mediaItems],
+            generation_config: { thinking_level: 'minimal', thinking_summaries: 'none' },
+            store: false
+          })
+        });
+        if (!response.ok) throw await responseError(response, 'Gemini Interactions API');
+        const data = await response.json();
+        let outputText = typeof data?.output_text === 'string' ? data.output_text.trim() : '';
+        if (!outputText && Array.isArray(data?.output)) {
+          outputText = data.output
+            .filter(step => step?.type === 'model_output' || Array.isArray(step?.content))
+            .flatMap(step => Array.isArray(step?.content) ? step.content : [])
+            .filter(block => block?.type === 'text' && typeof block?.text === 'string')
+            .map(block => block.text).join('').trim();
+        }
+        if (!outputText && Array.isArray(data?.steps)) {
+          outputText = data.steps.filter(step => step?.type === 'model_output' && Array.isArray(step?.content))
+            .flatMap(step => step.content)
+            .filter(block => block?.type === 'text' && typeof block?.text === 'string')
+            .map(block => block.text).join('').trim();
+        }
+        if (!outputText) fail('Gemini returned no usable text output. No data was committed.');
+        let parsed;
+        try { parsed = JSON.parse(outputText); }
+        catch (_) { fail('Gemini returned invalid JSON. Try a clearer document. No data was committed.'); }
+        return validateQuestions(parsed, 'Gemini output');
       }
-      if (!aiResponseText && Array.isArray(geminiData?.steps)) {
-        aiResponseText = geminiData.steps
-          .filter(step => step?.type === 'model_output' && Array.isArray(step?.content))
-          .flatMap(step => step.content)
-          .filter(block => block?.type === 'text' && typeof block?.text === 'string')
-          .map(block => block.text)
-          .join('')
-          .trim();
+
+      let newQuestions = [];
+      if (isPdf && file.size <= MAX_INLINE_PDF_BYTES) {
+        // Small PDF: use the original file directly, avoiding image conversion.
+        const base64Data = await readFileAsBase64(file);
+        newQuestions = await extractWithGemini(
+          [{ type: 'document', mime_type: 'application/pdf', data: base64Data }],
+          'Step 2/4: Reading the original PDF directly…'
+        );
+      } else if (isPdf) {
+        // Large PDF: render to reduced-resolution JPEGs and submit only four pages per request.
+        const prepared = await renderPdfBatches(file, (pageNo, total) => {
+          setStatus('Compressing PDF pages: ' + pageNo + ' of ' + total + '…');
+        });
+        for (let batchIndex = 0; batchIndex < prepared.batches.length; batchIndex++) {
+          const pages = prepared.batches[batchIndex];
+          const mediaItems = pages.map(page => ({ type: 'image', mime_type: page.mime_type, data: page.data }));
+          const batchQuestions = await extractWithGemini(
+            mediaItems,
+            'Extracting batch ' + (batchIndex + 1) + ' of ' + prepared.batches.length +
+              ' (pages ' + pages[0].pageNo + '–' + pages[pages.length - 1].pageNo + ')…'
+          );
+          newQuestions.push(...batchQuestions);
+        }
+      } else {
+        const imageData = await compressImage(file);
+        newQuestions = await extractWithGemini(
+          [{ type: 'image', mime_type: imageData.mime_type, data: imageData.data }],
+          'Step 2/4: Extracting MCQs from image…'
+        );
       }
-      if (!aiResponseText) fail('Gemini returned no usable text output. Check the API response and try again. No data was committed.');
-      let parsed;
-      try { parsed = JSON.parse(aiResponseText); }
-      catch (_) { fail('Gemini returned invalid JSON. Try again or use a clearer document. No data was committed.'); }
-      const newQuestions = validateQuestions(parsed, 'Gemini output');
-      renderPreview(newQuestions);
+
 
       const previewText = newQuestions.slice(0, 5).map((q, i) => `${i + 1}. ${q.question}`).join('\n');
       const confirmText = `Gemini extracted ${newQuestions.length} valid question(s) for ${targetFile}.\n\nPreview:\n${previewText}${newQuestions.length > 5 ? '\n…' : ''}\n\nHave you checked the answer keys and want to continue to GitHub?`;
