@@ -99,9 +99,9 @@
   function normalizeExtractedText(value) {
     return String(value || '')
       // Gujarati dependent vowel signs and combining marks belong to the previous character.
-      .replace(/\\s+([\\u0A81-\\u0A83\\u0ABC\\u0ABE-\\u0ACD\\u0AE2-\\u0AE3])/g, '$1')
-      .replace(/[\\u200B-\\u200D\\uFEFF]/g, '')
-      .replace(/[ \\t]+/g, ' ')
+      .replace(/\s+([\u0A81-\u0A83\u0ABC\u0ABE-\u0ACD\u0AE2-\u0AE3])/g, '$1')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')
+      .replace(/[ \t]+/g, ' ')
       .trim();
   }
   function validateQuestions(value, label) {
