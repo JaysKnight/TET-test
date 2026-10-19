@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>150-Question Mixed-Subject MCQ Test</title>
     <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-  };
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            },
+            startup: { typeset: false }
+        };
+    </script>
+    <script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
         (function () {
             try {
@@ -356,7 +364,6 @@
             { name: 'Balvikas', class: 'badge-Balvikas' }
         ];
         
-        const CORE_SUBJECTS =SUBJECTS.filter(subject => !['Gujarati', 'Balvikas','Maths', 'GK','English'].includes(subject.name));
         const QUESTIONS_TO_SELECT_PER_SUBJECT = 30; // Pick 30 per subject
         const BALVIKAS_DATA_URL = './Balvikas.json';
         const GUJARATI_DATA_URL = './Gujarati.json';
@@ -365,8 +372,7 @@
         const ENGLISH_DATA_URL = './English.json';
         let TOTAL_QUESTIONS = 0;
         
-        // Previous subject banks retained as source material; only ACTIVE_QUESTION_DATA is used.
-        // Each entry is [question, options, correctOptionIndex].
+        // The live question banks are loaded from the subject JSON files at startup.
        
         let questionBank = [];
         let testQuestions = []; // Final shuffled exam questions
@@ -499,23 +505,6 @@
             return chosen;
         }
 
-        // 3. Build the four fixed, answer-keyed subject banks.
-        function generateDatabase() {
-            CORE_SUBJECTS.forEach(subjectInfo => {
-                ACTIVE_QUESTION_DATA[subjectInfo.name].forEach(([text, options, correctIndex], index) => {
-                    questionBank.push({
-                        id: `${subjectInfo.name.toLowerCase().replaceAll(' ', '-')}-${index + 1}`,
-                        subject: subjectInfo.name,
-                        subjectClass: subjectInfo.class,
-                        text,
-                        options,
-                        correctIndex
-                    });
-                });
-            });
-        }
-
-
         // 4. Randomly select 30 from each subject bank, then shuffle all 150 together.
         function generateTest() {
             const selectedQuestions = [];
@@ -552,11 +541,10 @@
             testQuestions.forEach((q, index) => {
                 const qNumber = index + 1;
                 const questionText = escapeHTML(q.text);
-                    const imageBlock = q.image 
-      ? `<div class="my-4 flex justify-center w-full">
-           <img src="${escapeHTML(q.image)}" alt="Question Diagram" loading="lazy" class="max-h-64 max-w-full rounded-lg border border-slate-200 bg-white p-1 shadow-sm">
-         </div>` 
-      : '';
+                    const safeImagePath = safeQuestionImagePath(q.image);
+                const imageBlock = safeImagePath
+                    ? '<div class="question-diagram-wrap my-4 flex justify-center w-full"><img src="' + escapeHTML(safeImagePath) + '" alt="' + escapeHTML(q.subject + ' question diagram') + '" loading="lazy" decoding="async" class="question-diagram-image max-h-96 max-w-full rounded-lg border border-slate-200 bg-white p-1 shadow-sm"></div>'
+                    : '';
                 let optionsHTML = '';
                 q.options.forEach((optText, optIndex) => {
                     const letter = String.fromCharCode(65 + optIndex); // A, B, C, D
@@ -607,9 +595,19 @@
             });
 
             elTestContainer.innerHTML = htmlContent;
+            elTestContainer.querySelectorAll('img.question-diagram-image').forEach(img => {
+                img.addEventListener('error', () => {
+                    const wrapper = img.closest('.question-diagram-wrap');
+                    if (!wrapper) return;
+                    const warning = document.createElement('p');
+                    warning.className = 'text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg p-3';
+                    warning.textContent = 'Question diagram could not be loaded. Check the saved image path.';
+                    wrapper.replaceChildren(warning);
+                }, { once: true });
+            });
             updateBookmarkCount();
             applyBookmarkFilter();
-            if (window.MathJax) { MathJax.typesetPromise(); }
+            typesetTestMath(elTestContainer);
         }
 
         function toggleBookmark(index) {
@@ -688,6 +686,26 @@
                 "'": '&#39;'
             })[character]);
         }
+
+        function safeQuestionImagePath(value) {
+            if (typeof value !== 'string') return null;
+            const path = value.trim().replace(/\\/g, '/');
+            if (!path || path.startsWith('/') || /^[a-z][a-z0-9+.-]*:/i.test(path) || path.split('/').some(part => !part || part === '.' || part === '..')) return null;
+            return path;
+        }
+
+        function typesetTestMath(container) {
+            const mathJax = window.MathJax;
+            if (!mathJax || typeof mathJax.typesetPromise !== 'function') {
+                console.error('MathJax did not finish loading; mathematical notation remains in the original text form.');
+                return;
+            }
+            if (typeof mathJax.typesetClear === 'function') mathJax.typesetClear([container]);
+            mathJax.typesetPromise([container]).catch(error => {
+                console.error('MathJax could not typeset the test content:', error);
+            });
+        }
+
 
         // 6. Handle User Selection
         function handleSelection(questionIndex, optionIndex) {
@@ -1018,8 +1036,6 @@
 
         // 10. Bootstrapping the app
        window.onload = async function () {
-    generateDatabase();
-
     const sources = [
         {
             subject: 'Gujarati',
@@ -1079,7 +1095,7 @@
                     text: item.question,
                     options: item.options,
                     correctIndex: item.correctIndex,
-                    image: typeof item.image === 'string' ? item.image : null
+                    image: safeQuestionImagePath(item.image)
                 });
             });
         }
