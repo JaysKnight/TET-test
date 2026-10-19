@@ -151,15 +151,15 @@
       return { mime_type: 'image/jpeg', data: canvasToJpegBase64(canvas, 0.86) };
     } finally { URL.revokeObjectURL(objectUrl); }
   }
-  async function renderPdfBatches(file, onProgress) {
+  async function processPdfInBatches(file, onProgress, onBatch) {
     const pdfjs = await loadPdfJs();
     const bytes = new Uint8Array(await file.arrayBuffer());
     const pdf = await pdfjs.getDocument({ data: bytes, isEvalSupported: false }).promise;
-    const batches = [];
     try {
-      for (let start = 1; start <= pdf.numPages; start += PDF_BATCH_PAGES) {
+      const totalPages = pdf.numPages;
+      for (let start = 1; start <= totalPages; start += PDF_BATCH_PAGES) {
         const batch = [];
-        const end = Math.min(pdf.numPages, start + PDF_BATCH_PAGES - 1);
+        const end = Math.min(totalPages, start + PDF_BATCH_PAGES - 1);
         for (let pageNo = start; pageNo <= end; pageNo++) {
           const page = await pdf.getPage(pageNo);
           const base = page.getViewport({ scale: 1 });
@@ -172,13 +172,14 @@
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           await page.render({ canvasContext: ctx, viewport, background: '#ffffff' }).promise;
           batch.push({ pageNo, mime_type: 'image/jpeg', data: canvasToJpegBase64(canvas, 0.88) });
-          canvas.width = 1; canvas.height = 1;
+          canvas.width = 1;
+          canvas.height = 1;
           page.cleanup();
-          if (onProgress) onProgress(pageNo, pdf.numPages);
+          if (onProgress) onProgress(pageNo, totalPages);
         }
-        batches.push(batch);
+        await onBatch(batch, Math.floor((start - 1) / PDF_BATCH_PAGES) + 1, Math.ceil(totalPages / PDF_BATCH_PAGES));
+        batch.length = 0;
       }
-      return { pageCount: pdf.numPages, batches };
     } finally { await pdf.destroy(); }
   }
   function decodeGitHubContent(content) {
@@ -245,7 +246,7 @@
       setStatus('Unsupported file type. Select a PNG, JPEG, WebP, or PDF file.', 'error'); return;
     }
     if (file.size === 0 || file.size > MAX_FILE_BYTES) {
-      setStatus('The file must be non-empty and no larger than 14 MB for inline Gemini requests.', 'error'); return;
+      setStatus('The file must be non-empty and no larger than 50 MB.', 'error'); return;
     }
 
     btn.disabled = true;
@@ -300,19 +301,17 @@
         );
       } else if (isPdf) {
         // Large PDF: render to reduced-resolution JPEGs and submit only four pages per request.
-        const prepared = await renderPdfBatches(file, (pageNo, total) => {
+        await processPdfInBatches(file, (pageNo, total) => {
           setStatus('Compressing PDF pages: ' + pageNo + ' of ' + total + '…');
-        });
-        for (let batchIndex = 0; batchIndex < prepared.batches.length; batchIndex++) {
-          const pages = prepared.batches[batchIndex];
+        }, async (pages, batchIndex, totalBatches) => {
           const mediaItems = pages.map(page => ({ type: 'image', mime_type: page.mime_type, data: page.data }));
           const batchQuestions = await extractWithGemini(
             mediaItems,
-            'Extracting batch ' + (batchIndex + 1) + ' of ' + prepared.batches.length +
+            'Extracting batch ' + batchIndex + ' of ' + totalBatches +
               ' (pages ' + pages[0].pageNo + '–' + pages[pages.length - 1].pageNo + ')…'
           );
           newQuestions.push(...batchQuestions);
-        }
+        });
       } else {
         const imageData = await compressImage(file);
         newQuestions = await extractWithGemini(
