@@ -47,9 +47,13 @@
     <button type="button" id="action-btn" class="w-full bg-blue-600 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all">Extract, Review &amp; Commit</button>
     <div id="status" role="status" aria-live="polite" class="mt-4 text-sm font-bold text-center text-slate-600 whitespace-pre-wrap"></div>
     <section id="preview-wrap" class="hidden mt-6 border border-slate-200 rounded-xl p-4">
-      <h2 class="font-bold mb-2">Extraction preview</h2>
+      <h2 class="font-bold text-lg mb-2">Preview and edit all MCQs</h2>
       <p id="preview-summary" class="text-sm mb-3"></p>
-      <ol id="preview-list" class="list-decimal pl-5 space-y-3 text-sm"></ol>
+      <div id="preview-list" class="space-y-4 max-h-[65vh] overflow-y-auto pr-1"></div>
+      <div class="sticky bottom-0 bg-white pt-3 mt-4 border-t flex flex-col sm:flex-row gap-3">
+        <button type="button" id="review-cancel" class="border border-slate-300 rounded-lg px-4 py-3 font-semibold">Cancel — don't add to JSON</button>
+        <button type="button" id="review-save" class="bg-green-700 hover:bg-green-800 text-white rounded-lg px-4 py-3 font-bold">Approve all edits and continue</button>
+      </div>
     </section>
   </main>
 
@@ -218,26 +222,112 @@
     } catch (_) { /* response may not be JSON */ }
     return new Error(`${service} request failed (${response.status}${response.statusText ? ' ' + response.statusText : ''}).${detail ? '\n' + detail : ''}`);
   }
-  function renderPreview(questions) {
+  function reviewAllQuestions(questions) {
     previewList.replaceChildren();
-    questions.slice(0, 10).forEach((q) => {
-      const li = document.createElement('li');
-      const title = document.createElement('p');
-      title.className = 'font-semibold';
-      title.textContent = q.question;
-      li.appendChild(title);
-      const options = document.createElement('ul');
-      options.className = 'list-disc pl-5 mt-1 text-slate-600';
-      q.options.forEach((option, i) => {
-        const item = document.createElement('li');
-        item.textContent = `${String.fromCharCode(65 + i)}. ${option}${i === q.correctIndex ? ' (answer key)' : ''}`;
-        options.appendChild(item);
+    questions.forEach((q, index) => {
+      const card = document.createElement('article');
+      card.className = 'border border-slate-200 rounded-xl p-3 sm:p-4 bg-slate-50';
+      const heading = document.createElement('h3');
+      heading.className = 'font-bold text-base mb-3';
+      heading.textContent = 'MCQ ' + (index + 1) + ' of ' + questions.length;
+      card.appendChild(heading);
+
+      const questionLabel = document.createElement('label');
+      questionLabel.className = 'block text-sm font-semibold mb-2';
+      questionLabel.textContent = 'Question text';
+      const questionInput = document.createElement('textarea');
+      questionInput.className = 'block w-full border border-slate-300 rounded-lg p-2 mt-1 bg-white';
+      questionInput.rows = 3;
+      questionInput.value = q.question;
+      questionInput.dataset.field = 'question';
+      questionInput.dataset.index = String(index);
+      questionLabel.appendChild(questionInput);
+      card.appendChild(questionLabel);
+
+      const optionTitle = document.createElement('p');
+      optionTitle.className = 'font-semibold text-sm mt-3 mb-2';
+      optionTitle.textContent = 'Options';
+      card.appendChild(optionTitle);
+      q.options.forEach((value, optionIndex) => {
+        const label = document.createElement('label');
+        label.className = 'block text-sm mb-3';
+        label.textContent = 'Option ' + String.fromCharCode(65 + optionIndex);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'block w-full border border-slate-300 rounded-lg p-2 mt-1 bg-white';
+        input.value = value;
+        input.dataset.field = 'option';
+        input.dataset.index = String(index);
+        input.dataset.option = String(optionIndex);
+        label.appendChild(input);
+        card.appendChild(label);
       });
-      li.appendChild(options);
-      previewList.appendChild(li);
+
+      const answerLabel = document.createElement('label');
+      answerLabel.className = 'block text-sm font-semibold mt-3';
+      answerLabel.textContent = 'Correct answer key';
+      const select = document.createElement('select');
+      select.className = 'block w-full border border-slate-300 rounded-lg p-2 mt-1 bg-white';
+      select.dataset.field = 'correctIndex';
+      select.dataset.index = String(index);
+      for (let optionIndex = 0; optionIndex < 4; optionIndex++) {
+        const option = document.createElement('option');
+        option.value = String(optionIndex);
+        option.textContent = String.fromCharCode(65 + optionIndex) + ' — ' + q.options[optionIndex];
+        option.selected = optionIndex === q.correctIndex;
+        select.appendChild(option);
+      }
+      select.addEventListener('focus', () => {
+        for (let optionIndex = 0; optionIndex < 4; optionIndex++) {
+          select.options[optionIndex].textContent = String.fromCharCode(65 + optionIndex) + ' — ' +
+            (card.querySelector('[data-field="option"][data-option="' + optionIndex + '"]')?.value || '');
+        }
+      });
+      answerLabel.appendChild(select);
+      card.appendChild(answerLabel);
+      previewList.appendChild(card);
     });
-    previewSummary.textContent = `Found ${questions.length} valid question(s). Preview shows up to 10. Verify the wording and answer keys before committing.`;
+
+    previewSummary.textContent = 'All ' + questions.length + ' extracted MCQs are shown below. Edit the question, each option, and the answer key. Nothing is added to the JSON file until you approve.';
     previewWrap.classList.remove('hidden');
+    previewWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    return new Promise(resolve => {
+      const saveButton = $('review-save');
+      const cancelButton = $('review-cancel');
+      const cleanup = () => {
+        saveButton.removeEventListener('click', onSave);
+        cancelButton.removeEventListener('click', onCancel);
+      };
+      const onCancel = () => {
+        cleanup();
+        previewWrap.classList.add('hidden');
+        resolve(null);
+      };
+      const onSave = () => {
+        const edited = questions.map(q => ({ ...q, options: [...q.options] }));
+        for (const field of previewList.querySelectorAll('[data-field]')) {
+          const index = Number(field.dataset.index);
+          if (!Number.isInteger(index) || index < 0 || index >= edited.length) continue;
+          if (field.dataset.field === 'question') edited[index].question = field.value.trim();
+          if (field.dataset.field === 'option') edited[index].options[Number(field.dataset.option)] = field.value.trim();
+          if (field.dataset.field === 'correctIndex') edited[index].correctIndex = Number(field.value);
+        }
+        try {
+          const validated = validateQuestions(edited, 'Reviewed MCQs');
+          cleanup();
+          previewWrap.classList.add('hidden');
+          resolve(validated);
+        } catch (error) {
+          setStatus(error.message || 'Please correct empty fields and answer keys.', 'error');
+          previewSummary.textContent = 'Cannot continue yet. Make sure every question and all four options are non-empty and each answer key is valid.';
+          const invalid = Array.from(previewList.querySelectorAll('[data-field="question"], [data-field="option"]')).find(field => !field.value.trim());
+          if (invalid) invalid.focus();
+        }
+      };
+      saveButton.addEventListener('click', onSave);
+      cancelButton.addEventListener('click', onCancel);
+    });
   }
   async function processAndCommit() {
     if (btn.disabled) return;
@@ -363,11 +453,12 @@
       }
 
 
-      const previewText = newQuestions.slice(0, 5).map((q, i) => `${i + 1}. ${q.question}`).join('\n');
-      const confirmText = `Gemini extracted ${newQuestions.length} valid question(s) for ${targetFile}.\n\nPreview:\n${previewText}${newQuestions.length > 5 ? '\n…' : ''}\n\nHave you checked the answer keys and want to continue to GitHub?`;
-      if (!window.confirm(confirmText)) {
-        setStatus('Commit cancelled. Nothing was changed on GitHub.'); return;
+      const reviewedQuestions = await reviewAllQuestions(newQuestions);
+      if (!reviewedQuestions) {
+        setStatus('Review cancelled. Nothing was added to the JSON file.'); return;
       }
+      newQuestions = reviewedQuestions;
+      setStatus('Review approved. Checking duplicates and preparing the JSON update…');
 
       setStatus('Step 3/4: Fetching and validating existing GitHub JSON…');
       const githubFileUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodeURIComponent(targetFile)}`;
